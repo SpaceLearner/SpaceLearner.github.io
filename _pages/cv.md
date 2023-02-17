@@ -1,6 +1,6 @@
 ---
 layout: archive
-title: "CV"
+title: "About Me"
 permalink: /
 author_profile: true
 redirect_from:
@@ -11,21 +11,30 @@ redirect_from:
 
 Education
 ======
-* B.S. in GitHub, GitHub University, 2012
-* M.S. in Jekyll, GitHub University, 2014
-* Ph.D in Version Control Theory, GitHub University, 2018 (expected)
+* Ph.D Student in Peking University, since 2019
+* B.S. in Beijing Institute of Technology, 2015-2019
 
 Work experience
 ======
-* Summer 2015: Research Assistant
-  * Github University
-  * Duties included: Tagging issues
-  * Supervisor: Professor Git
+* Since 2022.09: Research Intern
+  * Microsoft Research Asia
+  * Duties included: developing graph algorithms for heterogeneous graphs and recommender systems.
+  * Supervisor: Lun Du
 
-* Fall 2015: Research Assistant
-  * Github University
+* 2022.03-2022.09: Research Assistant
+  * The Hong Kong University of Science and Technology
+  * Duties included: Developing recommender system algorithms
+  * Supervisor: Professor Sunghun Kim
+
+* 2021.09-2022.03: Algorithm Engineer Intern
+  * Meituan
+  * Duties included: Developing re-ranking models for multi-stage advertisement system.
+  * Leader: Zhiwei Liu
+
+* 2020.09-2021.09: Research Intern
+  * Microsoft Research Asia
   * Duties included: Merging pull requests
-  * Supervisor: Professor Hub
+  * Supervisor: Yaming Yang
   
 Skills
 ======
