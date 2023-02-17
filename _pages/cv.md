@@ -36,15 +36,6 @@ Work experience
   * Duties included: Merging pull requests
   * Supervisor: Yaming Yang
   
-Skills
-======
-* Skill 1
-* Skill 2
-  * Sub-skill 2.1
-  * Sub-skill 2.2
-  * Sub-skill 2.3
-* Skill 3
-
 Publications
 ======
   <ul>{% for post in site.publications %}
@@ -65,4 +56,4 @@ Teaching
   
 Service and leadership
 ======
-* Currently signed in to 43 different slack teams
+* Reviewer for: KDD,WWW,TNNLS,CIKM,ICDM,VLDB
