@@ -9,7 +9,7 @@ redirect_from:
 
 {% include base_path %}
 
-I am currently a final year PhD Candidate at Peking University~(PKU) since 2019. Before joining PKU, I received my B.S. in Computer Science in Beijing Institute of Technology~(BIT) in 2019. 
+I am currently a final year PhD Candidate at Peking University (PKU) since 2019. Before joining PKU, I received my B.S. in Computer Science in Beijing Institute of Technology (BIT) in 2019. 
 
 My research interests focus on Multi-modal LLM, especially on its social intelligence. 
 
