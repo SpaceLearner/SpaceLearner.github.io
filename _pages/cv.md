@@ -46,6 +46,8 @@ Publications
   * On Manipulating Signals of User-Item Graph: A Jacobi Polynomial-based Graph Collaborative Filtering, Jiayan Guo, et al. SIGKDD 2023
   * Homophily-oriented Heterogeneous Graph Rewiring, Jiayan Guo, et al. TheWebConf 2023
   * Efficiently leveraging multi-level user intent for session-based recommendation via atten-mixer network, Peiyan Zhang, Jiayan Guo, et al. WSDM 2023
+### 2022
+  * 
   <ul>{% for post in site.publications %}
     {% include archive-single-cv.html %}
   {% endfor %}</ul>
