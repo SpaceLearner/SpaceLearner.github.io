@@ -42,6 +42,8 @@ Work experience
   
 Publications
 ======
+## 2023
+  * On Manipulating Signals of User-Item Graph: A Jacobi Polynomial-based Graph Collaborative Filtering, Jiayan Guo, et al. SIGKDD 2023
   <ul>{% for post in site.publications %}
     {% include archive-single-cv.html %}
   {% endfor %}</ul>
