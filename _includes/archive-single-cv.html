@@ -39,6 +39,11 @@
           {% if post.pages %}, pp. {{ post.pages }}{% endif %}
         </p>
       {% endif %}
+      {% if post.award %}
+        <p class="page__meta" style="color: #e67e22; font-weight: bold; margin-bottom: 0.5em;">
+          {{ post.award }}
+        </p>
+      {% endif %}
       <p class="page__meta">
         {% if post.paperurl %}
           <a href="{{ post.paperurl }}" target="_blank">[Paper]</a>&nbsp;

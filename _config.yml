@@ -10,7 +10,7 @@ locale                   : "en-US"
 title                    : "Homepage"
 title_separator          : "-"
 name                     : &name "Jiayan Guo"
-description              : &description "PhD Candidate at Peking University"
+description              : &description "Research Engineer at Alibaba DAMO Academy"
 url                      : https://spacelearner.github.io # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
 repository               : "SpaceLearner/SpaceLearner.github.io"
@@ -80,14 +80,14 @@ analytics:
 
 # Site Author
 author:
-  name             : "Jiayan"
+  name             : "Jiayan Guo"
   avatar           : "profile.png"
-  bio              : "PhD Student at Peking University"
+  bio              : "Research Engineer, Alibaba DAMO Academy. Exploring Multi-modal AI Agent, Embodied AI, and Reinforcement Learning."
   location         : "Beijing"
-  employer         :
-  pubmed           : "https://www.ncbi.nlm.nih.gov/pubmed/?term=john+snow"
-  googlescholar    : "http://yourfullgooglescholarurl.com"
-  email            :
+  employer         : "Alibaba DAMO Academy"
+  pubmed           : # "https://www.ncbi.nlm.nih.gov/pubmed/?term=john+snow" # Remove or update if not applicable
+  googlescholar    : "https://scholar.google.com/citations?user=M-AFBG4AAAAJ&hl=en"
+  email            : "guojiayan@pku.edu.cn"
   researchgate     :  # example: "https://www.researchgate.net/profile/yourprofile"
   uri              :
   bitbucket        :
@@ -97,6 +97,7 @@ author:
   facebook         :
   foursquare       :
   github           : "SpaceLearner"
+  dblp             : "https://dblp.org/pid/309/6736.html"
   google_plus      :
   keybase          :
   instagram        :
