@@ -42,15 +42,15 @@ Work experience
   
 Publications
 ======
-### 2023
-  * On Manipulating Signals of User-Item Graph: A Jacobi Polynomial-based Graph Collaborative Filtering, Jiayan Guo, et al. SIGKDD 2023
-  * Homophily-oriented Heterogeneous Graph Rewiring, Jiayan Guo, et al. TheWebConf 2023
-  * Efficiently leveraging multi-level user intent for session-based recommendation via atten-mixer network, Peiyan Zhang, Jiayan Guo, et al. WSDM 2023
-### 2022
-  * 
-  <ul>{% for post in site.publications %}
-    {% include archive-single-cv.html %}
-  {% endfor %}</ul>
+{% assign publications_by_year = site.publications | group_by_exp:"post", "post.date | date: '%Y'" | sort: "name" | reverse %}
+{% for year_group in publications_by_year %}
+  <h3>{{ year_group.name }}</h3>
+  <ul>
+    {% for post in year_group.items %}
+      {% include archive-single-cv.html %}
+    {% endfor %}
+  </ul>
+{% endfor %}
   
 Talks
 ======
