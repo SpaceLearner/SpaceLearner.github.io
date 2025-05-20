@@ -42,15 +42,12 @@ Work experience
   
 Publications
 ======
-{% assign publications_by_year = site.publications | group_by_exp:"post", "post.date | date: '%Y'" | sort: "name" | reverse %}
-{% for year_group in publications_by_year %}
-  <h3>{{ year_group.name }}</h3>
-  <ul>
-    {% for post in year_group.items %}
-      {% include archive-single-cv.html %}
-    {% endfor %}
-  </ul>
-{% endfor %}
+<ul>
+  {% assign sorted_publications = site.publications | sort: "date" | reverse %}
+  {% for post in sorted_publications %}
+    {% include archive-single-cv.html %}
+  {% endfor %}
+</ul>
   
 Talks
 ======
