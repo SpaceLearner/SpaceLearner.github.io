@@ -200,3 +200,12 @@ Still sticking with science and Isaac Newton's E = MC<sup>2</sup>, which should 
 ### Variable Tag
 
 This allows you to denote <var>variables</var>.
+
+Publications
+=========
+<ul>
+  {% assign sorted_publications = site.publications | sort: "date" | reverse %}
+  {% for post in sorted_publications %}
+    {% include archive-single-cv.html %}
+  {% endfor %}
+</ul>
