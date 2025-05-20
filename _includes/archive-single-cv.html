@@ -16,11 +16,7 @@
   <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
     <li>
       <h3 class="archive__item-title" itemprop="headline">
-        {% if post.permalink %}
-          <a href="{{ post.permalink | relative_url }}">{{ title }}</a>
-        {% else %}
-          {{ title }}
-        {% endif %}
+        {{ title }}
       </h3>
       {% if post.authors %}
         <p class="page__meta" style="margin-bottom: 0.5em;">
@@ -50,17 +46,6 @@
         {% if post.codeurl %}
           <a href="{{ post.codeurl }}" target="_blank">[Code]</a>&nbsp;
         {% endif %}
-        {% if post.projecturl %}
-          <a href="{{ post.projecturl }}" target="_blank">[Project Page]</a>&nbsp;
-        {% endif %}
-        {% comment %} 您可以添加更多自定义链接字段，例如：
-        {% if post.slidesurl %}
-          <a href="{{ post.slidesurl }}" target="_blank">[Slides]</a>&nbsp;
-        {% endif %}
-        {% if post.videourl %}
-          <a href="{{ post.videourl }}" target="_blank">[Video]</a>&nbsp;
-        {% endif %}
-        {% endcomment %}
       </p>
     </li>
   </article>
