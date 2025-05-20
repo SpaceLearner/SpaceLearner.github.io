@@ -54,7 +54,7 @@ Honors & Awards
 * KDD Cup 2023 Task 2, Top 3%
 * RecSys Challenge 2022, Top 5%
 
-Publications
+Selected Publications
 ======
 <p><small><sup>*</sup>Equal contribution. <sup>✉</sup>Corresponding author.</small></p>
 <ul>
@@ -63,7 +63,8 @@ Publications
     {% include archive-single-cv.html %}
   {% endfor %}
 </ul>
-  
+
+<!--   
 Talks
 ======
   <ul>{% for post in site.talks %}
@@ -74,7 +75,7 @@ Teaching
 ======
   <ul>{% for post in site.teaching %}
     {% include archive-single-cv.html %}
-  {% endfor %}</ul>
+  {% endfor %}</ul> -->
   
 Academic Service
 ======
