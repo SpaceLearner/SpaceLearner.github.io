@@ -15,31 +15,45 @@ My research interests include Multi-modal AI Agent, Embodied AI, and Reinforceme
 
 Education
 ======
-* Ph.D. in Peking University, 2019-2024
-* B.S. in Beijing Institute of Technology, 2015-2019
+* **Ph.D. in Intelligence Science and Technology, Peking University**, 2019.09 - 2024.07
+  * Research: Large Language Models, Multi-modal LLMs, Graph Learning & Applications, Generative Models
+  * Honors: Doctoral National Scholarship
+* **B.S. in Computer Science and Technology, Beijing Institute of Technology**, 2015.09 - 2019.07
+  * Honors: Outstanding Graduates of Beijing, Outstanding Student Pacemaker of BIT
 
-Work experience
+Work Experience
 ======
-* Since 2022.09: Research Intern
-  * Microsoft Research Asia
-  * Duties included: developing graph algorithms for heterogeneous graphs and recommender systems.
+* **Research Engineer, Alibaba DAMO Academy**, 2024.07 - Present
+  * Focus: Multi-modal AI Agent, Embodied AI, LLM Agents (e.g., AIGB, ZeroSearch).
+* **Algorithm Engineer Intern, Alibaba Group (Alimama)**, 2023.07 - 2024.04
+  * Developed generative auto-bidding algorithms (AIGB project).
+* **Research Intern, Microsoft Research Asia (DKI Group)**, 2022.06 - 2023.06
   * Supervisor: Lun Du
-
-* 2022.03-2022.09: Research Assistant
-  * The Hong Kong University of Science and Technology
-  * Duties included: Developing recommender system algorithms
-  * Supervisor: Professor Sunghun Kim
-
-* 2021.09-2022.03: Algorithm Engineer Intern
-  * Meituan
-  * Duties included: Developing re-ranking models for multi-stage advertisement system.
+  * Developed graph algorithms for heterogeneous graphs and recommender systems.
+* **Visiting Student, The Hong Kong University of Science and Technology (HKUST)**, 2022.03 - 2022.06
+  * Supervisor: Prof. Sunghun Kim
+  * Worked on recommender system algorithms.
+* **Algorithm Engineer Intern, Meituan**, 2021.09 - 2022.03
   * Leader: Zhiwei Liu
-
-* 2020.09-2021.09: Research Intern
-  * Microsoft Research Asia
-  * Duties included: Merging pull requests
+  * Developed re-ranking models for multi-stage advertisement system.
+* **Research Intern, Microsoft Research Asia (SIG Group)**, 2020.09 - 2021.09
   * Supervisor: Yaming Yang
-  
+  * Contributed to graph-based projects and pull request integration.
+
+Honors & Awards
+======
+* National Scholarship (Doctoral), Peking University, 2023
+* Pacemaker to Merit Student, Peking University, 2023
+* Microsoft Research Asia 'Stars of Tomorrow' Internship Program Excellence Award (Top 10%), 2023
+* Global Vision - Peking University Graduate Student Academic Exchange Fund Sponsorship, 2023
+* First Prize, Peking University Challenge Cup May 4th Academic Competition, 2023
+* Outstanding Communist Party Member, School of Intelligence Science, Peking University, 2022
+* Merit Student, Peking University, 2020
+* Outstanding Graduates of Beijing, 2019
+* Outstanding Graduates of Beijing Institute of Technology, 2019
+* KDD Cup 2023 Task 2, Top 3%
+* RecSys Challenge 2022, Top 5%
+
 Publications
 ======
 <p><small><sup>*</sup>Equal contribution. <sup>✉</sup>Corresponding author.</small></p>
