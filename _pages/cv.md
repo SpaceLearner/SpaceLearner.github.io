@@ -9,13 +9,13 @@ redirect_from:
 
 {% include base_path %}
 
-I am currently a final year PhD Candidate at Peking University (PKU) since 2019. Before joining PKU, I received my B.S. in Computer Science in Beijing Institute of Technology (BIT) in 2019. 
+I am currently a Research Engineer at Alibaba DAMO Academy. I received my Ph.D. from Peking University (PKU) in 2024 and my B.S. in Computer Science from Beijing Institute of Technology (BIT) in 2019.
 
-My research interests focus on Multi-modal LLM, especially on its social intelligence. 
+My research interests include Multi-modal AI Agent, Embodied AI, and Reinforcement Learning.
 
 Education
 ======
-* Ph.D Student in Peking University, since 2019
+* Ph.D. in Peking University, 2019-2024
 * B.S. in Beijing Institute of Technology, 2015-2019
 
 Work experience
