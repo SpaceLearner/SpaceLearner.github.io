@@ -42,6 +42,7 @@ Work experience
   
 Publications
 ======
+<p><small><sup>*</sup>Equal contribution. <sup>✉</sup>Corresponding author.</small></p>
 <ul>
   {% assign sorted_publications = site.publications | sort: "date" | reverse %}
   {% for post in sorted_publications %}
