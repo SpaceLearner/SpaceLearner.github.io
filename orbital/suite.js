@@ -16,6 +16,8 @@ import { createVistaTransit } from './vista-transit.js';
 import { createOrbitalView } from './orbital-view.js';
 import { createVistaPicker } from './vista-picker.js';
 import { createVistaLighting } from './vista-lighting.js';
+import { createObjectFocus } from './object-focus.js';
+import { createResearchNotebook } from './research-notebook.js';
 
 const canvas = document.getElementById('space');
 const status = document.getElementById('status');
@@ -130,8 +132,8 @@ function createSuite() {
   const cushion2=round(.7,.56,.23,4.6,1.02,1.27,mat('#687e81',.95),.1);cushion2.rotation.z=-.14;
   cylinder(.8,.8,.07,2.6,.64,3.4,stone);cylinder(.09,.15,.6,2.6,.3,3.4,bronze);cylinder(.51,.57,.07,2.6,.07,3.4,dark);
   const notes=new THREE.Group();room.add(notes);
-  const tablet=round(.68,.045,.48,2.6,.73,3.55,dark,.02,notes);tablet.rotation.y=-.18;
-  const notePanel=panel(.61,.41,2.6,.758,3.55,screenTexture('Field notes',publicationCount+' PUBLICATIONS',[publicationYears,'EXPLORE THE ARCHIVE']),notes);notePanel.rotation.x=-Math.PI/2;notePanel.rotation.z=.18;
+  const notebook=createResearchNotebook(THREE,screenTexture('Field notes',publicationCount+' PUBLICATIONS',[publicationYears,'RESEARCH / PAPERS']));
+  notebook.group.position.set(2.6,.70,3.55);notebook.group.rotation.y=-.18;notes.add(notebook.group);
   notes.scale.setScalar(.82);notes.position.set(-4.02,.896,-4.03);notes.rotation.y=.03;
   register(notes,'papers',[-1.8,1.72,-1.2]);
   cylinder(.08,.07,.2,2.13,.8,3.18,paper);cylinder(.071,.071,.005,2.13,.904,3.18,mat('#34251d'));
@@ -264,10 +266,10 @@ function createSuite() {
   const baseYaw=Math.atan2(-forward.x,-forward.z),basePitch=Math.asin(forward.y);
   const yawLimit=THREE.MathUtils.degToRad(30),pitchLimit=THREE.MathUtils.degToRad(15);
   const dragThreshold=6,sensitivity=.0025;
-  let yaw=0,pitch=0,gesture=null,suppressClick=false,entry=null;
+  let yaw=0,pitch=0,gesture=null,suppressClick=false,entry=null,objectFocus=null;
   const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
-  function updateLook(){if(entry?.active)return;yaw=THREE.MathUtils.clamp(yaw,-yawLimit,yawLimit);pitch=THREE.MathUtils.clamp(pitch,-pitchLimit,pitchLimit);camera.position.copy(cameraPosition);camera.rotation.set(basePitch+pitch,baseYaw+yaw,0,'YXZ');camera.updateMatrixWorld();needsRender=true;}
-  function resize(){width=canvas.parentElement.clientWidth;height=canvas.parentElement.clientHeight;mobile=width<600;renderer.setSize(width,height,false);camera.aspect=width/height;camera.fov=mobile?79:59;camera.updateProjectionMatrix();if(entry?.active){entryPath.sample(entry.progress,camera);needsRender=true;}else updateLook();}
+  function updateLook(){if(entry?.active||objectFocus?.active)return;yaw=THREE.MathUtils.clamp(yaw,-yawLimit,yawLimit);pitch=THREE.MathUtils.clamp(pitch,-pitchLimit,pitchLimit);camera.position.copy(cameraPosition);camera.rotation.set(basePitch+pitch,baseYaw+yaw,0,'YXZ');camera.updateMatrixWorld();needsRender=true;}
+  function resize(){width=canvas.parentElement.clientWidth;height=canvas.parentElement.clientHeight;mobile=width<600;renderer.setSize(width,height,false);camera.aspect=width/height;camera.fov=mobile?79:59;camera.updateProjectionMatrix();if(entry?.active){entryPath.sample(entry.progress,camera);needsRender=true;}else if(objectFocus?.active){objectFocus.resize();layoutReading();}else updateLook();}
   const motionButton=document.getElementById('motion');
   const entryControls=document.getElementById('entry-controls'),skipButton=document.getElementById('entry-skip'),replayButton=document.getElementById('entry-replay'),recenterButton=document.getElementById('recenter');
   const hint=document.getElementById('hint');
@@ -300,12 +302,12 @@ function createSuite() {
   });
   vistaControl.addEventListener('change',e=>{
     if(e.target.name!=='vista')return;
-    transit.request(e.target.value,{quiet:paused||motionPreference.matches||entry?.active});
+    transit.request(e.target.value,{quiet:paused||motionPreference.matches||entry?.active||objectFocus?.active});
   });
   function intersect(x,y){const r=canvas.getBoundingClientRect();pointer.set((x-r.left)/r.width*2-1,-(y-r.top)/r.height*2+1);raycaster.setFromCamera(pointer,camera);return raycaster.intersectObjects(objects,false)[0]?.object.userData.panel;}
-  canvas.addEventListener('pointerdown',e=>{if(entry?.active||e.isPrimary===false||e.button!==0||gesture)return;suppressClick=false;gesture={id:e.pointerId,x:e.clientX,y:e.clientY,yaw,pitch,dragging:false};canvas.focus({preventScroll:true});canvas.setPointerCapture(e.pointerId);});
+  canvas.addEventListener('pointerdown',e=>{if(entry?.active||objectFocus?.active||e.isPrimary===false||e.button!==0||gesture)return;suppressClick=false;gesture={id:e.pointerId,x:e.clientX,y:e.clientY,yaw,pitch,dragging:false};canvas.focus({preventScroll:true});canvas.setPointerCapture(e.pointerId);});
   canvas.addEventListener('pointermove',e=>{
-    if(entry?.active)return;
+    if(entry?.active||objectFocus?.active)return;
     if(gesture&&gesture.id===e.pointerId){const dx=e.clientX-gesture.x,dy=e.clientY-gesture.y;if(!gesture.dragging&&dx*dx+dy*dy>dragThreshold*dragThreshold)gesture.dragging=true;if(gesture.dragging){suppressClick=true;yaw=gesture.yaw+dx*sensitivity;pitch=gesture.pitch+dy*sensitivity;updateLook();canvas.style.cursor='grabbing';}return;}
     if(!gesture)canvas.style.cursor=intersect(e.clientX,e.clientY)?'pointer':'grab';
   });
@@ -313,14 +315,69 @@ function createSuite() {
   canvas.addEventListener('pointerup',e=>endGesture(e));
   canvas.addEventListener('pointercancel',e=>endGesture(e,true));
   canvas.addEventListener('lostpointercapture',e=>endGesture(e,true));
-  canvas.addEventListener('click',e=>{if(entry?.active||suppressClick){e.preventDefault();return;}const id=intersect(e.clientX,e.clientY);if(id)window.suiteOpen(id);});
-  function recenter(){if(entry?.active){entry.skip();return;}if(gesture)endGesture({pointerId:gesture.id},true);yaw=0;pitch=0;updateLook();}
+  canvas.addEventListener('click',e=>{if(entry?.active||suppressClick){e.preventDefault();return;}const id=intersect(e.clientX,e.clientY);if(id)window.suiteOpen(id==='papers'?'research':id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':''});});
+  function recenter(){if(objectFocus?.active)return;if(entry?.active){entry.skip();return;}if(gesture)endGesture({pointerId:gesture.id},true);yaw=0;pitch=0;updateLook();}
   document.getElementById('recenter').addEventListener('click',recenter);
-  canvas.addEventListener('keydown',e=>{const id={1:'about',2:'research',3:'projects',4:'papers'}[e.key];if(id){e.preventDefault();window.suiteOpen(id);return;}const step=THREE.MathUtils.degToRad(3);if(e.key==='Home'){e.preventDefault();recenter();}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();if(entry?.active)return;if(e.key==='ArrowLeft')yaw+=step;if(e.key==='ArrowRight')yaw-=step;if(e.key==='ArrowUp')pitch+=step;if(e.key==='ArrowDown')pitch-=step;updateLook();}});
+  canvas.addEventListener('keydown',e=>{const id={1:'about',2:'research',3:'projects',4:'papers'}[e.key];if(id){e.preventDefault();window.suiteOpen(id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':''});return;}const step=THREE.MathUtils.degToRad(3);if(e.key==='Home'){e.preventDefault();recenter();}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();if(entry?.active||objectFocus?.active)return;if(e.key==='ArrowLeft')yaw+=step;if(e.key==='ArrowRight')yaw-=step;if(e.key==='ArrowUp')pitch+=step;if(e.key==='ArrowDown')pitch-=step;updateLook();}});
+  const sheet=document.getElementById('sheet');
+  function focusTarget(kind){
+    room.updateMatrixWorld(true);
+    const pose=new THREE.PerspectiveCamera();pose.fov=camera.fov;
+    if(kind==='monitor'){
+      const screen=deskAssets.monitorScreen,center=screen.mesh.getWorldPosition(new THREE.Vector3());
+      const normal=new THREE.Vector3(0,0,1).transformDirection(screen.mesh.matrixWorld);
+      const size=new THREE.Vector3();screen.mesh.getWorldScale(size);
+      const tangent=Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
+      const distance=Math.max(screen.height*size.y/(2*tangent)*(height/Math.max(180,height-180)),screen.width*size.x/(2*tangent)*(height/Math.max(240,width-72)),.58);
+      pose.position.copy(center).addScaledVector(normal,distance);pose.lookAt(center);
+    }else{
+      const center=notebook.center();
+      pose.position.copy(center).add(new THREE.Vector3(.04,.64,.63));
+      pose.lookAt(center.clone().add(new THREE.Vector3(0,.08,0)));
+    }
+    if(width<700)pose.rotateX(-.44);
+    return {position:pose.position.clone(),quaternion:pose.quaternion.clone(),fov:pose.fov};
+  }
+  function layoutReading(){
+    if(!objectFocus?.active||sheet.dataset.focusPending==='true'||!sheet.dataset.object)return;
+    const project=p=>{p.project(camera);return {x:(p.x*.5+.5)*width,y:(-.5*p.y+.5)*height};};
+    let left,top,w,h;
+    if(objectFocus.kind==='monitor'&&width>=700){
+      const screen=deskAssets.monitorScreen;
+      const corners=[[-1,-1],[-1,1],[1,-1],[1,1]].map(([x,y])=>project(screen.mesh.localToWorld(new THREE.Vector3(x*screen.width/2,y*screen.height/2,.001))));
+      left=Math.min(...corners.map(p=>p.x))+5;top=Math.min(...corners.map(p=>p.y))+5;
+      w=Math.max(...corners.map(p=>p.x))-left-5;h=Math.max(...corners.map(p=>p.y))-top-5;
+    }else if(width<700){
+      // On phones the object remains visible above its attached reading surface.
+      left=12;top=Math.min(242,height*.31);w=width-24;h=height-top-18;
+    }else{
+      const point=project(notebook.center());w=Math.min(790,width-72);h=Math.min(540,height-120);
+      left=Math.max(24,Math.min(width-w-24,point.x-w/2));top=Math.max(90,Math.min(height-h-44,point.y-h*.65));
+    }
+    Object.assign(sheet.style,{left:left+'px',top:top+'px',width:w+'px',height:h+'px'});
+  }
+  objectFocus=createObjectFocus(THREE,{camera,book:notebook,target:focusTarget,reduced:()=>motionPreference.matches,
+    changed(){needsRender=true;layoutReading();},
+    phase(value,kind){
+      document.body.dataset.objectFocus=value;document.body.dataset.focusObject=kind;
+      recenterButton.disabled=replayButton.disabled=value!=='idle';
+      canvas.setAttribute('aria-busy',String(value==='approaching'||value==='returning'));
+      if(value==='idle'){canvas.removeAttribute('aria-busy');canvas.style.cursor='grab';}
+      needsRender=true;
+    }
+  });
+  window.suiteFocus={
+    enter(kind,options){
+      if(gesture)endGesture({pointerId:gesture.id},true);
+      entry?.skip();transit.settle('object-reading');
+      return objectFocus.enter(kind,options);
+    },
+    leave(options){objectFocus.leave(options);},finish(){objectFocus.finish();},layout:layoutReading
+  };
   let entryStorage=null;try{entryStorage=window.sessionStorage;}catch{/* Private storage denial defaults to skipping autoplay. */}
   entry=createEntryPlayback({storage:entryStorage,reduceMotion:reduceMotion||document.getElementById('sheet').open,
     onStart(){
-      transit.settle('entry');
+      objectFocus.leave({instant:true});transit.settle('entry');
       if(gesture)endGesture({pointerId:gesture.id},true);yaw=0;pitch=0;suppressClick=true;
       document.body.classList.add('entering');entryControls.hidden=false;
       recenterButton.disabled=motionButton.disabled=replayButton.disabled=true;
@@ -338,16 +395,16 @@ function createSuite() {
       if(reason!=='unavailable'&&(document.activeElement===skipButton||document.activeElement===replayButton))canvas.focus({preventScroll:true});
     }
   });
-  stopEntry=()=>{viewAvailable=false;entry.disable();transit.disable();orbitalView.dispose();};
+  stopEntry=()=>{viewAvailable=false;objectFocus.disable();delete window.suiteFocus;window.dispatchEvent(new Event('suite-focus-unavailable'));entry.disable();transit.disable();orbitalView.dispose();};
   skipButton.addEventListener('click',()=>entry.skip());
-  replayButton.addEventListener('click',()=>{if(!document.querySelector('dialog[open]'))entry.start({replay:true});});
+  replayButton.addEventListener('click',()=>{if(!objectFocus.active&&!document.querySelector('dialog[open]'))entry.start({replay:true});});
   window.addEventListener('keydown',e=>{if(e.key==='Escape'&&entry.active){e.preventDefault();entry.skip();}else if(e.key==='Escape'&&transit.active){e.preventDefault();transit.settle('skip');}});
   window.addEventListener('suite-panel-open',()=>{entry.skip();transit.settle('panel');});
   let reading=!!document.querySelector('dialog[open]'),lastSceneFrame=-Infinity;
   window.addEventListener('suite-reading-change',e=>{reading=e.detail.active;needsRender=true;lastSceneFrame=-Infinity;});
-  document.addEventListener('visibilitychange',()=>{entry.suspend();orbit.suspendMotion();if(document.hidden)transit.settle('hidden');});
-  window.addEventListener('pagehide',()=>{orbit.suspendMotion();transit.settle('pagehide');});
-  motionPreference.addEventListener?.('change',e=>{if(e.matches){entry.skip();transit.settle('reduced-motion');paused=true;orbit.suspendMotion();updateMotion();needsRender=true;}});
+  document.addEventListener('visibilitychange',()=>{entry.suspend();objectFocus.suspend();orbit.suspendMotion();if(document.hidden)transit.settle('hidden');});
+  window.addEventListener('pagehide',()=>{objectFocus.suspend();orbit.suspendMotion();transit.settle('pagehide');});
+  motionPreference.addEventListener?.('change',e=>{if(e.matches){entry.skip();transit.settle('reduced-motion');objectFocus.finish();paused=true;orbit.suspendMotion();updateMotion();needsRender=true;}});
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();showFallback('3D 图形连接已中断。所有内容仍可通过下方入口打开，刷新页面可尝试重新进入套房。');});
   window.addEventListener('resize',resize);window.addEventListener('suite-texture-ready',()=>{needsRender=true;});resize();entry.start();
   const projected=new THREE.Vector3();
@@ -357,10 +414,11 @@ function createSuite() {
     if(document.hidden){entry.suspend();requestAnimationFrame(render);return;}
     entry.tick(ms);
     transit.tick(ms);
+    objectFocus.tick(ms);
     // Earth samples UTC; local environmental motion uses a suspendable clock.
     // Reading remains at 10 fps without changing its movement speed.
     if(!paused&&(!reading||entry.active||transit.active||ms-lastSceneFrame>=100)){orbit.setTime(Date.now(),ms);needsRender=true;}
-    if(needsRender){lastSceneFrame=ms;orbit.update(camera);orbitalView.render(renderer,camera);document.querySelectorAll('[data-anchor]').forEach(b=>{const anchor=anchors[b.dataset.anchor];projected.copy(anchor).project(camera);const x=(projected.x*.5+.5)*width,y=(-projected.y*.5+.5)*height;const visible=!entry.active&&projected.z<1&&projected.z>-1&&x>58&&x<width-58&&y>110&&y<height-90&&!blockedOverlays.some(el=>{const r=el.getBoundingClientRect();return x+54>r.left&&x-54<r.right&&y>r.top&&y-48<r.bottom;});b.style.left=x+'px';b.style.top=y+'px';b.style.visibility=visible?'visible':'hidden';});needsRender=false;}
+    if(needsRender){lastSceneFrame=ms;orbit.update(camera);orbitalView.render(renderer,camera);document.querySelectorAll('[data-anchor]').forEach(b=>{const anchor=anchors[b.dataset.anchor];projected.copy(anchor).project(camera);const x=(projected.x*.5+.5)*width,y=(-projected.y*.5+.5)*height;const visible=!entry.active&&!objectFocus.active&&projected.z<1&&projected.z>-1&&x>58&&x<width-58&&y>110&&y<height-90&&!blockedOverlays.some(el=>{const r=el.getBoundingClientRect();return x+54>r.left&&x-54<r.right&&y>r.top&&y-48<r.bottom;});b.style.left=x+'px';b.style.top=y+'px';b.style.visibility=visible?'visible':'hidden';});needsRender=false;}
     requestAnimationFrame(render);
   }
   orbit.update(camera);orbitalView.render(renderer,camera);document.body.classList.add('ready');requestAnimationFrame(render);

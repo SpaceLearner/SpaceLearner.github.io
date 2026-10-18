@@ -9,7 +9,8 @@
   const stage=document.getElementById('image-stage');
   const scaleButton=document.getElementById('image-scale');
   const pages={news:['News · 近况','05 / NEWS'],about:['关于我','01 / ABOUT'],research:['研究方向','02 / RESEARCH'],projects:['代表项目','03 / PROJECTS'],papers:['研究论文','04 / PAPERS']};
-  let previousFocus=null,imageFocus=null,currentPage='',currentProject='',historyBusy=false,closeToRoot=false;
+  let previousFocus=null,imageFocus=null,currentPage='',currentProject='',historyBusy=false,closeToRoot=false,generation=0;
+  const toolbar=dialog.querySelector('.focus-toolbar'),direct=document.getElementById('focus-direct'),back=document.getElementById('focus-return'),tabs=dialog.querySelector('.notebook-tabs');
   const inherited=history.state?.suite;
   const owner=inherited?.owner||String(Date.now())+Math.random().toString(36).slice(2);
   const route=()=>{const [id,project='']=location.hash.slice(1).split('/');return {id:pages[id]?id:'',project:['zerosearch','rynnbrain'].includes(project)?project:''};};
@@ -18,7 +19,7 @@
   const url=(id,project='')=>location.pathname+location.search+(id?'#'+id+(project?'/'+project:''):'');
   history.replaceState(state(),'',location.href);
   function readingChanged(){window.dispatchEvent(new CustomEvent('suite-reading-change',{detail:{active:dialog.open||viewer.open}}));}
-  function push(id,project='',image=null){history.pushState(state({depth:depth()+1,image}),'',url(id,project));}
+  function push(id,project='',image=null,object=dialog.dataset.object||''){history.pushState(state({depth:depth()+1,image,object}),'',url(id,project));}
   function scrollProject(project){
     const target=project&&body.querySelector('[data-project="'+project+'"]');
     if(target){target.scrollIntoView({block:'start',behavior:'instant'});target.querySelector('h3').focus({preventScroll:true});}
@@ -57,7 +58,7 @@
     viewer.querySelector('.image-close').focus({preventScroll:true});
     readingChanged();
   }
-  function show(id,trigger=null,project='') {
+  function show(id,trigger=null,project='',object='') {
     if(!pages[id])return;
     window.dispatchEvent(new Event('suite-panel-open'));
     hideImage();
@@ -70,19 +71,37 @@
       body.scrollTop=0;
     }
     currentPage=id;currentProject=project;
+    const token=++generation;object=window.suiteFocus?object:'';
+    dialog.dataset.object=object;dialog.removeAttribute('style');toolbar.hidden=!object;tabs.hidden=object!=='notebook';
+    tabs.querySelectorAll('[data-open]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.open===id)));
+    document.getElementById('focus-label').textContent=object==='monitor'?'正在靠近显示屏…':'正在打开札记…';
+    dialog.dataset.focusPending=String(!!object);direct.hidden=!object;
+    dialog.setAttribute('aria-busy',String(!!object));
     if(!dialog.open)dialog.showModal();
-    if(project)scrollProject(project);
+    function ready(){
+      if(token!==generation||!dialog.open)return;
+      dialog.dataset.focusPending='false';dialog.setAttribute('aria-busy','false');direct.hidden=true;
+      window.suiteFocus?.layout();
+      document.getElementById('focus-label').textContent=object==='monitor'?'个人终端':'研究札记';
+      if(project)scrollProject(project);else (object?back:dialog.querySelector('.close')).focus({preventScroll:true});
+    }
+    if(object)window.suiteFocus.enter(object,{done:ready});
+    else {window.suiteFocus?.leave();ready();}
     readingChanged();
   }
-  function open(id,trigger=null) {
+  function open(id,trigger=null,options={}) {
     if(!pages[id]||historyBusy)return;
     const project=trigger?.dataset.project||'';
-    if(currentPage!==id||currentProject!==project||!dialog.open)push(id,project);
-    show(id,trigger,project);
+    const object=options.focus||'';
+    if(currentPage!==id||currentProject!==project||!dialog.open||dialog.dataset.object!==object)push(id,project,null,object);
+    show(id,trigger,project,object);
   }
   function hide(){
-    hideImage();if(dialog.open)dialog.close();currentPage='';currentProject='';
-    previousFocus?.focus({preventScroll:true});readingChanged();
+    const token=++generation;hideImage();if(dialog.open)dialog.close();currentPage='';currentProject='';
+    dialog.dataset.object='';dialog.dataset.focusPending='false';dialog.removeAttribute('style');
+    const restoreFocus=()=>{if(token===generation&&previousFocus?.isConnected)previousFocus.focus({preventScroll:true});};
+    if(window.suiteFocus)window.suiteFocus.leave({done:restoreFocus});else restoreFocus();
+    readingChanged();
   }
   function close() {
     if(historyBusy)return;
@@ -95,7 +114,7 @@
     const {id,project}=route();
     if(!id){hide();return;}
     const image=history.state?.suite?.image;
-    if(currentPage!==id||currentProject!==project||!dialog.open)show(id,null,project);
+    if(currentPage!==id||currentProject!==project||!dialog.open||dialog.dataset.object!==(history.state?.suite?.object||''))show(id,null,project,history.state?.suite?.object||'');
     if(image){const trigger=[...body.querySelectorAll('.figure-open')].find(el=>el.dataset.imageTitle===image);if(trigger&&!viewer.open)openImage(trigger,false);}
     else hideImage();
   }
@@ -103,7 +122,7 @@
     const imageTrigger=event.target.closest('.figure-open');
     if(imageTrigger){event.preventDefault();openImage(imageTrigger);return;}
     const target=event.target.closest('[data-open]');
-    if(target){event.preventDefault();open(target.dataset.open,target);}
+    if(target){event.preventDefault();open(target.dataset.open,target,{focus:event.shiftKey?'':target.dataset.focus||''});}
   });
   scaleButton.addEventListener('click',()=>{
     const actual=viewer.classList.toggle('is-actual');
@@ -123,6 +142,17 @@
   });
   viewer.addEventListener('cancel',event=>{event.preventDefault();closeImage();});
   dialog.querySelector('.close').addEventListener('click',close);
+  dialog.addEventListener('keydown',event=>{
+    if(event.key!=='Tab')return;
+    const stops=[...dialog.querySelectorAll('button:not([disabled]),a[href],[tabindex="0"]')].filter(el=>!el.hidden&&el.getClientRects().length);
+    if(!stops.length)return;
+    const current=stops.indexOf(document.activeElement);
+    const next=current<0?(event.shiftKey?stops.length-1:0):(current+(event.shiftKey?-1:1)+stops.length)%stops.length;
+    event.preventDefault();stops[next].focus({preventScroll:true});
+  });
+  direct.addEventListener('click',()=>window.suiteFocus?.finish());
+  back.addEventListener('click',close);
+  window.addEventListener('suite-focus-unavailable',()=>{if(dialog.open)show(currentPage,null,currentProject);});
   dialog.addEventListener('cancel',event=>{event.preventDefault();if(viewer.open)closeImage();else close();});
   // Only a click outside a dialog's rectangle dismisses its backdrop.
   for(const [element,dismiss]of [[dialog,close],[viewer,closeImage]])element.addEventListener('click',event=>{

@@ -189,3 +189,55 @@ body{font-family:var(--ui-font);-webkit-font-smoothing:antialiased;text-renderin
 
 /* With the introduction removed, keep the mobile vista picker below navigation. */
 @media(max-width:600px) and (orientation:portrait){.vista-control,.entering .vista-control{top:112px;left:auto;right:20px}}
+
+/* Reading surfaces grow out of the selected desk object. The monitor surface
+   follows the projected LCD bounds; the notebook keeps its paper and binding. */
+#sheet[data-object]:not([data-object=""]){inset:auto;margin:0;max-width:none;max-height:none;border-radius:5px;box-shadow:0 6px 28px #0004;overflow:hidden}
+#sheet[data-object]:not([data-object=""])[open]{display:flex;flex-direction:column}
+#sheet[data-object]:not([data-object=""])::backdrop{background:#03080c12;backdrop-filter:none}
+#sheet[data-object]:not([data-object=""]) .sheet-body{flex:1;min-height:0;max-height:none;padding:18px 28px 26px;font-size:15px}
+#sheet[data-object]:not([data-object=""]) .sheet-head{padding:18px 28px 14px;flex:none}
+#sheet[data-object]:not([data-object=""]) .sheet-head h2{font-size:27px}
+#sheet[data-object]:not([data-object=""]) .sheet-head .close{display:none}
+.focus-toolbar{display:flex;align-items:center;gap:12px;padding:8px 16px;flex:none;border-bottom:1px solid #b5aa943d;font-size:12px}
+.focus-toolbar[hidden],.notebook-tabs[hidden]{display:none}
+.focus-toolbar span{margin-right:auto;font-size:12px;letter-spacing:.08em}
+.focus-toolbar button,.notebook-tabs button{font:500 13px/1.3 var(--ui-font);min-height:40px;padding:8px 12px;border:1px solid currentColor;border-radius:4px;background:none;color:inherit;cursor:pointer;flex:none}
+.focus-toolbar button[hidden]{display:none}
+#sheet[data-object="monitor"]{background:#142126;color:#e3e9e4;border:1px solid #455957}
+#sheet[data-object="monitor"] .sheet-head{border-color:#4e615e}
+#sheet[data-object="monitor"] .sheet-body{scrollbar-color:#718d86 #152126}
+#sheet[data-object="monitor"] .sheet-kicker,#sheet[data-object="monitor"] .timeline span,#sheet[data-object="monitor"] .note{color:#aabeb0}
+#sheet[data-object="monitor"] a{color:#c3d8b8}
+#sheet[data-object="monitor"] .rule{border-color:#4e615e}
+#sheet[data-object="monitor"] :focus-visible{outline-color:#d8e9c7}
+#sheet[data-object="notebook"]{background:linear-gradient(90deg,#d5cbb8,#f1ede3 24px,#f1ede3);border:1px solid #b6aa90;border-left:7px solid #364749;border-radius:3px 9px 9px 3px}
+.notebook-tabs{display:flex;gap:8px;padding:10px 26px 0;flex:none}
+.notebook-tabs button{color:#64533c;border-color:#b7a88d}
+.notebook-tabs button[aria-pressed="true"]{background:#e0d4bd;color:#322e28;border-color:#8b795d}
+#sheet[data-focus-pending="true"]{left:50%!important;top:auto!important;bottom:32px!important;transform:translateX(-50%);width:min(470px,calc(100vw - 24px))!important;height:auto!important;background:#152126f2;border:1px solid #9eb4a966;color:#e3e9e4}
+#sheet[data-focus-pending="true"] .sheet-head,#sheet[data-focus-pending="true"] .sheet-body,#sheet[data-focus-pending="true"] .notebook-tabs{display:none}
+#sheet[data-focus-pending="true"] .focus-toolbar{padding:10px 12px;border:0}
+body[data-object-focus="approaching"] .hotspots,body[data-object-focus="reading"] .hotspots,body[data-object-focus="returning"] .hotspots{visibility:hidden}
+body[data-object-focus="approaching"] .vista-control,body[data-object-focus="reading"] .vista-control,body[data-object-focus="returning"] .vista-control{visibility:hidden}
+@media(max-width:699px){
+ #sheet[data-object]:not([data-object=""]){border-radius:8px;box-shadow:0 -8px 30px #0005}
+ #sheet[data-object]:not([data-object=""]) .sheet-body{padding:15px 19px 24px;font-size:15px;line-height:1.8}
+ #sheet[data-object]:not([data-object=""]) .sheet-head{padding:14px 19px 12px}
+ #sheet[data-object]:not([data-object=""]) .sheet-head h2{font-size:24px}
+ .focus-toolbar{padding:6px 10px;gap:6px}.focus-toolbar span{font-size:11px}
+ .focus-toolbar button{padding:8px;min-height:44px;font-size:12px}.notebook-tabs{padding:10px 17px 0}
+ #sheet[data-focus-pending="true"] .focus-toolbar span{display:none}
+}
+#sheet[data-object="monitor"] .sheet-head h2,#sheet[data-object="monitor"] .sheet-body h3{color:#e3e9e4}
+@media(min-width:700px){#sheet[data-object="monitor"]:not([data-object=""]) .sheet-body,#sheet[data-object="monitor"]:not([data-object=""]) .sheet-head{padding-left:max(28px,calc((100% - 880px)/2));padding-right:max(28px,calc((100% - 880px)/2))}}
+#sheet[data-object]:not([data-object=""])[data-focus-pending="false"] .sheet-body{animation:reading-appear .18s ease-out}
+@keyframes reading-appear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-height:520px){
+ #sheet[data-object]:not([data-object=""]) .sheet-kicker{display:none}
+ #sheet[data-object]:not([data-object=""]) .sheet-head{padding-top:10px;padding-bottom:10px}
+ #sheet[data-object]:not([data-object=""]) .sheet-head h2{font-size:21px}
+ #sheet[data-object]:not([data-object=""]) .sheet-body{padding-top:12px;padding-bottom:18px;line-height:1.65}
+ .focus-toolbar{padding-top:4px;padding-bottom:4px}.focus-toolbar button{min-height:40px}
+ .notebook-tabs{padding-top:5px}.notebook-tabs button{min-height:34px;padding-top:6px;padding-bottom:6px}
+}
