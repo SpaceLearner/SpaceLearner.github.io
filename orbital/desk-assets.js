@@ -1,5 +1,6 @@
 import {createKeyboard} from './desk-inputs.js';
 import {createCoffeeMug} from './coffee-mug.js';
+import {createResearchArm} from './research-arm.js';
 import { RoundedBoxGeometry } from './vendor/DeskRoundedBoxGeometry.js';
 
 /** Original desktop models. Metres, +Y up, +Z toward the seated viewer.
@@ -128,65 +129,7 @@ export function createDeskAssets(THREE, maps = {}) {
 
   const mug=createCoffeeMug(THREE);
 
-  // Compact six-axis engineering arm. Cast housings enclose the links and motors.
-  const robot=group('Desktop articulated research manipulator');
-  for(const x of [-.064,.064])for(const z of [-.055,.055])rb(robot,.019,.004,.019,.002,materials.rubber,[x,.002,z],'Isolated robot foot');
-  rb(robot,.178,.024,.156,.007,materials.graphite,[0,.016,0],'Machined mounting plinth',3);
-  rb(robot,.170,.008,.148,.0035,materials.aluminum,[0,.032,0],'Plinth top plate');
-  for(const x of [-.065,.065])for(const z of [-.052,.052])screw(robot,x,.0367,z,.004,'y');
-  cyl(robot,.052,.062,.051,materials.robotPaint,[0,.062,0],'Yaw motor housing',48);
-  cyl(robot,.053,.053,.006,materials.rubber,[0,.090,0],'Yaw bearing seal',48);
-  cyl(robot,.048,.051,.018,materials.aluminum,[0,.102,0],'Rotating shoulder flange',48);
-  const joints=[[0,.135,0],[-.073,.327,0],[.089,.440,.008],[.188,.354,.023]];
-  function joint(at,r,w,name){
-    const outer=cyl(robot,r,r,w,materials.graphite,at,name+' motor casing',40);outer.rotation.x=Math.PI/2;
-    for(const side of [-1,1]){
-      const z=at[2]+side*(w/2+.001);
-      const capProfile=[[0,-.0015],[r*.77,-.0015],[r*.85,-.0005],[r*.85,.0005],[r*.80,.0015],[0,.0015]];
-      const cap=part(robot,new THREE.LatheGeometry(capProfile.map(p=>new THREE.Vector2(...p)),48),materials.aluminum,[at[0],at[1],z],name+' chamfered bearing cover');cap.rotation.x=Math.PI/2;
-      torus(robot,r*.69,.00085,materials.gasket,[at[0],at[1],z+side*.0019],'z',name+' cover seam');
-      const hub=cyl(robot,r*.30,r*.30,.004,materials.robotAccent,[at[0],at[1],z+side*.002],name+' axis hub',24);hub.rotation.x=Math.PI/2;
-      for(let j=0;j<4;j++){const a=j*Math.PI/2+Math.PI/4;screw(robot,at[0]+Math.cos(a)*r*.60,at[1]+Math.sin(a)*r*.60,z+side*.0025,.0019,'z',side);}
-    }
-  }
-  // Continuous shoulder yoke supports the first horizontal pivot.
-  for(const side of [-1,1])rb(robot,.065,.059,.013,.005,materials.robotPaint,[0,.126,side*.055],'Shoulder bearing yoke');
-  joint(joints[0],.045,.091,'Shoulder');
-  const widths=[.062,.054,.042],depths=[.064,.056,.045];
-  for(let i=0;i<3;i++){
-    const a=V(joints[i]),b=V(joints[i+1]),dir=b.clone().sub(a).normalize();
-    const aa=a.clone().addScaledVector(dir,.012),bb=b.clone().addScaledVector(dir,-.014);
-    beam(robot,aa.toArray(),bb.toArray(),widths[i],depths[i],.013,materials.robotPaint,`Cast link ${i+1}`);
-    // Inset service panel, fastening points, and a proper parting line.
-    const mid=aa.clone().add(bb).multiplyScalar(.5);
-    const frontA=aa.clone();frontA.z+=depths[i]/2+.0006;const frontB=bb.clone();frontB.z+=depths[i]/2+.0006;
-    const trim=beam(robot,frontA.toArray(),frontB.toArray(),widths[i]*.61,.0018,.0007,materials.robotAccent,`Link ${i+1} service cover`);
-    for(const t of [.26,.74]){const p=a.clone().lerp(b,t);screw(robot,p.x,p.y,p.z+depths[i]/2+.002,.0018);}
-    if(i<2)joint(joints[i+1],i===0?.039:.033,depths[i]+.014,i===0?'Elbow':'Wrist pitch');
-  }
-  joint(joints[3],.025,.054,'Tool roll');
-  const wristDirection=V(joints[3]).sub(V(joints[2])).normalize();
-  const wristCenter=V(joints[2]).lerp(V(joints[3]),.60);
-  const wrist=cyl(robot,.025,.025,.028,materials.hardware,wristCenter.toArray(),'Wrist axial bearing',40);
-  wrist.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),wristDirection);
-  const wristSeal=torus(robot,.025,.0015,materials.gasket,wristCenter.toArray(),'z','Wrist axial seal');
-  wristSeal.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),wristDirection);
-  // Parallel gripper: sliding carriage, opposed jaws, and replaceable rubber tips.
-  const tool=group('Parallel end effector');tool.position.set(...joints[3]);tool.rotation.z=-.12;robot.add(tool);
-  rb(tool,.064,.030,.041,.005,materials.graphite,[0,-.031,.005],'Gripper actuator');
-  rb(tool,.062,.005,.042,.0018,materials.aluminum,[0,-.049,.005],'Gripper sliding rail');
-  for(const side of [-1,1]){
-    rb(tool,.013,.021,.030,.002,materials.hardware,[side*.024,-.058,.005],'Sliding jaw carriage');
-    rb(tool,.008,.038,.025,.0022,materials.aluminum,[side*.027,-.081,.005],'Gripper finger');
-    rb(tool,.004,.022,.021,.0012,materials.rubber,[side*.022,-.088,.005],'Replaceable grip pad');
-    screw(tool,side*.027,-.079,.019,.0017);
-  }
-  // A rear service loop gives each pivot enough cable travel; clamps anchor it.
-  tube(robot,[[.01,.047,-.056],[.029,.116,-.066],[-.038,.219,-.060],[-.092,.320,-.057],[-.075,.362,-.051],[.014,.405,-.050],[.085,.467,-.042],[.129,.425,-.036],[.181,.357,-.020]],.0041,materials.rubber,'Joint service cable loom',48);
-  for(const [x,y,z]of [[-.033,.219,-.054],[.013,.400,-.041],[.139,.399,-.020]])rb(robot,.014,.011,.012,.003,materials.graphite,[x,y,z],'Cable retaining saddle');
-  rb(robot,.030,.014,.002,.002,materials.recess,[0,.018,.079],'Base controller socket');
-  rb(robot,.011,.007,.0015,.0006,materials.hardware,[0,.018,.0804],'Recessed data connector');
-  robot.userData.axes=6;
+  const robot=createResearchArm(THREE,materials);
 
   const result={monitor,terminal,keyboard,mug,robot,monitorScreen:main.screen,terminalScreen:secondary.screen,materials};
   // Convenient contact/size metadata, also useful for automated geometry checks.

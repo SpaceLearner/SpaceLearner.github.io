@@ -2,6 +2,18 @@
 // Fixed directions, mixed magnitudes and a faint dusty band; no animated twinkle.
 export function createStarField(THREE) {
   const sky=new THREE.Group();sky.name='Distant layered star field';
+  // Author star/nebula levels in display-linear light, then lift them into the
+  // HDR capture. The shared orbital pass applies the same filmic tone map at
+  // rest and in flight, without washing out stars or crushing the faint dust.
+  const radianceGLSL=`
+    vec3 skyRadiance(vec3 displayLight){
+      vec3 y=clamp(displayLight,vec3(0.),vec3(.98));
+      vec3 a=1.-.983729*y,b=.0245786-.432951*y,c=-.000090537-.238081*y;
+      return .6*(-b+sqrt(b*b-4.*a*c))/(2.*a);
+    }
+    vec3 linearFromDisplay(vec3 s){return mix(s/12.92,pow((s+.055)/1.055,vec3(2.4)),step(vec3(.04045),s));}
+    vec3 displayFromLinear(vec3 c){return mix(c*12.92,1.055*pow(c,vec3(1./2.4))-.055,step(vec3(.0031308),c));}
+  `;
   const pole=new THREE.Vector3(.48,.86,.14).normalize();
   const axis=new THREE.Vector3().crossVectors(pole,new THREE.Vector3(0,0,1)).normalize();
   const other=new THREE.Vector3().crossVectors(pole,axis).normalize();
@@ -10,6 +22,7 @@ export function createStarField(THREE) {
     uniforms:{pole:{value:pole}},
     vertexShader:`varying vec3 direction;void main(){direction=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
     fragmentShader:`
+      ${radianceGLSL}
       varying vec3 direction;uniform vec3 pole;
       float hash(vec3 p){p=fract(p*.3183099+vec3(.1,.2,.3));p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
       float noise(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(mix(hash(i),hash(i+vec3(1,0,0)),f.x),mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x),f.y),mix(mix(hash(i+vec3(0,0,1)),hash(i+vec3(1,0,1)),f.x),mix(hash(i+vec3(0,1,1)),hash(i+vec3(1,1,1)),f.x),f.y),f.z);}
@@ -21,7 +34,7 @@ export function createStarField(THREE) {
         float lane=exp(-pow((latitude+.035+(structure-.5)*.10)*24.,2.));
         float density=broad*(.16+.84*structure)*(.45+.55*detail)*(1.-lane*.68);
         vec3 color=vec3(.00024,.00033,.00050)+vec3(.011,.013,.016)*density;
-        gl_FragColor=vec4(color,1.);
+        gl_FragColor=vec4(skyRadiance(color),1.);
         #include <colorspace_fragment>
       }`
   }));
@@ -61,7 +74,7 @@ export function createStarField(THREE) {
     transparent:true,depthWrite:false,depthTest:true,blending:THREE.AdditiveBlending,toneMapped:false,
     uniforms:{pixelRatio:{value:Math.min(globalThis.devicePixelRatio||1,1.7)}},
     vertexShader:`attribute vec3 color;attribute float size;uniform float pixelRatio;varying vec3 light;void main(){light=color;gl_PointSize=size*pixelRatio;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-    fragmentShader:`varying vec3 light;void main(){float radius=length(gl_PointCoord-.5);if(radius>.5)discard;float core=exp(-radius*radius*8.);float edge=1.-smoothstep(.35,.50,radius);gl_FragColor=vec4(light,core*edge*.95);
+    fragmentShader:`${radianceGLSL}varying vec3 light;void main(){float radius=length(gl_PointCoord-.5);if(radius>.5)discard;float core=exp(-radius*radius*8.);float edge=1.-smoothstep(.35,.50,radius);vec3 apparent=linearFromDisplay(displayFromLinear(light)*core*edge*.95);gl_FragColor=vec4(skyRadiance(apparent),1.);
       #include <colorspace_fragment>
     }`
   });
