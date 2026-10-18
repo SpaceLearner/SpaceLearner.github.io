@@ -1,12 +1,13 @@
 // Art-directed celestial field, not an astronomical catalogue or a sky photograph.
 // Fixed directions, mixed magnitudes and a faint dusty band; no animated twinkle.
+// Tone mapping runs once in both direct Earth rendering and the HDR transit path.
 export function createStarField(THREE) {
   const sky=new THREE.Group();sky.name='Distant layered star field';
   const pole=new THREE.Vector3(.48,.86,.14).normalize();
   const axis=new THREE.Vector3().crossVectors(pole,new THREE.Vector3(0,0,1)).normalize();
   const other=new THREE.Vector3().crossVectors(pole,axis).normalize();
   const band=new THREE.Mesh(new THREE.SphereGeometry(480,64,32),new THREE.ShaderMaterial({
-    side:THREE.BackSide,depthWrite:false,depthTest:true,toneMapped:false,
+    side:THREE.BackSide,depthWrite:false,depthTest:true,toneMapped:true,
     uniforms:{pole:{value:pole}},
     vertexShader:`varying vec3 direction;void main(){direction=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
     fragmentShader:`
@@ -20,8 +21,9 @@ export function createStarField(THREE) {
         float detail=cloud(d*25.);float structure=cloud(d*5.7);
         float lane=exp(-pow((latitude+.035+(structure-.5)*.10)*24.,2.));
         float density=broad*(.16+.84*structure)*(.45+.55*detail)*(1.-lane*.68);
-        vec3 color=vec3(.00024,.00033,.00050)+vec3(.011,.013,.016)*density;
+        vec3 color=vec3(.00018,.00021,.00028)+vec3(.0065,.0072,.0085)*density;
         gl_FragColor=vec4(color,1.);
+        #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }`
   }));
@@ -43,26 +45,27 @@ export function createStarField(THREE) {
       direction.set(Math.cos(longitude)*r,y,Math.sin(longitude)*r);
     }
     positions.push(direction.x*450,direction.y*450,direction.z*450);
-    const light=minLight+(maxLight-minLight)*random(),temperature=random();
+    const light=minLight+(maxLight-minLight)*Math.pow(random(),1.7),temperature=random();
     // Very restrained warm/cool variation, keeping the field essentially neutral.
-    colors.push(light*(.88+.12*temperature),light*.95,light*(1.-.15*temperature));
+    colors.push(light*(.96+.04*temperature),light*.98,light*(1.-.05*temperature));
     sizes.push(minSize+(maxSize-minSize)*random());
   }
-  for(let i=0;i<2400;i++)star(false,1.05,1.75,.38,.74);
-  for(let i=0;i<650;i++)star(false,1.8,2.8,.68,1.05);
-  for(let i=0;i<85;i++)star(false,2.8,3.7,1.,1.30);
-  for(let i=0;i<14;i++)star(false,3.8,4.7,1.2,1.45);
-  for(let i=0;i<1800;i++)star(true,.85,1.45,.25,.52);
+  for(let i=0;i<2400;i++)star(false,.72,1.25,.06,.26);
+  for(let i=0;i<650;i++)star(false,1.05,1.9,.22,.55);
+  for(let i=0;i<85;i++)star(false,1.9,2.8,.65,1.18);
+  for(let i=0;i<14;i++)star(false,3.1,3.9,1.1,1.5);
+  for(let i=0;i<1800;i++)star(true,.60,1.05,.035,.14);
   const geometry=new THREE.BufferGeometry();
   geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
   geometry.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
   geometry.setAttribute('size',new THREE.Float32BufferAttribute(sizes,1));
   const material=new THREE.ShaderMaterial({
-    transparent:true,depthWrite:false,depthTest:true,blending:THREE.AdditiveBlending,toneMapped:false,
+    transparent:true,depthWrite:false,depthTest:true,blending:THREE.AdditiveBlending,toneMapped:true,
     uniforms:{pixelRatio:{value:Math.min(globalThis.devicePixelRatio||1,1.7)}},
-    vertexShader:`attribute vec3 color;attribute float size;uniform float pixelRatio;varying vec3 light;void main(){light=color;gl_PointSize=size*pixelRatio;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-    fragmentShader:`varying vec3 light;void main(){float radius=length(gl_PointCoord-.5);if(radius>.5)discard;float core=exp(-radius*radius*8.);float edge=1.-smoothstep(.35,.50,radius);gl_FragColor=vec4(light,core*edge*.95);
-      #include <colorspace_fragment>
+    vertexShader:`attribute vec3 color;attribute float size;uniform float pixelRatio;varying vec3 light;varying float energy;void main(){light=color;float footprint=size*pixelRatio;energy=min(1.,pow(footprint/1.1,2.));gl_PointSize=max(footprint,1.);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+    fragmentShader:`varying vec3 light;varying float energy;void main(){float radius=length(gl_PointCoord-.5);if(radius>.5)discard;float core=exp(-radius*radius*8.);float edge=1.-smoothstep(.35,.50,radius);gl_FragColor=vec4(light,core*edge*.95*energy);
+      #include <tonemapping_fragment>
+        #include <colorspace_fragment>
     }`
   });
   const points=new THREE.Points(geometry,material);points.name='Fixed stars with varied apparent magnitudes';sky.add(points);

@@ -25,24 +25,49 @@ export function createOrbitalBackground(THREE, surface, clouds) {
   const material=new THREE.ShaderMaterial({
     uniforms:{surface:{value:surface},clouds:{value:clouds},cloudDrift:{value:0},sunDirection:{value:sunDirection}},
     vertexShader:`
-      varying vec2 vUv;varying vec3 vNormalW;varying vec3 vWorldP;
-      void main(){vUv=uv;vNormalW=normalize(mat3(modelMatrix)*normal);vec4 p=modelMatrix*vec4(position,1.);vWorldP=p.xyz;gl_Position=projectionMatrix*viewMatrix*p;}`,
+      varying vec2 vUv;varying vec3 vNormalW;varying vec3 vWorldP;varying vec3 vEastW;varying vec3 vNorthW;
+      void main(){
+        vUv=uv;vNormalW=normalize(mat3(modelMatrix)*normal);
+        vec3 east=normalize(vec3(position.z,0.,-position.x)+vec3(.00001,0.,0.));
+        vEastW=normalize(mat3(modelMatrix)*east);vNorthW=normalize(mat3(modelMatrix)*cross(normal,east));
+        vec4 p=modelMatrix*vec4(position,1.);vWorldP=p.xyz;gl_Position=projectionMatrix*viewMatrix*p;
+      }`,
     fragmentShader:`
       uniform sampler2D surface;uniform sampler2D clouds;uniform float cloudDrift;uniform vec3 sunDirection;
-      varying vec2 vUv;varying vec3 vNormalW;varying vec3 vWorldP;
+      varying vec2 vUv;varying vec3 vNormalW;varying vec3 vWorldP;varying vec3 vEastW;varying vec3 vNorthW;
       void main(){
         vec3 n=normalize(vNormalW),viewDir=normalize(cameraPosition-vWorldP);
+        vec3 east=normalize(vEastW),north=normalize(vNorthW);
+        float mu=dot(n,sunDirection),viewMu=max(dot(n,viewDir),.06);
+        float day=smoothstep(-.06,.13,mu),direct=pow(max(mu,0.),.83);
         vec3 albedo=texture2D(surface,vUv).rgb;
-        albedo=mix(vec3(dot(albedo,vec3(.2126,.7152,.0722))),albedo,.84);
+        albedo=mix(vec3(dot(albedo,vec3(.2126,.7152,.0722))),albedo,.88);
+        // A thin cloud layer: tangent-plane projection follows the actual sun
+        // direction and tilted Earth, rather than a constant texture offset.
+        // This is a bounded visual approximation, not atmospheric simulation.
+        float latitudeScale=max(sin(vUv.y*3.141593),.18);
+        vec2 metric=vec2(6.283185*latitudeScale,3.141593);
+        vec2 sunTangent=vec2(dot(sunDirection,east),dot(sunDirection,north));
+        vec2 shadowStep=clamp(sunTangent/metric*(.0015/max(mu,.12)),vec2(-.012),vec2(.012));
         vec2 cloudUv=vUv+vec2(cloudDrift,0.);
-        float cloud=texture2D(clouds,cloudUv).r;
-        float cloudShadow=texture2D(clouds,cloudUv+vec2(.001,-.0006)).r;
-        albedo*=1.-cloudShadow*.16;
-        albedo=mix(albedo,vec3(.84,.88,.92),smoothstep(.08,.88,cloud)*.9);
-        float mu=dot(n,sunDirection),day=smoothstep(-.08,.14,mu);
-        vec3 light=albedo*(.001+day*(.14+.82*pow(max(mu,0.),.65)));
-        float grazing=pow(1.-max(dot(n,viewDir),0.),4.);
-        light=mix(light,vec3(.035,.13,.24)*(.28+.72*day),grazing*.55);
+        vec2 viewStep=vec2(dot(viewDir,east),dot(viewDir,north))/metric*(.0015/viewMu);
+        float shadow=texture2D(clouds,cloudUv+shadowStep).r;
+        vec3 ground=albedo*(1.-smoothstep(.14,.85,shadow)*.24*day);
+        vec3 light=ground*(.0006+day*(.045+.94*direct));
+        vec2 raisedUv=cloudUv+viewStep;
+        float cloud=texture2D(clouds,raisedUv).r;
+        float dx=texture2D(clouds,raisedUv+vec2(.0007,0.)).r-cloud;
+        float dy=texture2D(clouds,raisedUv+vec2(0.,.0014)).r-cloud;
+        vec3 cloudNormal=normalize(n-east*dx*.75-north*dy*.75);
+        float cloudMu=max(dot(cloudNormal,sunDirection),0.);
+        float cloudDay=smoothstep(-.075,.12,mu);
+        vec3 cloudLight=vec3(.88,.90,.92)*(.0007+cloudDay*(.065+.94*pow(cloudMu,.72)));
+        float coverage=smoothstep(.09,.84,cloud)*.94;
+        light=mix(light,cloudLight,coverage);
+        // Very shallow blue grazing scatter, restricted to the illuminated rim.
+        // The dark hemisphere stays dark instead of carrying an all-around halo.
+        float grazing=pow(1.-max(dot(n,viewDir),0.),5.);
+        light+=vec3(.015,.065,.125)*grazing*smoothstep(-.055,.24,mu)*.55;
         gl_FragColor=vec4(light,1.);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
@@ -64,9 +89,15 @@ export function createOrbitalBackground(THREE, surface, clouds) {
     vertexShader:`varying vec3 n;varying vec3 v;varying vec3 nw;
       void main(){vec4 p=modelViewMatrix*vec4(position,1.);n=normalize(normalMatrix*normal);v=normalize(-p.xyz);nw=normalize(mat3(modelMatrix)*normal);gl_Position=projectionMatrix*p;}`,
     fragmentShader:`uniform vec3 sunDirection;varying vec3 n;varying vec3 v;varying vec3 nw;
-      void main(){float limb=pow(1.-abs(dot(normalize(n),normalize(v))),4.);float day=smoothstep(-.1,.22,dot(normalize(nw),sunDirection));gl_FragColor=vec4(.13,.34,.58,limb*(.025+day*.42));}`
+      void main(){
+        float limb=pow(1.-abs(dot(normalize(n),normalize(v))),5.);
+        float day=smoothstep(-.055,.25,dot(normalize(nw),sunDirection));
+        gl_FragColor=vec4(.08,.25,.48,limb*(.002+day*.27));
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }`
   });
-  const airRadius=radius*1.0023;
+  const airRadius=radius*1.0030;
   const air=new THREE.Mesh(new THREE.SphereGeometry(airRadius,192,128),atmosphere);
   air.name='Thin sunlit atmospheric limb';air.position.copy(center);air.userData.safetySphere={radius:airRadius};group.add(air);
   const stars=createStarField(THREE);group.add(stars.group);

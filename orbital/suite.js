@@ -15,6 +15,7 @@ import { createEntryFlight, createEntryPlayback } from './entry-flight.js';
 import { createVistaTransit } from './vista-transit.js';
 import { createOrbitalView } from './orbital-view.js';
 import { createVistaPicker } from './vista-picker.js';
+import { createVistaLighting } from './vista-lighting.js';
 
 const canvas = document.getElementById('space');
 const status = document.getElementById('status');
@@ -250,6 +251,7 @@ function createSuite() {
   // made its far edge cross the pressure shell in the offline lighting bake.
   const interiorLight=new THREE.RectAreaLight('#f0dfc5',.72,8,4);interiorLight.name='Ceiling diffuse fill';interiorLight.position.set(-1,5.9,.3);interiorLight.rotation.x=-Math.PI/2;room.add(interiorLight);
   const windowFill=new THREE.RectAreaLight('#b8d5e7',.20,11,3.5);windowFill.position.set(0,3.4,-5.6);windowFill.lookAt(-3,1.4,-1);room.add(windowFill);
+  const vistaLight=createVistaLighting(THREE,earthKey,windowFill);
   const orbitalView=createOrbitalView(THREE,scene,orbit);
   let viewAvailable=true;
 
@@ -284,7 +286,7 @@ function createSuite() {
   const transit=createVistaTransit({
     onCommit:updateVista,
     onFrame(state){
-      orbitalView.setTransit(state);needsRender=true;
+      orbitalView.setTransit(state);vistaLight.update(state);needsRender=true;
       const stage=!state.active?'idle':state.lowMotion?'quiet':state.progress<.25?'charging':state.progress<.7?'transit':'arriving';
       if(stage!==transitStage){transitStage=stage;document.body.dataset.transit=stage;
         if(state.active)vistaCaption.textContent='正在切换至 '+vistaName(state.desired);
