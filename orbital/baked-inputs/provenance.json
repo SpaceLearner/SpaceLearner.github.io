@@ -1,0 +1,39 @@
+{
+  "engine": "Blender Cycles",
+  "blender_version": "4.5.3 LTS",
+  "device": "GPU",
+  "metal_devices": [
+    "Apple M4 Pro (GPU - 20 cores)"
+  ],
+  "samples": 256,
+  "diffuse_bounces": 4,
+  "passes": [
+    "DIFFUSE_DIRECT",
+    "DIFFUSE_INDIRECT"
+  ],
+  "color_pass": false,
+  "encoding": "Linear RGBM",
+  "range": 8,
+  "resolution": [
+    2048,
+    2048
+  ],
+  "maximum_radiance": 1.1495060920715332,
+  "bake_seconds": 8.0,
+  "mapped_meshes": 36,
+  "triangles": 67500,
+  "source_sha256": "4abcf429d66b349732bbd9f5781b31e4b4aadeed12f8d47cfbf06126a4ad3aef",
+  "lighting": "Scene sun, Earth key, four area fills and desk spot. Area intensity converted to power with a factor of three for the offline light study.",
+  "assets": "Original keyboard, mouse and mat geometry. No reference website assets copied.",
+  "denoiser": "Open Image Denoise RT (HDR), bundled with Blender",
+  "denoise_seconds": 0.51,
+  "contact_shadow": {
+    "engine": "Cycles AO baked through emission",
+    "distance_metres": 0.025,
+    "resolution": [
+      1024,
+      512
+    ],
+    "maximum_occlusion": 0.9976562261581421
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "engine": "Blender Cycles AO",
+  "samples": 256,
+  "originalAsset": true,
+  "source_sha256": "05b535e0378ea955ecfbb35170154c403675da1b433cdb4ddb5ecf6659ac5994",
+  "contact_shadow": {
+    "engine": "Cycles AO baked through emission",
+    "distance_metres": 0.01,
+    "resolution": [
+      512,
+      512
+    ],
+    "maximum_occlusion": 1.0
+  }
+}

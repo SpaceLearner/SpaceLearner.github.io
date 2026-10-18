@@ -1,0 +1,30 @@
+{
+  "engine": "Blender Cycles",
+  "blender_version": "4.5.3 LTS",
+  "device": "GPU",
+  "metal_devices": [
+    "Apple M4 Pro (GPU - 20 cores)"
+  ],
+  "samples": 256,
+  "diffuse_bounces": 4,
+  "passes": [
+    "DIFFUSE_DIRECT",
+    "DIFFUSE_INDIRECT"
+  ],
+  "color_pass": false,
+  "encoding": "Linear RGBM",
+  "range": 8,
+  "resolution": [
+    1024,
+    1024
+  ],
+  "maximum_radiance": 0.85051429271698,
+  "bake_seconds": 2.03,
+  "mapped_meshes": 44,
+  "triangles": 2016,
+  "source_sha256": "58b3405d34096a7ef5db2e547054ce638b135ebf33d4c2e3b964fc437da3c121",
+  "lighting": "Scene sun, Earth key, four area fills and desk spot. Area intensity converted to power with a factor of three for the offline light study.",
+  "assets": "Self-built cabin and original scene geometry. No models or textures copied from the reference website.",
+  "denoiser": "Open Image Denoise RT (HDR), bundled with Blender",
+  "denoise_seconds": 0.16
+}

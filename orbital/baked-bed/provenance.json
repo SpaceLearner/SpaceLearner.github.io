@@ -1,0 +1,30 @@
+{
+  "engine": "Blender Cycles",
+  "blender_version": "4.5.3 LTS",
+  "device": "GPU",
+  "metal_devices": [
+    "Apple M4 Pro (GPU - 20 cores)"
+  ],
+  "samples": 256,
+  "diffuse_bounces": 4,
+  "passes": [
+    "DIFFUSE_DIRECT",
+    "DIFFUSE_INDIRECT"
+  ],
+  "color_pass": false,
+  "encoding": "Linear RGBM",
+  "range": 8,
+  "resolution": [
+    1024,
+    1024
+  ],
+  "maximum_radiance": 0.8280429840087891,
+  "bake_seconds": 4.24,
+  "mapped_meshes": 7,
+  "triangles": 24120,
+  "source_sha256": "2424961f6f1911fe7c97a841589038356ad5393bc32eb6cc03a342c814918d05",
+  "lighting": "Scene sun, Earth key, four area fills and desk spot. Area intensity converted to power with a factor of three for the offline light study.",
+  "assets": "Refined existing walnut platform bed, linen pillows and draped greige foot throw. Original procedural geometry.",
+  "denoiser": "Open Image Denoise RT (HDR), bundled with Blender",
+  "denoise_seconds": 0.16
+}

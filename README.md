@@ -1,3 +1,17 @@
+# Jiayan Guo — Orbital Research Homepage
+
+The root page is the orbital desk experience, migrated from the approved Sites v36 source (`6f0f94eb44dedbc782309581eac63ecbb2e4d2cc`). `/classic/` provides the text-first research page. All runtime assets are self-hosted under `orbital/` and `research-assets/`; no Sites backend is required.
+
+The migration is prepared for GitHub Pages branch publishing from `master` and `/ (root)`. `.nojekyll` serves the prepared static files without Jekyll. Confirm that source in Settings → Pages before publishing. There is no build or dependency installation step. To preview locally, run `python3 -m http.server 8000` in this directory.
+
+The previous Jekyll source remains in the repository and on branch `backup/before-orbital-home-2026-10-18`, at commit `15a2a6aacc06b5ab1c1dc1db69f548ba2c067f9a`. To roll back, revert the migration commit through a normal new commit, including removal of `.nojekyll`, then republish through the same Pages source. Do not force-push or delete repository history.
+
+The existing Sites publication is retained separately and is not changed by this migration. QA recordings and screenshots are local-only and are not part of this repository.
+
+---
+
+## Original template documentation
+
 A Github Pages template for academic websites. This was forked (then detached) by [Stuart Geiger](https://github.com/staeiou) from the [Minimal Mistakes Jekyll Theme](https://mmistakes.github.io/minimal-mistakes/), which is © 2016 Michael Rose and released under the MIT License. See LICENSE.md.
 
 I think I've got things running smoothly and fixed some major bugs, but feel free to file issues or make pull requests if you want to improve the generic template / theme.

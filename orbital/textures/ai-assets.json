@@ -1,0 +1,22 @@
+[
+  {
+    "file": "ai-walnut-desktop-v1.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2450854,
+    "sha256": "7bc3b32ebb1b3932e62fe195e0f846ac89ddb9c8591bbb7102c65e2a5dac64d1",
+    "source": "OpenAI built-in image generation",
+    "description": "Image-generated natural dark walnut color/albedo map; applied to the volumetric desktop with separate bump/roughness maps.",
+    "transformed": false
+  },
+  {
+    "file": "ai-orbital-planet-v1.png",
+    "width": 1774,
+    "height": 887,
+    "bytes": 3559600,
+    "sha256": "9c35683149afe162773934fe4aebb96c66ab34abd949b0172ac28aacb0856089",
+    "source": "OpenAI built-in image generation",
+    "description": "Image-generated Earth-inspired equirectangular albedo; artistic visualization, not an authoritative satellite dataset. Applied to a 3D sphere with real-time terminator and atmospheric scattering approximation.",
+    "transformed": false
+  }
+]

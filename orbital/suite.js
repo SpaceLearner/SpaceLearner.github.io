@@ -1,0 +1,365 @@
+import { textureAsset } from './asset-profile.js';
+import * as THREE from './vendor/three.module.min.js';
+import { RoomEnvironment } from './vendor/RoomEnvironment.js';
+import { RectAreaLightUniformsLib } from './vendor/RectAreaLightUniformsLib.js';
+import { createDeskAssets } from './desk-assets.js';
+import { createMouse, createDeskMat } from './desk-inputs.js';
+import { applyInputBake } from './input-lightmap.js';
+import { applyMugBake } from './coffee-mug.js';
+import { createShelfBooks } from './book-assets.js';
+import { createBed, applyBedBake } from './bed-assets.js';
+import { createCabinArchitecture } from './cabin-architecture.js';
+import { applyCabinBake } from './cabin-lightmap.js';
+import { createOrbitalBackground } from './orbit-background.js';
+import { createEntryFlight, createEntryPlayback } from './entry-flight.js';
+import { createVistaTransit } from './vista-transit.js';
+import { createOrbitalView } from './orbital-view.js';
+import { createVistaPicker } from './vista-picker.js';
+
+const canvas = document.getElementById('space');
+const status = document.getElementById('status');
+const fallback = document.getElementById('fallback');
+const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+const reduceMotion = motionPreference.matches;
+const anchors = {};
+const objects = [];
+let paused = reduceMotion;
+let renderer;
+let stopEntry=()=>{};
+
+function showFallback(message) {
+  stopEntry();
+  document.body.classList.remove('entering');
+  document.getElementById('entry-controls').hidden=true;
+  document.getElementById('entry-replay').hidden=true;
+  document.body.classList.remove('ready');
+  document.body.classList.add('no-webgl');
+  fallback.hidden = false;
+  status.textContent = 'STANDARD EXPLORER / 普通浏览模式';
+  if (message) document.getElementById('fallback-detail').textContent = message;
+  canvas.hidden = true;
+}
+
+try {
+  renderer = new THREE.WebGLRenderer({canvas, antialias: true, alpha: false, powerPreference:'high-performance'});
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.7));
+  renderer.setSize(innerWidth, canvas.parentElement.clientHeight, false);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  // Static geometry needs its sunlight, Earthlight and lamp shadow maps only once.
+  renderer.shadowMap.autoUpdate = false;
+  renderer.shadowMap.needsUpdate = true;
+  RectAreaLightUniformsLib.init();
+  createSuite();
+} catch (error) {
+  console.warn('Orbital Suite could not start WebGL:', error);
+  showFallback('当前浏览器未能启用 WebGL 3D。你仍可浏览全部研究内容；在支持 WebGL 的浏览器中打开本页即可探索套房。');
+}
+
+function createSuite() {
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color('#010205');
+  const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 260);
+  const room = new THREE.Group(); scene.add(room);
+  const mat = (color, roughness=.65, metalness=.05) => new THREE.MeshPhysicalMaterial({color, roughness, metalness});
+  const walnut=mat('#ffffff',.49), bronze=mat('#858c8b',.42,.72), shell=mat('#747672',.47,.7), dark=mat('#292d2e',.5,.55), ivory=mat('#c7c3b9',.92), upholstery=mat('#98958c',.96), rugMat=mat('#77766c',1), black=mat('#131719',.38,.32), paper=mat('#d7d0bc',.95);
+  const stone=mat('#a4a39c',.55,.02),leather=mat('#403a34',.77);
+  ivory.sheen=1;ivory.sheenRoughness=.85;ivory.sheenColor=new THREE.Color('#aca99e');upholstery.sheen=.8;upholstery.sheenRoughness=.95;
+  walnut.clearcoat=.12;walnut.clearcoatRoughness=.65;
+  const loadTex=(file,repeat,color=false)=>{const t=new THREE.TextureLoader().load(new URL('./textures/'+textureAsset(file),import.meta.url).href,()=>{window.dispatchEvent(new Event('suite-texture-ready'));});t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(...repeat);t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());if(color)t.colorSpace=THREE.SRGBColorSpace;return t;};
+  walnut.map=loadTex('walnut-color.jpg',[2,2],true);walnut.bumpMap=loadTex('walnut-bump.jpg',[2,2]);walnut.bumpScale=.014;walnut.roughnessMap=loadTex('walnut-roughness.jpg',[2,2]);
+  for(const m of [ivory,upholstery,rugMat]){m.map=loadTex('linen-color.jpg',[5,5],true);m.bumpMap=loadTex('linen-bump.jpg',[5,5]);m.bumpScale=.011;m.roughnessMap=loadTex('linen-roughness.jpg',[5,5]);}
+  for(const m of [bronze,shell,dark]){m.bumpMap=loadTex('metal-bump.jpg',[3,3]);m.bumpScale=.002;m.roughnessMap=loadTex('metal-roughness.jpg',[3,3]);}
+  stone.map=loadTex('stone-color.jpg',[2,2],true);stone.bumpMap=loadTex('stone-bump.jpg',[2,2]);stone.bumpScale=.01;stone.roughnessMap=loadTex('stone-roughness.jpg',[2,2]);
+  leather.bumpMap=loadTex('leather-bump.jpg',[3,3]);leather.bumpScale=.006;leather.roughnessMap=loadTex('leather-roughness.jpg',[3,3]);
+  const warm=new THREE.MeshBasicMaterial({color:'#d5c4a5'}), cool=new THREE.MeshBasicMaterial({color:'#8a989c'});
+  const environment=new RoomEnvironment();const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromScene(environment,.04).texture;scene.environmentIntensity=.29;environment.dispose();pmrem.dispose();
+  // Every furnishing is a volumetric mesh, with a real perspective camera and ray-cast hit testing.
+  function mesh(geo, material, x=0,y=0,z=0,parent=room) { const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m; }
+  function box(w,h,d,x,y,z,material,parent=room){return mesh(new THREE.BoxGeometry(w,h,d),material,x,y,z,parent);}
+  function round(w,h,d,x,y,z,material,r=.12,parent=room){
+    r=Math.min(r,w/2-.001,h/2-.001,d/2-.001);const shape=new THREE.Shape();const a=-w/2+r,b=-h/2+r,W=w-2*r,H=h-2*r;
+    shape.moveTo(a,b-r);shape.lineTo(a+W,b-r);shape.quadraticCurveTo(a+W+r,b-r,a+W+r,b);shape.lineTo(a+W+r,b+H);shape.quadraticCurveTo(a+W+r,b+H+r,a+W,b+H+r);shape.lineTo(a,b+H+r);shape.quadraticCurveTo(a-r,b+H+r,a-r,b+H);shape.lineTo(a-r,b);shape.quadraticCurveTo(a-r,b-r,a,b-r);
+    const g=new THREE.ExtrudeGeometry(shape,{depth:d-2*r,bevelEnabled:true,bevelSegments:5,steps:1,bevelSize:r*.5,bevelThickness:r,curveSegments:16});g.translate(0,0,-d/2+r);return mesh(g,material,x,y,z,parent);
+  }
+  function cylinder(rt,rb,h,x,y,z,material,parent=room){return mesh(new THREE.CylinderGeometry(rt,rb,h,40),material,x,y,z,parent);}
+  function sphere(r,x,y,z,material,parent=room){return mesh(new THREE.SphereGeometry(r,32,24),material,x,y,z,parent);}
+  function lineBetween(a,b,r,material,parent=room){const p=new THREE.Vector3(...a),q=new THREE.Vector3(...b);const m=mesh(new THREE.CylinderGeometry(r,r,p.distanceTo(q),12),material,0,0,0,parent);m.position.copy(p).add(q).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),q.sub(p).normalize());return m;}
+  function register(group,id,anchor){group.traverse(m=>{if(m.isMesh){m.userData.panel=id;objects.push(m);}});anchors[id]=new THREE.Vector3(...anchor);}
+  function texture(draw,w=1024,h=512){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t;}
+  function screenTexture(title,subtitle,lines){return texture((c,w,h)=>{const bg=c.createLinearGradient(0,0,w,h);bg.addColorStop(0,'#252c2d');bg.addColorStop(1,'#101617');c.fillStyle=bg;c.fillRect(0,0,w,h);c.fillStyle='#d2bc91';c.font='18px monospace';c.fillText('JIAYAN GUO / ORBITAL RESEARCH',48,54);c.strokeStyle='#5c8898';c.lineWidth=2;c.beginPath();c.moveTo(48,78);c.lineTo(w-48,78);c.stroke();c.fillStyle='#eae5d1';c.font='52px Georgia';c.fillText(title,48,161);c.fillStyle='#b1b7b3';c.font='19px monospace';c.fillText(subtitle,50,205);lines.forEach((t,i)=>{c.fillStyle=i%2?'#9eb4b9':'#d2d3b8';c.font='22px monospace';c.fillText(t,50,290+i*53);});c.strokeStyle='#73c2cc';c.globalAlpha=.5;for(let i=0;i<3;i++){c.beginPath();c.ellipse(790,340,106,35+i*20,-.5,0,Math.PI*2);c.stroke();}c.globalAlpha=1;});}
+  function panel(w,h,x,y,z,t,parent){const m=mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:t}),x,y,z,parent);m.castShadow=false;return m;}
+  function desktopTexture(projects=false){return texture((c,w,h)=>{
+    c.fillStyle='#171c20';c.fillRect(0,0,w,h);c.fillStyle='#23292e';c.fillRect(0,0,w,36);
+    for(let i=0;i<3;i++){c.beginPath();c.arc(20+i*17,18,4,0,Math.PI*2);c.fillStyle=['#a07b72','#aa9974','#7f9286'][i];c.fill();}
+    c.fillStyle='#a1a9ad';c.font='12px Arial';c.fillText('JIAYAN GUO  /  RESEARCH DESKTOP',390,23);
+    c.fillStyle='#1c2226';c.fillRect(0,36,177,h-36);c.fillStyle='#d5c6a9';c.font='bold 20px Georgia';c.fillText('JG /',25,89);
+    ['Overview','Research','Projects','Publications'].forEach((label,i)=>{c.fillStyle=(projects?i===2:i===0)?'#343b3e':'#1c2226';c.fillRect(14,123+i*47,148,34);c.fillStyle=(projects?i===2:i===0)?'#ece5d5':'#8c979b';c.font='15px Arial';c.fillText(label,27,145+i*47);});
+    c.fillStyle='#899591';c.font='12px monospace';c.fillText('PERSONAL WORKSPACE',211,85);c.fillStyle='#e7e3d9';c.font='46px Georgia';c.fillText(projects?'Selected research':'Jiayan Guo',209,151);
+    c.fillStyle='#a6b0b2';c.font='17px Arial';c.fillText(projects?'Generalist agents. Physical intelligence.':'Building agents that reason, act, and learn.',211,191);
+    const cards=projects?[['ZeroSearch','Search agents / reinforcement learning'],['RynnBrain','Embodied foundation models'],['WorldVLA · RynnVLA','Vision, language and action']]:[['01 / Generalist Agents','Search, tools and multi-step reasoning'],['02 / Physical Intelligence','Perception, spatial reasoning and action'],['Research archive','17 public records / 2022 — 2026']];
+    cards.forEach(([title,caption],i)=>{const y=231+i*99;c.fillStyle='#20272b';c.fillRect(209,y,775,83);c.strokeStyle='#3a4447';c.strokeRect(209,y,775,83);c.fillStyle='#d6c6a7';c.font='23px Georgia';c.fillText(title,231,y+32);c.fillStyle='#98a4a7';c.font='16px Arial';c.fillText(caption,231,y+59);c.fillStyle='#b9c4be';c.font='19px Arial';c.fillText('↗',945,y+44);});
+    c.fillStyle='#707e82';c.font='11px monospace';c.fillText('SELECT THE DISPLAY TO EXPLORE',212,554);
+  },1024,576);}
+
+  const cabin=createCabinArchitecture(THREE,{walnut,metalBump:bronze.bumpMap,metalRoughness:bronze.roughnessMap});room.add(cabin);
+  applyCabinBake(THREE,cabin).then(({count})=>{
+    document.body.dataset.cabinBake=String(count);
+    window.dispatchEvent(new Event('suite-texture-ready'));
+  }).catch(error=>{
+    document.body.dataset.cabinBake='unavailable';
+    console.warn('Cabin lighting uses its realtime fallback.',error);
+  });
+  // The right lounge is a private suite, rather than an empty control room.
+  round(4.6,.13,5.0,2.9,.01,1.6,rugMat,.055);
+  for(let i=0;i<42;i++)box(4.3,.004,.006,2.9,.08,-.65+i*.11,mat('#6f7067',1));
+  const bed=createBed(THREE,{walnut});bed.position.set(4.1,0,-3.25);bed.scale.x=.74;room.add(bed);
+  applyBedBake(THREE,bed).then(({count})=>{document.body.dataset.bedBake='ready';document.body.dataset.bedBakeCount=String(count);window.dispatchEvent(new Event('suite-texture-ready'));}).catch(error=>{document.body.dataset.bedBake='unavailable';console.warn('Bed lighting uses its realtime fallback.',error);});
+  // Lounge sofa, low table and a book left open under a warm pendant.
+  round(3.2,.22,1.32,3.4,.39,1.65,leather,.055);
+  for(const x of [2,4.8])for(const z of [1.16,2.1])cylinder(.035,.035,.27,x,.17,z,bronze);
+  round(3.3,.78,.25,3.4,.99,1.02,upholstery,.08);
+  for(const x of [2.61,4.18]){const back=round(1.45,.65,.24,x,1.01,1.2,ivory,.075);back.rotation.x=-.1;}
+  for(const x of [1.85,4.95])round(.18,.52,1.4,x,.76,1.63,upholstery,.055);
+  for(const x of [2.62,4.15])round(1.41,.19,1.01,x,.64,1.55,ivory,.055);
+  const cushion=round(.7,.56,.23,2.25,1.02,1.27,mat('#897158',.95),.1);cushion.rotation.z=.18;
+  const cushion2=round(.7,.56,.23,4.6,1.02,1.27,mat('#687e81',.95),.1);cushion2.rotation.z=-.14;
+  cylinder(.8,.8,.07,2.6,.64,3.4,stone);cylinder(.09,.15,.6,2.6,.3,3.4,bronze);cylinder(.51,.57,.07,2.6,.07,3.4,dark);
+  const notes=new THREE.Group();room.add(notes);
+  const tablet=round(.68,.045,.48,2.6,.73,3.55,dark,.02,notes);tablet.rotation.y=-.18;
+  const notePanel=panel(.61,.41,2.6,.758,3.55,screenTexture('Field notes','17 PUBLICATIONS',['2022 / 2026','EXPLORE THE ARCHIVE']),notes);notePanel.rotation.x=-Math.PI/2;notePanel.rotation.z=.18;
+  notes.scale.setScalar(.82);notes.position.set(-4.02,.896,-4.03);notes.rotation.y=.03;
+  register(notes,'papers',[-1.8,1.72,-1.2]);
+  cylinder(.08,.07,.2,2.13,.8,3.18,paper);cylinder(.071,.071,.005,2.13,.904,3.18,mat('#34251d'));
+  const hoop=mesh(new THREE.TorusGeometry(.055,.012,12,24),paper,2.03,.81,3.18);hoop.rotation.y=Math.PI/2;
+  // Fixed first-person workstation. The tabletop remains true volumetric geometry.
+  const desktopWalnut=walnut.clone();desktopWalnut.map=loadTex('ai-walnut-desktop-v1.png',[1,1],true);desktopWalnut.roughness=.68;desktopWalnut.roughnessMap=null;desktopWalnut.bumpScale=.006;desktopWalnut.clearcoat=.03;
+  const desktopSurface=round(4.6,.18,1.7,-3.15,1.35,-1.6,desktopWalnut,.055);desktopSurface.name='Preserved walnut desktop';
+  desktopSurface.geometry.computeBoundingBox();
+  const deskTop=desktopSurface.position.y+desktopSurface.geometry.boundingBox.max.y,matTop=deskTop+.003/.62;
+  for(const x of [-5.05,-1.3]){round(.075,1.3,1.25,x,.65,-1.6,dark,.022);}
+  // Metric hero assets: preserve fabrication proportions despite the room's legacy scale.
+  const deskAssets=createDeskAssets(THREE,{monitor:desktopTexture(),terminal:desktopTexture(true)});
+  function placeDeskAsset(g,x,y,z,scale=1,angle=0){
+    const mount=new THREE.Group();room.add(mount);mount.position.set(x,y,z);mount.scale.set(1/.84,1/.62,1/.84);
+    g.scale.setScalar(scale);g.rotation.y=angle;mount.add(g);return mount;
+  }
+  const monitor=placeDeskAsset(deskAssets.monitor,-3.7,1.468,-2,1.3);
+  register(monitor,'about',[-3.7,2.6,-1.96]);
+  const terminal=placeDeskAsset(deskAssets.terminal,-1.9,1.468,-1.73,1.2,-.12);
+  register(terminal,'projects',[-1.9,2.12,-1.7]);
+  // Screen fill leaves the front surface, aimed slightly down at the desk.
+  for(const [group,screen,intensity]of [[deskAssets.monitor,deskAssets.monitorScreen,.45],[deskAssets.terminal,deskAssets.terminalScreen,.24]]){
+    const fill=new THREE.RectAreaLight('#c1cfd2',intensity,screen.width,screen.height);
+    fill.position.set(...screen.position);fill.position.z+=.004;
+    fill.lookAt(new THREE.Vector3(0,screen.position[1]-.22,.65));group.add(fill);
+  }
+  const keyboardMount=placeDeskAsset(deskAssets.keyboard,-3.65,matTop,-1.02,1.15);
+  const mouseGroup=createMouse(THREE);placeDeskAsset(mouseGroup,-3.08,matTop,-1);
+  // Compact ceramic/aluminium task lamp, kept below the window horizon.
+  const lampBase=mat('#d2d0c6',.66,.08),lampStem=mat('#4b5658',.46,.72);
+  cylinder(.13,.16,.045,-5.12,1.49,-1.96,lampBase);
+  lineBetween([-5.12,1.52,-1.96],[-5.12,2.28,-1.96],.014,lampStem);
+  lineBetween([-5.12,2.28,-1.96],[-4.96,2.33,-1.96],.014,lampStem);
+  cylinder(.12,.19,.115,-4.96,2.29,-1.96,lampBase);
+  cylinder(.165,.165,.008,-4.96,2.23,-1.96,warm);
+  // A shielded task light: only the downward cone illuminates the work surface.
+  const lampLight=new THREE.SpotLight('#ffe3bc',.22,2.2,Math.PI/3.3,.72,2);
+  lampLight.position.set(-4.96,2.21,-1.96);lampLight.target.position.set(-4.55,1.44,-1.3);
+  lampLight.castShadow=true;lampLight.shadow.mapSize.set(1024,1024);
+  lampLight.shadow.camera.near=.08;lampLight.shadow.camera.far=3;
+  lampLight.shadow.bias=-.00008;lampLight.shadow.normalBias=.0015;
+  room.add(lampLight,lampLight.target);
+  // Desk chair.
+  cylinder(.1,.13,.5,-3.5,.55,.1,bronze);cylinder(.55,.55,.05,-3.5,.11,.1,dark);
+  round(1,.2,1,-3.5,.9,.1,upholstery,.09);round(1,.95,.22,-3.5,1.4,.5,upholstery,.1);
+  // The research entrance is the articulated desktop arm, with real joint housings.
+  const lab=placeDeskAsset(deskAssets.robot,-4.85,1.468,-1.72);
+  register(lab,'research',[-4.78,2.3,-1.64]);
+  const deskMat=createDeskMat(THREE);placeDeskAsset(deskMat,-3.5,deskTop,-1.05);
+  let inputBakeIndex=0;
+  for(const group of [deskAssets.keyboard,mouseGroup,deskMat])group.traverse(mesh=>{if(mesh.isMesh&&mesh.material.isMeshStandardMaterial){mesh.geometry=mesh.geometry.index?mesh.geometry.toNonIndexed():mesh.geometry.clone();mesh.userData.inputBakeIndex=inputBakeIndex++;}});
+  applyInputBake(THREE,[deskAssets.keyboard,mouseGroup,deskMat]).then(result=>{document.body.dataset.inputBake=String(result.count);window.dispatchEvent(new Event('suite-texture-ready'));}).catch(error=>{document.body.dataset.inputBake='unavailable';console.warn('Desktop detail lighting unavailable:',error);});
+  function cable(points,r=.004){return mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p))),32,r,8,false),black);}
+  cable([[-3.7,1.51,-2],[-3.9,1.48,-2.2],[-4.4,1.47,-2.2],[-4.5,1.4,-2.3]]);
+  cable([[-1.9,1.5,-1.75],[-2.05,1.47,-2],[-2.4,1.47,-2.2]]);
+  cylinder(.055,.055,.012,-4.5,1.449,-2.23,dark);
+  // Clear iced coffee at the approved cup position; the glass retains real wall thickness.
+  placeDeskAsset(deskAssets.mug,-2.5,1.468,-1.9,1.15,-.4);
+  applyMugBake(THREE,deskAssets.mug).then(result=>{document.body.dataset.mugBake=String(result.count);window.dispatchEvent(new Event('suite-texture-ready'));}).catch(error=>{document.body.dataset.mugBake='unavailable';console.warn('Cup detail lighting unavailable:',error);});
+  round(.38,.035,.48,-5.12,1.47,-1.26,leather,.014);
+  for(let i=0;i<4;i++)box(.35,.002,.44,-5.12,1.47+i*.004,-1.26,paper);
+  const pen=lineBetween([-5.21,1.495,-1.08],[-5.03,1.495,-1.44],.007,bronze);sphere(.009,-5.03,1.495,-1.44,black);
+
+  // Personal details: books, plant, shelving, pendant, wall art.
+  const bookshelf=round(1.8,.065,.46,-5.72,3.6,-4.3,walnut,.025);bookshelf.name='Walnut books shelf';
+  bookshelf.geometry.computeBoundingBox();
+  const shelfBooks=createShelfBooks(THREE);shelfBooks.position.set(-5.72,bookshelf.position.y+bookshelf.geometry.boundingBox.max.y,-4.25);
+  shelfBooks.scale.set(1/.84,1/.62,1/.84);room.add(shelfBooks);
+  cylinder(.32,.22,.62,5.68,.4,3.3,bronze);
+  for(let i=0;i<8;i++){const ang=i*2.4;const x=5.68+Math.cos(ang)*.38,z=3.3+Math.sin(ang)*.3,y=1.2+i*.13;lineBetween([5.68,.7,3.3],[x,y,z],.015,mat('#415d46'));const leaf=sphere(.23,x,y,z,mat(i%2?'#54715b':'#344e43'));leaf.scale.set(.53,1.8,.3);leaf.rotation.z=Math.cos(ang)*.75;}
+  lineBetween([2.6,6.1,-.1],[2.6,3.7,-.1],.015,bronze);
+  const pendant=mesh(new THREE.TorusGeometry(.48,.025,16,80),bronze,2.6,3.65,-.1);pendant.rotation.x=Math.PI/2;
+  const diffuser=mesh(new THREE.TorusGeometry(.48,.012,12,80),warm,2.6,3.626,-.1);diffuser.rotation.x=Math.PI/2;
+  const pendantLight=new THREE.PointLight('#ffe4c1',.55,4,2);pendantLight.position.set(2.6,3.4,-.1);room.add(pendantLight);
+
+  // Thin upholstery piping, mattress seams, hardware and layered construction.
+  const seam=mat('#a09b8e',.97);
+  function piping(w,d,x,y,z,m=seam){const pts=[];const r=.055;for(let i=0;i<=80;i++){const a=i/80*Math.PI*2;const px=Math.sign(Math.cos(a))*(w/2-r)+Math.cos(a)*r;const pz=Math.sign(Math.sin(a))*(d/2-r)+Math.sin(a)*r;pts.push(new THREE.Vector3(px+x,y,pz+z));}return mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts,true),100,.007,5,true),m);}
+  for(const x of [2.62,4.15])piping(1.37,.97,x,.735,1.55);
+  // Soft local contact shadows anchor every major piece to the floor.
+  const shadowTexture=texture((c,w,h)=>{c.clearRect(0,0,w,h);const g=c.createRadialGradient(w/2,h/2,w*.04,w/2,h/2,w*.5);g.addColorStop(0,'rgba(0,0,0,.55)');g.addColorStop(.45,'rgba(0,0,0,.30)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(0,0,w,h);},128,128);
+  function contact(w,d,x,z,opacity=.55,y=-.032){const m=new THREE.MeshBasicMaterial({map:shadowTexture,transparent:true,opacity,depthWrite:false,toneMapped:false});const o=mesh(new THREE.PlaneGeometry(w,d),m,x,y,z);o.rotation.x=-Math.PI/2;o.castShadow=false;o.receiveShadow=false;return o;}
+  contact(4.2,2.2,3.4,1.65,.6,.084);contact(3.6,3.5,4.1,-3.25,.68);contact(4.9,2,-3.15,-1.6,.48);contact(1.5,1.5,-3.5,.1,.65);contact(2.3,2.1,2.6,3.4,.48,.084);contact(1.55,1.35,-5.55,1.55,.6);
+  // Subtle tabletop contact shadows sit directly below the device feet.
+  contact(.52,.34,-3.7,-2.04,.25,1.469);
+  contact(.30,.24,-1.9,-1.77,.23,1.469);contact(.28,.25,-4.85,-1.72,.28,1.469);
+  // Correct architectural proportions: human-scale ceiling and furniture heights.
+  room.scale.set(.84,.62,.84);
+  for(const anchor of Object.values(anchors))anchor.multiply(room.scale);
+
+  // An open celestial field, with a smaller depth-tested Earth near the window edge.
+  // At this apparent size the 2k maps are sufficient, including on desktop.
+  const planetMap=loadTex('nasa-earth-surface.jpg',[1,1],true);
+  const cloudMap=loadTex('nasa-earth-clouds.jpg',[1,1]);
+  const orbit=createOrbitalBackground(THREE,planetMap,cloudMap);scene.add(orbit.group);
+  const {sunDirection}=orbit;camera.far=800;camera.updateProjectionMatrix();
+
+  scene.add(new THREE.HemisphereLight('#c8d5dc','#777267',.40));
+  scene.add(new THREE.AmbientLight('#d2cec3',.05));
+  const sunlight=new THREE.DirectionalLight('#eee8d9',2.1);
+  sunlight.target.position.set(-2.65,1,-1.5);sunlight.position.copy(sunlight.target.position).addScaledVector(sunDirection,14);
+  sunlight.castShadow=true;sunlight.shadow.mapSize.set(2048,2048);
+  // Concentrate the shadow map on the desktop; millimetre offsets keep feet grounded.
+  Object.assign(sunlight.shadow.camera,{left:-3.2,right:3.2,top:3,bottom:-2.5,near:.1,far:28});
+  sunlight.shadow.bias=-.00008;sunlight.shadow.normalBias=.002;sunlight.shadow.radius=2;
+  scene.add(sunlight,sunlight.target);
+  // Broad Earth-reflected light enters through the glass; the sun stays outside.
+  // A soft shadowing key complements the area fill and anchors the desk objects.
+  const earthKey=new THREE.DirectionalLight('#b9d1e0',.28);earthKey.name='Earthlight through the window';
+  earthKey.target.position.set(-2.65,1,-1.5);
+  earthKey.position.copy(earthKey.target.position).addScaledVector(orbit.center.clone().sub(earthKey.target.position).normalize(),10);
+  earthKey.castShadow=true;earthKey.shadow.mapSize.set(2048,2048);
+  Object.assign(earthKey.shadow.camera,{left:-3.2,right:3.2,top:2.5,bottom:-2.5,near:.1,far:15});
+  earthKey.shadow.bias=-.00008;earthKey.shadow.normalBias=.001;earthKey.shadow.radius=3;
+  scene.add(earthKey,earthKey.target);
+  // Keep the full rectangular emitter below the roof: tilting this broad panel
+  // made its far edge cross the pressure shell in the offline lighting bake.
+  const interiorLight=new THREE.RectAreaLight('#f0dfc5',.72,8,4);interiorLight.name='Ceiling diffuse fill';interiorLight.position.set(-1,5.9,.3);interiorLight.rotation.x=-Math.PI/2;room.add(interiorLight);
+  const windowFill=new THREE.RectAreaLight('#b8d5e7',.20,11,3.5);windowFill.position.set(0,3.4,-5.6);windowFill.lookAt(-3,1.4,-1);room.add(windowFill);
+  const orbitalView=createOrbitalView(THREE,scene,orbit);
+  let viewAvailable=true;
+
+  // Seated first-person view: the eye position never moves, only bounded head rotation.
+  let width=innerWidth,height=canvas.parentElement.clientHeight,mobile=width<600,needsRender=true;
+  const cameraPosition=new THREE.Vector3(-2.72,1.65,.55);
+  const cameraTarget=new THREE.Vector3(-2.66,1.42,-2.4);
+  const entryPath=createEntryFlight(THREE,cameraPosition,cameraTarget);
+  const forward=cameraTarget.clone().sub(cameraPosition).normalize();
+  const baseYaw=Math.atan2(-forward.x,-forward.z),basePitch=Math.asin(forward.y);
+  const yawLimit=THREE.MathUtils.degToRad(30),pitchLimit=THREE.MathUtils.degToRad(15);
+  const dragThreshold=6,sensitivity=.0025;
+  let yaw=0,pitch=0,gesture=null,suppressClick=false,entry=null;
+  const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
+  function updateLook(){if(entry?.active)return;yaw=THREE.MathUtils.clamp(yaw,-yawLimit,yawLimit);pitch=THREE.MathUtils.clamp(pitch,-pitchLimit,pitchLimit);camera.position.copy(cameraPosition);camera.rotation.set(basePitch+pitch,baseYaw+yaw,0,'YXZ');camera.updateMatrixWorld();needsRender=true;}
+  function resize(){width=canvas.parentElement.clientWidth;height=canvas.parentElement.clientHeight;mobile=width<600;renderer.setSize(width,height,false);camera.aspect=width/height;camera.fov=mobile?79:59;camera.updateProjectionMatrix();if(entry?.active){entryPath.sample(entry.progress,camera);needsRender=true;}else updateLook();}
+  const motionButton=document.getElementById('motion');
+  const entryControls=document.getElementById('entry-controls'),skipButton=document.getElementById('entry-skip'),replayButton=document.getElementById('entry-replay'),recenterButton=document.getElementById('recenter');
+  const hint=document.getElementById('hint');
+  function updateMotion(){motionButton.textContent=paused?'继续环境动画':'暂停环境动画';motionButton.setAttribute('aria-pressed',String(paused));motionButton.setAttribute('aria-label',paused?'继续环境动画':'暂停环境动画');}
+  updateMotion();motionButton.addEventListener('click',()=>{paused=!paused;orbit.suspendMotion();if(paused)transit.settle('pause');updateMotion();needsRender=true;});
+  const vistaControl=document.getElementById('vista-control'),vistaCaption=document.getElementById('vista-caption');
+  vistaControl.hidden=false;
+  vistaControl.querySelector('#vista-value').value='earth';document.body.dataset.vista='earth';
+  createVistaPicker(vistaControl);
+  const vistaName=v=>v==='earth'?'地球':'卡冈图亚';
+  let transitStage='idle';
+  function updateVista(vista){
+    orbit.setVista(vista);
+    document.querySelector('.intro .eyebrow').lastChild.textContent=vista==='earth'?' A DESK ABOVE THE EARTH':' A DESK NEAR GARGANTUA';
+    document.body.dataset.vista=vista;needsRender=true;
+  }
+  const transit=createVistaTransit({
+    onCommit:updateVista,
+    onFrame(state){
+      orbitalView.setTransit(state);needsRender=true;
+      const stage=!state.active?'idle':state.lowMotion?'quiet':state.progress<.25?'charging':state.progress<.7?'transit':'arriving';
+      if(stage!==transitStage){transitStage=stage;document.body.dataset.transit=stage;
+        if(state.active)vistaCaption.textContent=(stage==='quiet'?'正在切换至 ':stage==='arriving'?'正在抵达 ':stage==='charging'?'准备跃迁至 ':'穿越中 · ')+vistaName(state.desired);
+      }
+    },
+    onState(state){
+      vistaControl.setAttribute('aria-busy',String(state.active));document.body.classList.toggle('jumping',state.active);
+      if(state.active)vistaCaption.textContent='正在跃迁至 '+vistaName(state.desired);
+      else vistaCaption.textContent=state.current==='earth'?'地球 · UTC 日自转 / 云层缓流':'卡冈图亚 · 原创流动吸积盘';
+    }
+  });
+  vistaControl.addEventListener('change',e=>{
+    if(e.target.name!=='vista')return;
+    transit.request(e.target.value,{quiet:paused||motionPreference.matches||entry?.active});
+  });
+  function intersect(x,y){const r=canvas.getBoundingClientRect();pointer.set((x-r.left)/r.width*2-1,-(y-r.top)/r.height*2+1);raycaster.setFromCamera(pointer,camera);return raycaster.intersectObjects(objects,false)[0]?.object.userData.panel;}
+  canvas.addEventListener('pointerdown',e=>{if(entry?.active||e.isPrimary===false||e.button!==0||gesture)return;suppressClick=false;gesture={id:e.pointerId,x:e.clientX,y:e.clientY,yaw,pitch,dragging:false};canvas.focus({preventScroll:true});canvas.setPointerCapture(e.pointerId);});
+  canvas.addEventListener('pointermove',e=>{
+    if(entry?.active)return;
+    if(gesture&&gesture.id===e.pointerId){const dx=e.clientX-gesture.x,dy=e.clientY-gesture.y;if(!gesture.dragging&&dx*dx+dy*dy>dragThreshold*dragThreshold)gesture.dragging=true;if(gesture.dragging){suppressClick=true;yaw=gesture.yaw+dx*sensitivity;pitch=gesture.pitch+dy*sensitivity;updateLook();canvas.style.cursor='grabbing';}return;}
+    if(!gesture)canvas.style.cursor=intersect(e.clientX,e.clientY)?'pointer':'grab';
+  });
+  function endGesture(e,cancelled=false){if(!gesture||gesture.id!==e.pointerId)return;suppressClick=cancelled||gesture.dragging;gesture=null;canvas.style.cursor='grab';if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);}
+  canvas.addEventListener('pointerup',e=>endGesture(e));
+  canvas.addEventListener('pointercancel',e=>endGesture(e,true));
+  canvas.addEventListener('lostpointercapture',e=>endGesture(e,true));
+  canvas.addEventListener('click',e=>{if(entry?.active||suppressClick){e.preventDefault();return;}const id=intersect(e.clientX,e.clientY);if(id)window.suiteOpen(id);});
+  function recenter(){if(entry?.active){entry.skip();return;}if(gesture)endGesture({pointerId:gesture.id},true);yaw=0;pitch=0;updateLook();}
+  document.getElementById('recenter').addEventListener('click',recenter);
+  canvas.addEventListener('keydown',e=>{const id={1:'about',2:'research',3:'projects',4:'papers'}[e.key];if(id){e.preventDefault();window.suiteOpen(id);return;}const step=THREE.MathUtils.degToRad(3);if(e.key==='Home'){e.preventDefault();recenter();}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();if(entry?.active)return;if(e.key==='ArrowLeft')yaw+=step;if(e.key==='ArrowRight')yaw-=step;if(e.key==='ArrowUp')pitch+=step;if(e.key==='ArrowDown')pitch-=step;updateLook();}});
+  let entryStorage=null;try{entryStorage=window.sessionStorage;}catch{/* Private storage denial defaults to skipping autoplay. */}
+  entry=createEntryPlayback({storage:entryStorage,reduceMotion:reduceMotion||document.getElementById('sheet').open,
+    onStart(){
+      transit.settle('entry');
+      if(gesture)endGesture({pointerId:gesture.id},true);yaw=0;pitch=0;suppressClick=true;
+      document.body.classList.add('entering');entryControls.hidden=false;
+      recenterButton.disabled=motionButton.disabled=replayButton.disabled=true;
+      canvas.setAttribute('aria-busy','true');canvas.style.cursor='default';
+      status.textContent='正在入舱 · 约 5 秒';hint.textContent='可随时跳过，直接到桌前';
+      renderer.setPixelRatio(Math.min(devicePixelRatio,mobile?1.25:1.5));
+    },
+    onFrame(progress){entryPath.sample(progress,camera);needsRender=true;},
+    onFinish(reason){
+      document.body.classList.remove('entering');entryControls.hidden=true;
+      recenterButton.disabled=motionButton.disabled=replayButton.disabled=false;
+      canvas.removeAttribute('aria-busy');canvas.style.cursor='grab';yaw=0;pitch=0;updateLook();
+      status.innerHTML='<span class="pulse"></span> SEATED DESK VIEW / 桌前坐姿 · 可转头';
+      hint.textContent='拖动画面转头 · 点击桌面设备';renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
+      if(reason!=='unavailable'&&(document.activeElement===skipButton||document.activeElement===replayButton))canvas.focus({preventScroll:true});
+    }
+  });
+  stopEntry=()=>{viewAvailable=false;entry.disable();transit.disable();orbitalView.dispose();};
+  skipButton.addEventListener('click',()=>entry.skip());
+  replayButton.addEventListener('click',()=>{if(!document.querySelector('dialog[open]'))entry.start({replay:true});});
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'&&entry.active){e.preventDefault();entry.skip();}else if(e.key==='Escape'&&transit.active){e.preventDefault();transit.settle('skip');}});
+  window.addEventListener('suite-panel-open',()=>{entry.skip();transit.settle('panel');});
+  let reading=!!document.querySelector('dialog[open]'),lastSceneFrame=-Infinity;
+  window.addEventListener('suite-reading-change',e=>{reading=e.detail.active;needsRender=true;lastSceneFrame=-Infinity;});
+  document.addEventListener('visibilitychange',()=>{entry.suspend();orbit.suspendMotion();if(document.hidden)transit.settle('hidden');});
+  window.addEventListener('pagehide',()=>{orbit.suspendMotion();transit.settle('pagehide');});
+  motionPreference.addEventListener?.('change',e=>{if(e.matches){entry.skip();transit.settle('reduced-motion');paused=true;orbit.suspendMotion();updateMotion();needsRender=true;}});
+  canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();showFallback('3D 图形连接已中断。所有内容仍可通过下方入口打开，刷新页面可尝试重新进入套房。');});
+  window.addEventListener('resize',resize);window.addEventListener('suite-texture-ready',()=>{needsRender=true;});resize();entry.start();
+  const projected=new THREE.Vector3();
+  const blockedOverlays=[document.querySelector('.intro'),document.querySelector('.vista-control'),document.querySelector('.top')];
+  function render(ms){
+    if(!viewAvailable)return;
+    if(document.hidden){entry.suspend();requestAnimationFrame(render);return;}
+    entry.tick(ms);
+    transit.tick(ms);
+    // Earth samples UTC; local environmental motion uses a suspendable clock.
+    // Reading remains at 10 fps without changing its movement speed.
+    if(!paused&&(!reading||entry.active||transit.active||ms-lastSceneFrame>=100)){orbit.setTime(Date.now(),ms);needsRender=true;}
+    if(needsRender){lastSceneFrame=ms;orbit.update(camera);orbitalView.render(renderer,camera);document.querySelectorAll('[data-anchor]').forEach(b=>{const anchor=anchors[b.dataset.anchor];projected.copy(anchor).project(camera);const x=(projected.x*.5+.5)*width,y=(-projected.y*.5+.5)*height;const visible=!entry.active&&projected.z<1&&projected.z>-1&&x>58&&x<width-58&&y>110&&y<height-90&&!blockedOverlays.some(el=>{const r=el.getBoundingClientRect();return x+54>r.left&&x-54<r.right&&y>r.top&&y-48<r.bottom;});b.style.left=x+'px';b.style.top=y+'px';b.style.visibility=visible?'visible':'hidden';});needsRender=false;}
+    requestAnimationFrame(render);
+  }
+  orbit.update(camera);orbitalView.render(renderer,camera);document.body.classList.add('ready');requestAnimationFrame(render);
+}
