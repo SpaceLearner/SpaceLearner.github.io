@@ -241,3 +241,60 @@ body[data-object-focus="approaching"] .vista-control,body[data-object-focus="rea
  .focus-toolbar{padding-top:4px;padding-bottom:4px}.focus-toolbar button{min-height:40px}
  .notebook-tabs{padding-top:5px}.notebook-tabs button{min-height:34px;padding-top:6px;padding-bottom:6px}
 }
+
+/* Phone reading keeps a stable toolbar, generous touch targets and safe edges. */
+:root{--safe-top:env(safe-area-inset-top,0px);--safe-right:env(safe-area-inset-right,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px)}
+@media(max-width:699px),(max-width:950px) and (max-height:520px){
+ .suite{height:100dvh}
+ .top{height:calc(106px + var(--safe-top));padding:calc(8px + var(--safe-top)) calc(12px + var(--safe-right)) 8px calc(12px + var(--safe-left));display:grid;grid-template-columns:1fr auto;grid-template-rows:44px 44px;gap:2px 8px;align-content:start;align-items:center}
+ .brand{grid-column:1;grid-row:1;display:inline-flex;align-items:center;min-height:44px;font-size:24px}
+ .original{position:static;grid-column:2;grid-row:1;display:inline-flex;align-items:center;justify-content:flex-end;min-height:44px;padding:0;font-size:12px;border:0;text-decoration:underline;text-underline-offset:5px}
+ .top nav{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(5,minmax(44px,1fr));width:100%;gap:2px;margin:0}
+ .top nav a{justify-content:center;min-width:44px;min-height:44px;font-size:14px}
+ .vista-control,.entering .vista-control{top:calc(110px + var(--safe-top));left:auto;right:calc(12px + var(--safe-right))}
+ .vista-label{font-size:11px}#vista-select{font-size:13px}
+ .bottom,.ready .bottom{left:calc(12px + var(--safe-left));right:calc(12px + var(--safe-right));bottom:calc(10px + var(--safe-bottom));gap:0}
+ .view-controls,.ready .view-controls{display:flex;width:min(100%,420px);padding:4px;gap:2px}
+ .view-controls button,.view-controls #motion,.view-controls #entry-replay,.view-controls #recenter{flex:1;min-width:0;min-height:44px;padding:10px 8px;font-size:12px}
+ .bottom .hint,.ready .hint{bottom:62px;font-size:11px}
+ .entry-controls{left:auto;right:calc(12px + var(--safe-right));bottom:calc(76px + var(--safe-bottom));padding:6px}
+ #sheet{inset:calc(12px + var(--safe-top)) calc(12px + var(--safe-right)) calc(12px + var(--safe-bottom)) calc(12px + var(--safe-left));margin:0;width:auto;height:auto;max-width:none}
+ .sheet-head{padding:16px 18px;gap:12px}.sheet-head h2{font-size:27px}
+ .sheet-body,#sheet[data-object]:not([data-object=""]) .sheet-body{padding:18px 18px 26px;font-size:16px;line-height:1.8;touch-action:pan-y pinch-zoom;-webkit-overflow-scrolling:touch;scroll-padding-block:18px}
+ #sheet[data-object]:not([data-object=""]) .sheet-head{padding:12px 18px}
+ #sheet[data-object]:not([data-object=""]) .sheet-head h2{font-size:25px}
+ .focus-toolbar{padding:6px 10px;gap:6px}.focus-toolbar span{font-size:12px;letter-spacing:.02em}
+ .focus-toolbar button,.notebook-tabs button{min-height:44px;min-width:44px;font-size:13px;padding:8px 10px}
+ .notebook-tabs{padding:8px 17px 0}
+ .sheet-body .links{gap:4px 16px}.sheet-body .links a{min-height:44px}
+ .publications a{font-size:16px;line-height:1.65;padding-block:4px}.publications small{font-size:13px}
+ .figure-open span{min-height:44px;display:flex;justify-content:flex-end;align-items:center;padding:8px 3px}
+ .image-viewer{inset:calc(8px + var(--safe-top)) calc(8px + var(--safe-right)) calc(8px + var(--safe-bottom)) calc(8px + var(--safe-left));margin:0;width:auto;height:auto;max-width:none}
+ .image-head{padding:10px 14px;gap:10px}.image-head h2{font-size:20px}
+ .image-tools{padding:0 14px;gap:4px 14px}.image-tools button,.image-tools a{font-size:14px;min-height:44px}
+ .image-help{margin:6px 14px 10px;font-size:12px}.image-stage{padding:8px}
+ #sheet[data-focus-pending="true"]{bottom:calc(14px + var(--safe-bottom))!important;max-width:calc(100vw - 24px - var(--safe-left) - var(--safe-right))}
+ .fallback{top:calc(118px + var(--safe-top));bottom:calc(12px + var(--safe-bottom));left:calc(12px + var(--safe-left));right:calc(12px + var(--safe-right));transform:none;width:auto;max-height:none;padding:20px;overflow:auto}
+ .fallback h2{font-size:24px}.fallback>div{margin:16px 0}
+}
+@media(max-width:699px) and (max-height:650px){.bottom .hint,.ready .hint{display:none}}
+@media(max-width:950px) and (max-height:520px) and (orientation:landscape){
+ .top{height:calc(60px + var(--safe-top));grid-template-columns:auto minmax(240px,1fr) auto;grid-template-rows:44px;gap:8px;padding-top:calc(8px + var(--safe-top))}
+ .brand{font-size:23px}.top nav{grid-column:2;grid-row:1}.original{grid-column:3;grid-row:1;font-size:11px}
+ .vista-control,.entering .vista-control{top:calc(68px + var(--safe-top))}
+ .bottom,.ready .bottom{justify-content:flex-end}.view-controls{width:auto}.bottom .hint{display:none}
+ #sheet[data-object]:not([data-object=""]) .sheet-head{padding:8px 16px}
+ #sheet[data-object]:not([data-object=""]) .sheet-head h2{font-size:22px}
+ #sheet[data-object="notebook"] .sheet-head{display:none}
+ #sheet[data-object]:not([data-object=""]) .sheet-body{padding:14px 16px 22px;font-size:16px;line-height:1.75}
+ .sheet-kicker,.image-head .sheet-kicker{display:none}
+ .focus-toolbar{padding:4px 8px}.focus-toolbar button,.notebook-tabs button{min-height:44px}
+ .notebook-tabs{padding:6px 14px 8px;border-bottom:1px solid #b5aa943d}
+ .image-head{padding:6px 12px}.image-head h2{font-size:18px}.image-help{display:none}.image-tools{padding-bottom:6px}
+ .fallback{top:calc(68px + var(--safe-top))}
+}
+@media(max-width:650px) and (max-height:520px) and (orientation:landscape){
+ .top{grid-template-columns:auto 1fr;grid-template-rows:44px 44px;height:calc(106px + var(--safe-top))}
+ .brand{grid-column:1}.original{grid-column:2}.top nav{grid-column:1/-1;grid-row:2}
+ .vista-control,.entering .vista-control,.fallback{top:calc(110px + var(--safe-top))}
+}

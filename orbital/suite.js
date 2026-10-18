@@ -335,21 +335,30 @@ function createSuite() {
       pose.position.copy(center).add(new THREE.Vector3(.04,.64,.63));
       pose.lookAt(center.clone().add(new THREE.Vector3(0,.08,0)));
     }
-    if(width<700)pose.rotateX(-.44);
+    if(width<=950&&height<=520&&width>height)pose.rotateY(-.5);
+    else if(width<700)pose.rotateX(-.44);
     return {position:pose.position.clone(),quaternion:pose.quaternion.clone(),fov:pose.fov};
   }
   function layoutReading(){
     if(!objectFocus?.active||sheet.dataset.focusPending==='true'||!sheet.dataset.object)return;
     const project=p=>{p.project(camera);return {x:(p.x*.5+.5)*width,y:(-.5*p.y+.5)*height};};
     let left,top,w,h;
-    if(objectFocus.kind==='monitor'&&width>=700){
+    const style=getComputedStyle(document.documentElement);
+    const safe=side=>parseFloat(style.getPropertyValue('--safe-'+side))||0;
+    const leftSafe=safe('left'),rightSafe=safe('right'),topSafe=safe('top'),bottomSafe=safe('bottom');
+    if(width<=950&&height<=520&&width>height){
+      // A side sheet leaves the focused object visible without squeezing the text.
+      w=Math.min(600,(width-leftSafe-rightSafe)*.68);
+      left=width-rightSafe-12-w;top=topSafe+8;h=height-top-bottomSafe-8;
+    }else if(objectFocus.kind==='monitor'&&width>=700){
       const screen=deskAssets.monitorScreen;
       const corners=[[-1,-1],[-1,1],[1,-1],[1,1]].map(([x,y])=>project(screen.mesh.localToWorld(new THREE.Vector3(x*screen.width/2,y*screen.height/2,.001))));
       left=Math.min(...corners.map(p=>p.x))+5;top=Math.min(...corners.map(p=>p.y))+5;
       w=Math.max(...corners.map(p=>p.x))-left-5;h=Math.max(...corners.map(p=>p.y))-top-5;
     }else if(width<700){
       // On phones the object remains visible above its attached reading surface.
-      left=12;top=Math.min(242,height*.31);w=width-24;h=height-top-18;
+      left=leftSafe+12;top=topSafe+Math.min(196,(height-topSafe-bottomSafe)*.26);
+      w=width-leftSafe-rightSafe-24;h=height-top-bottomSafe-12;
     }else{
       const point=project(notebook.center());w=Math.min(790,width-72);h=Math.min(540,height-120);
       left=Math.max(24,Math.min(width-w-24,point.x-w/2));top=Math.max(90,Math.min(height-h-44,point.y-h*.65));
@@ -406,7 +415,10 @@ function createSuite() {
   window.addEventListener('pagehide',()=>{objectFocus.suspend();orbit.suspendMotion();transit.settle('pagehide');});
   motionPreference.addEventListener?.('change',e=>{if(e.matches){entry.skip();transit.settle('reduced-motion');objectFocus.finish();paused=true;orbit.suspendMotion();updateMotion();needsRender=true;}});
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();showFallback('3D 图形连接已中断。所有内容仍可通过下方入口打开，刷新页面可尝试重新进入套房。');});
-  window.addEventListener('resize',resize);window.addEventListener('suite-texture-ready',()=>{needsRender=true;});resize();entry.start();
+  window.addEventListener('resize',resize);window.addEventListener('suite-texture-ready',()=>{needsRender=true;});
+  // Dynamic browser bars can resize the scene without changing the layout viewport.
+  if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(canvas.parentElement);
+  resize();entry.start();
   const projected=new THREE.Vector3();
   const blockedOverlays=[document.querySelector('.vista-control'),document.querySelector('.top')];
   function render(ms){

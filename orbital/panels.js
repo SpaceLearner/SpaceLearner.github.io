@@ -144,7 +144,7 @@
   dialog.querySelector('.close').addEventListener('click',close);
   dialog.addEventListener('keydown',event=>{
     if(event.key!=='Tab')return;
-    const stops=[...dialog.querySelectorAll('button:not([disabled]),a[href],[tabindex="0"]')].filter(el=>!el.hidden&&el.getClientRects().length);
+    const stops=[...dialog.querySelectorAll('button:not([disabled]),a[href],summary,[tabindex="0"]')].filter(el=>!el.hidden&&el.getClientRects().length);
     if(!stops.length)return;
     const current=stops.indexOf(document.activeElement);
     const next=current<0?(event.shiftKey?stops.length-1:0):(current+(event.shiftKey?-1:1)+stops.length)%stops.length;

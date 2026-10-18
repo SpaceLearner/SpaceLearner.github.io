@@ -369,3 +369,20 @@ h2 { font-size: 29px; font-weight: 500; letter-spacing: 1px; line-height: 1.4; m
 
 /* News joins the existing navigation without clipping older links. */
 @media(max-width:600px){html{scroll-padding-top:192px}.header nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 9px}.header nav a{min-height:44px}.header nav a.current:after{bottom:0}}
+
+/* Mobile typography and controls retain the journal's spacing and colors. */
+@media(max-width:800px),(max-width:950px) and (max-height:520px){
+ .wrap,.nav-shell{padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}
+ .nav-shell{padding-top:calc(12px + env(safe-area-inset-top));gap:8px 12px}
+ .header nav a,.nav-link,.text-link,.project-links a,.project-series-links a,.paper-links a,.model-image-actions a,.experience-source,.project-continuation,.related-projects-link,.footer>a{min-height:44px;display:inline-flex;align-items:center}
+ .header nav a{justify-content:center;min-width:44px}.nav-link{justify-content:flex-end}
+ .research-item>p:not(.research-english),.project-description,.project-series-item>p,.body-copy,.timeline-item p,.experience-highlights{font-size:16px;line-height:1.8}
+ .project-role,.project-focus,.project-lineage,.project-links a,.project-series-links a,.paper-links a,.experience-source{font-size:13px}
+ .filter,.year-control select{min-height:44px;font-size:14px}.authors-details summary{min-height:44px;display:flex;align-items:center}
+ .paper-main h4{overflow-wrap:anywhere}.paper-authors{font-size:14px;line-height:1.75}
+ .footer{padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+}
+@media(max-width:950px) and (max-height:520px) and (orientation:landscape){
+ .header{position:relative}.nav-shell{min-height:0}.hero{padding-top:28px}
+ html{scroll-padding-top:20px}
+}
