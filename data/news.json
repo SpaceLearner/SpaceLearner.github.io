@@ -1,0 +1,26 @@
+[
+  {
+    "date": "2026-09",
+    "summary": "三篇论文被 NeurIPS 2026 接收。",
+    "papers": [
+      {
+        "title": "WorldVLA: A Unified Vision-Language-Action and World Model",
+        "url": "https://openreview.net/forum?id=2uT2MbEwuy",
+        "track": "NeurIPS 2026 · Poster",
+        "publishedAt": "2026-09-25"
+      },
+      {
+        "title": "Benchmarking Fine-Grained Spatio-Temporal Awareness in Embodied Brain Models",
+        "url": "https://openreview.net/forum?id=OBDBEkTysD",
+        "track": "NeurIPS 2026 · Evaluations and Datasets Track · Poster",
+        "publishedAt": "2026-09-25"
+      },
+      {
+        "title": "InterLV-Search: Benchmarking Interleaved Multimodal Agentic Search",
+        "url": "https://openreview.net/forum?id=f8reCCiMzH",
+        "track": "NeurIPS 2026 · Evaluations and Datasets Track · Poster",
+        "publishedAt": "2026-09-25"
+      }
+    ]
+  }
+]

@@ -178,3 +178,6 @@ body{font-family:var(--ui-font);-webkit-font-smoothing:antialiased;text-renderin
   .intro,.ready .intro{top:118px}
   .vista-control{top:254px}
 }
+
+/* Keep all five content entries visible on compact screens. */
+@media(max-width:600px){.top nav{gap:0;width:100%;justify-content:space-between}.top nav a{min-height:44px}}

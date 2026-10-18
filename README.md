@@ -8,6 +8,10 @@ The previous Jekyll source remains in the repository and on branch `backup/befor
 
 The existing Sites publication is retained separately and is not changed by this migration. QA recordings and screenshots are local-only and are not part of this repository.
 
+## News maintenance
+
+Edit `data/news.json`, then run `python3 scripts/render_news.py`. Entries are rendered newest first into the orbital News panel and `/classic/#news`. `python3 scripts/render_news.py --check` detects stale generated HTML. Paper links and track labels come from the supplied public OpenReview records; `publishedAt` is the record publication date, not an acceptance notification date.
+
 ---
 
 ## Original template documentation

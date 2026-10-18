@@ -366,3 +366,6 @@ h2 { font-size: 29px; font-weight: 500; letter-spacing: 1px; line-height: 1.4; m
 .featured-entry a:hover strong{text-decoration:underline;text-underline-offset:4px}
 .hero-current{font-size:13px;margin-bottom:28px}.hero-actions{margin-top:20px}
 @media(max-width:600px){.hero{padding-top:30px}.hero-current{font-size:12px;margin-bottom:23px}.hero h1{margin-bottom:18px}.featured-entry{gap:12px;margin-top:20px;padding-block:14px}.featured-entry strong{font-size:21px}.featured-entry>a>span{font-size:12px}.hero-actions{margin-top:20px}}
+
+/* News joins the existing navigation without clipping older links. */
+@media(max-width:600px){html{scroll-padding-top:192px}.header nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 9px}.header nav a{min-height:44px}.header nav a.current:after{bottom:0}}

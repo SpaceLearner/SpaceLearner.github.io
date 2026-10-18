@@ -287,12 +287,12 @@ function createSuite() {
       orbitalView.setTransit(state);needsRender=true;
       const stage=!state.active?'idle':state.lowMotion?'quiet':state.progress<.25?'charging':state.progress<.7?'transit':'arriving';
       if(stage!==transitStage){transitStage=stage;document.body.dataset.transit=stage;
-        if(state.active)vistaCaption.textContent=(stage==='quiet'?'正在切换至 ':stage==='arriving'?'正在抵达 ':stage==='charging'?'准备跃迁至 ':'穿越中 · ')+vistaName(state.destination)+(state.desired!==state.destination?' · 随后前往 '+vistaName(state.desired):'');
+        if(state.active)vistaCaption.textContent=(stage==='quiet'?'正在切换至 ':stage==='arriving'?'正在抵达 ':stage==='charging'?'准备跃迁至 ':'穿越中 · ')+vistaName(state.desired);
       }
     },
     onState(state){
       vistaControl.setAttribute('aria-busy',String(state.active));document.body.classList.toggle('jumping',state.active);
-      if(state.active)vistaCaption.textContent='正在跃迁至 '+vistaName(state.destination)+(state.desired!==state.destination?' · 随后前往 '+vistaName(state.desired):'');
+      if(state.active)vistaCaption.textContent='正在跃迁至 '+vistaName(state.desired);
       else vistaCaption.textContent=state.current==='earth'?'地球 · UTC 日自转 / 云层缓流':'卡冈图亚 · 原创流动吸积盘';
     }
   });

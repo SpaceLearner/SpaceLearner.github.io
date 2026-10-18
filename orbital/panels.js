@@ -8,7 +8,7 @@
   const fullImage=document.getElementById('image-full');
   const stage=document.getElementById('image-stage');
   const scaleButton=document.getElementById('image-scale');
-  const pages={about:['关于我','01 / ABOUT'],research:['研究方向','02 / RESEARCH'],projects:['代表项目','03 / PROJECTS'],papers:['研究论文','04 / PAPERS']};
+  const pages={news:['News · 近况','05 / NEWS'],about:['关于我','01 / ABOUT'],research:['研究方向','02 / RESEARCH'],projects:['代表项目','03 / PROJECTS'],papers:['研究论文','04 / PAPERS']};
   let previousFocus=null,imageFocus=null,currentPage='',currentProject='',historyBusy=false,closeToRoot=false;
   const inherited=history.state?.suite;
   const owner=inherited?.owner||String(Date.now())+Math.random().toString(36).slice(2);
@@ -61,7 +61,9 @@
     if(!pages[id])return;
     window.dispatchEvent(new Event('suite-panel-open'));
     hideImage();
-    previousFocus=dialog.open?previousFocus:(trigger||document.activeElement);
+    const active=document.activeElement;
+    const returnTarget=active&&active!==document.body&&!dialog.contains(active)?active:document.querySelector('nav [data-open="'+id+'"]');
+    previousFocus=dialog.open?previousFocus:(trigger||returnTarget);
     if(currentPage!==id){
       title.textContent=pages[id][0];kicker.textContent=pages[id][1];
       body.replaceChildren(document.getElementById(id).content.cloneNode(true));
