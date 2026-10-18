@@ -1,0 +1,593 @@
+{
+  "verifiedAt": "2026-10-10",
+  "publications": [
+    {
+      "id": "rynnbrain_11_2026",
+      "title": "RynnBrain 1.1: Towards More Capable and Generalizable Embodied Foundation Model",
+      "year": 2026,
+      "venue": "arXiv",
+      "authors": [
+        "Kehan Li",
+        "Bohan Hou",
+        "Minghao Zhu",
+        "Tianyi Zhang",
+        "Zesen Cheng",
+        "Zhikai Wang",
+        "Sicong Leng",
+        "Xin Li",
+        "Xiao Lin",
+        "Biying Yao",
+        "Minghua Zeng",
+        "Jiangpin Liu",
+        "Ronghao Dang",
+        "Jiayan Guo",
+        "Siteng Huang",
+        "Haoyu Zhao",
+        "Heng Ping",
+        "Yaxi Zhao",
+        "Tong Zhao",
+        "Kexiang Wang",
+        "Tong Lu",
+        "Shengke Xue",
+        "Jiahao Tang",
+        "Yulei Wang",
+        "Zejing Wang",
+        "Jianwei Gao",
+        "Shijian Lu",
+        "Chengju Liu",
+        "Jianfei Yang",
+        "Mingxiu Chen",
+        "Deli Zhao"
+      ],
+      "url": "https://arxiv.org/abs/2607.17977",
+      "code": "https://github.com/alibaba-damo-academy/RynnBrain",
+      "linkLabel": "arXiv",
+      "sources": [
+        "https://arxiv.org/abs/2607.17977",
+        "https://alibaba-damo-academy.github.io/RynnBrain/",
+        "https://github.com/alibaba-damo-academy/RynnBrain",
+        "https://github.com/SpaceLearner"
+      ]
+    },
+    {
+      "id": "rynnbrain_2026",
+      "title": "RynnBrain: Open Embodied Foundation Models",
+      "year": 2026,
+      "venue": "arXiv",
+      "authors": [
+        "Ronghao Dang",
+        "Jiayan Guo",
+        "Bohan Hou",
+        "Sicong Leng",
+        "Kehan Li",
+        "Xin Li",
+        "Jiangpin Liu",
+        "Yunxuan Mao",
+        "Zhikai Wang",
+        "Yuqian Yuan",
+        "Minghao Zhu",
+        "Xiao Lin",
+        "Yang Bai",
+        "Qian Jiang",
+        "Yaxi Zhao",
+        "Minghua Zeng",
+        "Junlong Gao",
+        "Yuming Jiang",
+        "Jun Cen",
+        "Siteng Huang",
+        "Liuyi Wang",
+        "Wenqiao Zhang",
+        "Chengju Liu",
+        "Jianfei Yang",
+        "Shijian Lu",
+        "Deli Zhao"
+      ],
+      "url": "https://arxiv.org/abs/2602.14979",
+      "code": "https://github.com/alibaba-damo-academy/RynnBrain",
+      "linkLabel": "arXiv",
+      "sources": [
+        "https://arxiv.org/abs/2602.14979",
+        "https://arxiv.org/html/2602.14979v1",
+        "https://github.com/alibaba-damo-academy/RynnBrain",
+        "https://github.com/SpaceLearner"
+      ]
+    },
+    {
+      "id": "atten-mixer-plus",
+      "title": "Advancing Session-Based Recommendations with Atten-Mixer+: Dynamic and Adaptive Multi-Level Intent Mining",
+      "year": 2025,
+      "venue": "ACM Transactions on Intelligent Systems and Technology (TIST), 16(5), Article 101",
+      "authors": [
+        "Peiyan Zhang",
+        "Jiayan Guo",
+        "Chaozhuo Li",
+        "Liying Kang",
+        "Jaeboum Kim",
+        "Jie Xu",
+        "Xi Zhang",
+        "Yan Zhang",
+        "Haohan Wang",
+        "Sunghun Kim"
+      ],
+      "url": "https://doi.org/10.1145/3700445",
+      "sources": [
+        "https://experts.illinois.edu/en/publications/advancing-session-based-recommendations-with-atten-mixer-dynamic-/",
+        "https://spacelearner.github.io/"
+      ]
+    },
+    {
+      "id": "chain_of_ideas_2025",
+      "title": "Chain of Ideas: Revolutionizing Research Via Novel Idea Development with LLM Agents",
+      "year": 2025,
+      "venue": "Findings of EMNLP 2025",
+      "authors": [
+        "Long Li",
+        "Weiwen Xu",
+        "Jiayan Guo",
+        "Ruochen Zhao",
+        "Xingxuan Li",
+        "Yuqian Yuan",
+        "Boqiang Zhang",
+        "Yuming Jiang",
+        "Yifei Xin",
+        "Ronghao Dang",
+        "Yu Rong",
+        "Deli Zhao",
+        "Tian Feng",
+        "Lidong Bing"
+      ],
+      "url": "https://doi.org/10.18653/v1/2025.findings-emnlp.477",
+      "linkLabel": "Paper",
+      "sources": [
+        "https://aclanthology.org/2025.findings-emnlp.477/",
+        "https://arxiv.org/abs/2410.13185",
+        "https://spacelearner.github.io/"
+      ]
+    },
+    {
+      "id": "zerosearch",
+      "title": "ZeroSearch: Incentivize the Search Capability of LLMs without Searching",
+      "year": 2025,
+      "venue": "arXiv",
+      "authors": [
+        "Hao Sun",
+        "Zile Qiao",
+        "Jiayan Guo",
+        "Xuanbo Fan",
+        "Yingyan Hou",
+        "Yong Jiang",
+        "Pengjun Xie",
+        "Yan Zhang",
+        "Fei Huang",
+        "Jingren Zhou"
+      ],
+      "url": "https://arxiv.org/abs/2505.04588",
+      "code": "https://github.com/Alibaba-NLP/ZeroSearch",
+      "sources": [
+        "https://arxiv.org/pdf/2505.04588",
+        "https://spacelearner.github.io/"
+      ]
+    },
+    {
+      "id": "diffup",
+      "title": "A Diffusion Model with User Preference Guidance for Recommendation",
+      "year": 2024,
+      "venue": "DASFAA 2024",
+      "authors": [
+        "Boci Peng",
+        "Xiaohe Bo",
+        "Jiayan Guo",
+        "Yan Zhang"
+      ],
+      "url": "https://link.springer.com/chapter/10.1007/978-981-97-5555-4_15",
+      "sources": [
+        "https://link.springer.com/chapter/10.1007/978-981-97-5555-4_15",
+        "https://spacelearner.github.io/"
+      ]
+    },
+    {
+      "id": "disfluency-generator",
+      "title": "Boosting Disfluency Detection with Large Language Model as Disfluency Generator",
+      "year": 2024,
+      "venue": "ICME 2024",
+      "authors": [
+        "Zhenrong Cheng",
+        "Jiayan Guo",
+        "Hao Sun",
+        "Yan Zhang"
+      ],
+      "url": "https://arxiv.org/abs/2403.08229",
+      "sources": [
+        "https://arxiv.org/abs/2403.08229",
+        "https://spacelearner.github.io/",
+        "https://ieeexplore.ieee.org/document/10688094/"
+      ]
+    },
+    {
+      "id": "aigb",
+      "title": "Generative Auto-bidding via Conditional Diffusion Modeling",
+      "year": 2024,
+      "venue": "KDD 2024",
+      "authors": [
+        "Jiayan Guo",
+        "Yusen Huo",
+        "Zhilin Zhang",
+        "Tianyu Wang",
+        "Chuan Yu",
+        "Jian Xu",
+        "Bo Zheng",
+        "Yan Zhang"
+      ],
+      "url": "https://arxiv.org/abs/2405.16141",
+      "sources": [
+        "https://arxiv.org/abs/2405.16141",
+        "https://dblp.dagstuhl.de/rec/conf/kdd/GuoHZWYXZZ24.html",
+        "https://spacelearner.github.io/"
+      ]
+    },
+    {
+      "id": "infofedsage",
+      "title": "An Information Theoretic Perspective for Heterogeneous Subgraph Federated Learning",
+      "year": 2023,
+      "venue": "DASFAA 2023",
+      "authors": [
+        "Jiayan Guo",
+        "Shangyang Li",
+        "Yan Zhang"
+      ],
+      "url": "https://link.springer.com/chapter/10.1007/978-3-031-30637-2_50",
+      "sources": [
+        "https://link.springer.com/chapter/10.1007/978-3-031-30637-2_50",
+        "https://spacelearner.github.io/"
+      ]
+    },
+    {
+      "id": "atten-mixer",
+      "title": "Efficiently Leveraging Multi-level User Intent for Session-based Recommendation via Atten-Mixer Network",
+      "year": 2023,
+      "venue": "WSDM 2023",
+      "authors": [
+        "Peiyan Zhang",
+        "Jiayan Guo",
+        "Chaozhuo Li",
+        "Yueqi Xie",
+        "Jaeboum Kim",
+        "Yan Zhang",
+        "Xing Xie",
+        "Haohan Wang",
+        "Sunghun Kim"
+      ],
+      "url": "https://arxiv.org/abs/2206.12781",
+      "sources": [
+        "https://arxiv.org/abs/2206.12781",
+        "https://www.wsdm-conference.org/2023/program/awards",
+        "https://spacelearner.github.io/"
+      ]
+    },
+    {
+      "id": "gpt4graph",
+      "title": "GPT4Graph: Can Large Language Models Understand Graph Structured Data? An Empirical Evaluation and Benchmarking",
+      "year": 2023,
+      "venue": "arXiv",
+      "authors": [
+        "Jiayan Guo",
+        "Lun Du",
+        "Hengyu Liu",
+        "Mengyu Zhou",
+        "Xinyi He",
+        "Shi Han"
+      ],
+      "url": "https://arxiv.org/abs/2305.15066",
+      "sources": [
+        "https://arxiv.org/abs/2305.15066",
+        "https://spacelearner.github.io/"
+      ]
+    },
+    {
+      "id": "hhr-tkg",
+      "title": "Hierarchical Hypergraph Recurrent Attention Network for Temporal Knowledge Graph Reasoning",
+      "year": 2023,
+      "venue": "ICASSP 2023",
+      "authors": [
+        "Jiayan Guo",
+        "Meiqi Chen",
+        "Yan Zhang",
+        "Jianqiang Huang",
+        "Zhiwei Liu"
+      ],
+      "url": "https://doi.org/10.1109/ICASSP49357.2023.10095378",
+      "sources": [
+        "https://spacelearner.github.io/",
+        "https://www.proceedings.com/content/071/071028webtoc.pdf",
+        "https://ieeexplore.ieee.org/document/10095378"
+      ]
+    },
+    {
+      "id": "homophily-rewiring",
+      "title": "Homophily-oriented Heterogeneous Graph Rewiring",
+      "year": 2023,
+      "venue": "The Web Conference (WWW) 2023",
+      "authors": [
+        "Jiayan Guo",
+        "Lun Du",
+        "Wendong Bi",
+        "Qiang Fu",
+        "Xiaojun Ma",
+        "Xu Chen",
+        "Shi Han",
+        "Dongmei Zhang",
+        "Yan Zhang"
+      ],
+      "url": "https://arxiv.org/abs/2302.06299",
+      "sources": [
+        "https://arxiv.org/pdf/2302.06299",
+        "https://doi.org/10.1145/3543507.3583454",
+        "https://spacelearner.github.io/"
+      ]
+    },
+    {
+      "id": "jgcf",
+      "title": "On Manipulating Signals of User-Item Graph: A Jacobi Polynomial-based Graph Collaborative Filtering",
+      "year": 2023,
+      "venue": "KDD 2023",
+      "authors": [
+        "Jiayan Guo",
+        "Lun Du",
+        "Xu Chen",
+        "Xiaojun Ma",
+        "Qiang Fu",
+        "Shi Han",
+        "Dongmei Zhang",
+        "Yan Zhang"
+      ],
+      "url": "https://arxiv.org/abs/2306.03624",
+      "code": "https://github.com/SpaceLearner/JGCF",
+      "sources": [
+        "https://arxiv.org/pdf/2306.03624",
+        "https://github.com/SpaceLearner/JGCF"
+      ]
+    },
+    {
+      "id": "gng-ode",
+      "title": "Evolutionary Preference Learning via Graph Nested GRU ODE for Session-based Recommendation",
+      "year": 2022,
+      "venue": "CIKM 2022",
+      "authors": [
+        "Jiayan Guo",
+        "Peiyan Zhang",
+        "Chaozhuo Li",
+        "Xing Xie",
+        "Yan Zhang",
+        "Sunghun Kim"
+      ],
+      "url": "https://arxiv.org/abs/2206.12779",
+      "code": "https://github.com/SpaceLearner/GNG-ODE",
+      "sources": [
+        "https://arxiv.org/pdf/2206.12779",
+        "https://spacelearner.github.io/"
+      ]
+    },
+    {
+      "id": "multi-granularity-intent",
+      "title": "Learning Multi-granularity Consecutive User Intent Unit for Session-based Recommendation",
+      "year": 2022,
+      "venue": "WSDM 2022",
+      "authors": [
+        "Jiayan Guo",
+        "Yaming Yang",
+        "Xiangchen Song",
+        "Yuan Zhang",
+        "Yujing Wang",
+        "Jing Bai",
+        "Yan Zhang"
+      ],
+      "url": "https://arxiv.org/abs/2112.13197",
+      "code": "https://github.com/SpaceLearner/SessionRec-pytorch",
+      "sources": [
+        "https://arxiv.org/abs/2112.13197",
+        "https://github.com/SpaceLearner/SessionRec-pytorch",
+        "https://ir.pku.edu.cn/handle/20.500.11897/663833"
+      ]
+    },
+    {
+      "id": "graphacl",
+      "title": "Learning Robust Representation Through Graph Adversarial Contrastive Learning",
+      "year": 2022,
+      "venue": "DASFAA 2022",
+      "authors": [
+        "Jiayan Guo",
+        "Shangyang Li",
+        "Yue Zhao",
+        "Yan Zhang"
+      ],
+      "url": "https://arxiv.org/abs/2201.13025",
+      "sources": [
+        "https://link.springer.com/chapter/10.1007/978-3-031-00123-9_54",
+        "https://arxiv.org/abs/2201.13025",
+        "https://spacelearner.github.io/"
+      ]
+    },
+    {
+      "id": "worldvla_neurips_2026",
+      "title": "WorldVLA: A Unified Vision-Language-Action and World Model",
+      "year": 2026,
+      "venue": "NeurIPS 2026 · Poster",
+      "url": "https://openreview.net/forum?id=2uT2MbEwuy",
+      "linkLabel": "OpenReview",
+      "publicationStatus": "accepted",
+      "publishedAt": "2026-09-25",
+      "verifiedAt": "2026-10-18",
+      "confirmedAuthors": [
+        "Jiayan Guo"
+      ],
+      "sources": [
+        "https://openreview.net/forum?id=2uT2MbEwuy",
+        "https://arxiv.org/abs/2511.17502",
+        "https://openreview.net/profile?id=%7EJiayan_Guo1"
+      ],
+      "links": [
+        {
+          "label": "预印本 / RynnVLA-002",
+          "url": "https://arxiv.org/abs/2511.17502"
+        }
+      ],
+      "aliases": [
+        "RynnVLA-002"
+      ],
+      "displayNote": "RynnVLA-002 的正式接收题名。"
+    },
+    {
+      "id": "embodied_spatiotemporal_neurips_2026",
+      "title": "Benchmarking Fine-Grained Spatio-Temporal Awareness in Embodied Brain Models",
+      "year": 2026,
+      "venue": "NeurIPS 2026 · Evaluations and Datasets Track · Poster",
+      "url": "https://openreview.net/forum?id=OBDBEkTysD",
+      "linkLabel": "OpenReview",
+      "publicationStatus": "accepted",
+      "publishedAt": "2026-09-25",
+      "verifiedAt": "2026-10-18",
+      "confirmedAuthors": [
+        "Jiayan Guo"
+      ],
+      "sources": [
+        "https://openreview.net/forum?id=OBDBEkTysD",
+        "https://openreview.net/profile?id=%7EJiayan_Guo1"
+      ]
+    },
+    {
+      "id": "interlv_search_neurips_2026",
+      "title": "InterLV-Search: Benchmarking Interleaved Multimodal Agentic Search",
+      "year": 2026,
+      "venue": "NeurIPS 2026 · Evaluations and Datasets Track · Poster",
+      "url": "https://openreview.net/forum?id=f8reCCiMzH",
+      "linkLabel": "OpenReview",
+      "publicationStatus": "accepted",
+      "publishedAt": "2026-09-25",
+      "verifiedAt": "2026-10-18",
+      "confirmedAuthors": [
+        "Jiayan Guo"
+      ],
+      "sources": [
+        "https://openreview.net/forum?id=f8reCCiMzH",
+        "https://openreview.net/profile?id=%7EJiayan_Guo1"
+      ]
+    },
+    {
+      "id": "rynnvla_001_2026",
+      "title": "RynnVLA-001: Using Human Demonstrations to Improve Robot Manipulation",
+      "year": 2026,
+      "venue": "ICRA 2026",
+      "url": "https://arxiv.org/abs/2509.15212",
+      "linkLabel": "arXiv",
+      "publicationStatus": "accepted",
+      "confirmedAuthors": [
+        "Jiayan Guo"
+      ],
+      "sources": [
+        "https://arxiv.org/abs/2509.15212",
+        "https://ras.papercept.net/conferences/conferences/ICRA26/program/ICRA26_ContentListWeb_3.html"
+      ],
+      "verifiedAt": "2026-10-18"
+    },
+    {
+      "id": "worldvla_preprint_2025",
+      "title": "WorldVLA: Towards Autoregressive Action World Model",
+      "year": 2025,
+      "venue": "arXiv",
+      "url": "https://arxiv.org/abs/2506.21539",
+      "linkLabel": "arXiv",
+      "publicationStatus": "preprint",
+      "confirmedAuthors": [
+        "Jiayan Guo"
+      ],
+      "sources": [
+        "https://arxiv.org/abs/2506.21539"
+      ],
+      "verifiedAt": "2026-10-18"
+    },
+    {
+      "id": "medgr2_2026",
+      "title": "MedGR²: Breaking the Data Barrier for Medical Reasoning via Generative Reward Learning",
+      "year": 2026,
+      "venue": "AAAI 2026",
+      "url": "https://ojs.aaai.org/index.php/AAAI/article/view/40125",
+      "linkLabel": "Paper",
+      "publicationStatus": "published",
+      "confirmedAuthors": [
+        "Jiayan Guo"
+      ],
+      "sources": [
+        "https://ojs.aaai.org/index.php/AAAI/article/view/40125"
+      ],
+      "verifiedAt": "2026-10-18"
+    },
+    {
+      "id": "affordance_grasping_2026",
+      "title": "Towards Affordance-Aware Robotic Dexterous Grasping with Human-like Priors",
+      "year": 2026,
+      "venue": "AAAI 2026",
+      "url": "https://doi.org/10.1609/aaai.v40i15.38313",
+      "linkLabel": "Paper",
+      "publicationStatus": "published",
+      "confirmedAuthors": [
+        "Jiayan Guo"
+      ],
+      "sources": [
+        "https://doi.org/10.1609/aaai.v40i15.38313"
+      ],
+      "verifiedAt": "2026-10-18"
+    },
+    {
+      "id": "evidence_mental_health_2026",
+      "title": "Evidence-Bounded Mental Health Reasoning from Heterogeneous Speech Protocols",
+      "year": 2026,
+      "venue": "Findings of EMNLP 2026 · Accepted",
+      "url": "https://arxiv.org/abs/2608.31014",
+      "linkLabel": "arXiv",
+      "publicationStatus": "accepted",
+      "confirmedAuthors": [
+        "Jiayan Guo"
+      ],
+      "sources": [
+        "https://arxiv.org/abs/2608.31014",
+        "https://arxiv.org/html/2608.31014v1"
+      ],
+      "verifiedAt": "2026-10-18",
+      "displayNote": "接收信息依据作者在 arXiv 元数据中的标注。"
+    },
+    {
+      "id": "unveil_2025",
+      "title": "Unveil: Unified Visual-Textual Integration and Distillation for Multi-modal Document Retrieval",
+      "year": 2025,
+      "venue": "ACL 2025",
+      "url": "https://aclanthology.org/2025.acl-long.1166/",
+      "linkLabel": "Paper",
+      "publicationStatus": "published",
+      "confirmedAuthors": [
+        "Jiayan Guo"
+      ],
+      "sources": [
+        "https://aclanthology.org/2025.acl-long.1166/"
+      ],
+      "verifiedAt": "2026-10-18"
+    },
+    {
+      "id": "subgraph_federated_ib_2025",
+      "title": "Subgraph Federated Learning with Information Bottleneck Constrained Generative Learning",
+      "year": 2025,
+      "venue": "ACM TKDD 2025 · 19(6)",
+      "url": "https://doi.org/10.1145/3737879",
+      "linkLabel": "Paper",
+      "publicationStatus": "published",
+      "confirmedAuthors": [
+        "Jiayan Guo"
+      ],
+      "sources": [
+        "https://doi.org/10.1145/3737879",
+        "https://www.gdiist.cn/en/research/lab_member_detail/46"
+      ],
+      "verifiedAt": "2026-10-18"
+    }
+  ],
+  "updatedAt": "2026-10-18"
+}

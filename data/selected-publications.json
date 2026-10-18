@@ -1,0 +1,51 @@
+[
+  {
+    "title": "RynnBrain: Open Embodied Foundation Models",
+    "year": 2026,
+    "venue": "arXiv",
+    "url": "https://arxiv.org/abs/2602.14979",
+    "code": "https://github.com/alibaba-damo-academy/RynnBrain",
+    "selected": true,
+    "summary": "面向物理世界的具身基础模型研究。",
+    "contribution": "Jiayan Guo · 项目负责人之一"
+  },
+  {
+    "title": "ZeroSearch: Incentivize the Search Capability of LLMs without Searching",
+    "year": 2025,
+    "venue": "arXiv",
+    "url": "https://arxiv.org/abs/2505.04588",
+    "code": "https://github.com/Alibaba-NLP/ZeroSearch",
+    "selected": true,
+    "summary": "通过模拟搜索交互，训练大语言模型的搜索能力。",
+    "contribution": "Jiayan Guo · 通讯作者"
+  },
+  {
+    "title": "Generative Auto-bidding via Conditional Diffusion Modeling",
+    "year": 2024,
+    "venue": "KDD",
+    "url": "https://arxiv.org/abs/2405.16141",
+    "selected": true,
+    "summary": "将条件扩散模型应用于自动竞价决策。"
+  },
+  {
+    "title": "Efficiently Leveraging Multi-level User Intent for Session-based Recommendation via Atten-Mixer Network",
+    "year": 2023,
+    "venue": "WSDM",
+    "url": "https://doi.org/10.1145/3539597.3570445",
+    "selected": true,
+    "summary": "通过多层次用户意图建模，改善会话推荐。",
+    "award": {
+      "label": "Best Paper Award · Honorable Mention",
+      "url": "https://www.wsdm-conference.org/2023/program/awards"
+    }
+  },
+  {
+    "title": "On Manipulating Signals of User-Item Graph: A Jacobi Polynomial-based Graph Collaborative Filtering",
+    "year": 2023,
+    "venue": "KDD",
+    "url": "https://arxiv.org/abs/2306.03624",
+    "code": "https://github.com/SpaceLearner/JGCF",
+    "selected": true,
+    "summary": "利用 Jacobi 多项式建模用户与物品图上的信号。"
+  }
+]

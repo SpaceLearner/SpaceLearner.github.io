@@ -53,7 +53,16 @@ if __name__ == '__main__':
     parser.add_argument('--check', action='store_true', help='Fail if generated HTML is stale')
     args = parser.parse_args()
     source = BASE / 'data/news.json'
-    content = render(json.loads(source.read_text()))
+    entries = json.loads(source.read_text())
+    archive = BASE / 'data/publications.json'
+    if archive.exists():
+        records = {p['url']: p for p in json.loads(archive.read_text())['publications']}
+        for entry in entries:
+            for paper in entry.get('papers', []):
+                record = records.get(paper['url'])
+                if not record or record['title'] != paper['title'] or record['venue'] != paper['track']:
+                    raise ValueError('News/publication mismatch: ' + paper['title'])
+    content = render(entries)
     primary = BASE / 'dist' if (BASE / 'dist/index.html').exists() else BASE
     update(primary, content, args.check)
     if args.mirror:

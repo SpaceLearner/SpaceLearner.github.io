@@ -12,6 +12,10 @@ The existing Sites publication is retained separately and is not changed by this
 
 Edit `data/news.json`, then run `python3 scripts/render_news.py`. Entries are rendered newest first into the orbital News panel and `/classic/#news`. `python3 scripts/render_news.py --check` detects stale generated HTML. Paper links and track labels come from the supplied public OpenReview records; `publishedAt` is the record publication date, not an acceptance notification date.
 
+## Publication maintenance
+
+`data/publications.json` supplies both publication views and their counts. Run `python3 scripts/render_publications.py` after editing it, then use `--check` to verify generated output. The archive has 27 confirmed records, including all 17 previous entries and 10 verified additions; the five-paper selected view is preserved. This is a curated archive, not a claim of exhaustive Scholar coverage. Preprints and accepted papers are labeled separately. RynnVLA-002 is linked under its accepted 2026 WorldVLA title and is counted once; the 2025 WorldVLA preprint is a distinct work. Both generators require News paper titles, links and venues to match the archive.
+
 ---
 
 ## Original template documentation

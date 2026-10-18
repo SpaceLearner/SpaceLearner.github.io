@@ -91,6 +91,8 @@ function createSuite() {
   function texture(draw,w=1024,h=512){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t;}
   function screenTexture(title,subtitle,lines){return texture((c,w,h)=>{const bg=c.createLinearGradient(0,0,w,h);bg.addColorStop(0,'#252c2d');bg.addColorStop(1,'#101617');c.fillStyle=bg;c.fillRect(0,0,w,h);c.fillStyle='#d2bc91';c.font='18px monospace';c.fillText('JIAYAN GUO / ORBITAL RESEARCH',48,54);c.strokeStyle='#5c8898';c.lineWidth=2;c.beginPath();c.moveTo(48,78);c.lineTo(w-48,78);c.stroke();c.fillStyle='#eae5d1';c.font='52px Georgia';c.fillText(title,48,161);c.fillStyle='#b1b7b3';c.font='19px monospace';c.fillText(subtitle,50,205);lines.forEach((t,i)=>{c.fillStyle=i%2?'#9eb4b9':'#d2d3b8';c.font='22px monospace';c.fillText(t,50,290+i*53);});c.strokeStyle='#73c2cc';c.globalAlpha=.5;for(let i=0;i<3;i++){c.beginPath();c.ellipse(790,340,106,35+i*20,-.5,0,Math.PI*2);c.stroke();}c.globalAlpha=1;});}
   function panel(w,h,x,y,z,t,parent){const m=mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:t}),x,y,z,parent);m.castShadow=false;return m;}
+  const publicationList=document.getElementById('papers').content.querySelector('.publications');
+  const publicationCount=publicationList.children.length,publicationYears=publicationList.dataset.years||'2022 — 2026';
   function desktopTexture(projects=false){return texture((c,w,h)=>{
     c.fillStyle='#171c20';c.fillRect(0,0,w,h);c.fillStyle='#23292e';c.fillRect(0,0,w,36);
     for(let i=0;i<3;i++){c.beginPath();c.arc(20+i*17,18,4,0,Math.PI*2);c.fillStyle=['#a07b72','#aa9974','#7f9286'][i];c.fill();}
@@ -98,8 +100,7 @@ function createSuite() {
     c.fillStyle='#1c2226';c.fillRect(0,36,177,h-36);c.fillStyle='#d5c6a9';c.font='bold 20px Georgia';c.fillText('JG /',25,89);
     ['Overview','Research','Projects','Publications'].forEach((label,i)=>{c.fillStyle=(projects?i===2:i===0)?'#343b3e':'#1c2226';c.fillRect(14,123+i*47,148,34);c.fillStyle=(projects?i===2:i===0)?'#ece5d5':'#8c979b';c.font='15px Arial';c.fillText(label,27,145+i*47);});
     c.fillStyle='#899591';c.font='12px monospace';c.fillText('PERSONAL WORKSPACE',211,85);c.fillStyle='#e7e3d9';c.font='46px Georgia';c.fillText(projects?'Selected research':'Jiayan Guo',209,151);
-    c.fillStyle='#a6b0b2';c.font='17px Arial';c.fillText(projects?'Generalist agents. Physical intelligence.':'Building agents that reason, act, and learn.',211,191);
-    const cards=projects?[['ZeroSearch','Search agents / reinforcement learning'],['RynnBrain','Embodied foundation models'],['WorldVLA · RynnVLA','Vision, language and action']]:[['01 / Generalist Agents','Search, tools and multi-step reasoning'],['02 / Physical Intelligence','Perception, spatial reasoning and action'],['Research archive','17 public records / 2022 — 2026']];
+    const cards=projects?[['ZeroSearch','Search agents / reinforcement learning'],['RynnBrain','Embodied foundation models'],['WorldVLA · RynnVLA','Vision, language and action']]:[['01 / Generalist Agents','Search, tools and multi-step reasoning'],['02 / Physical Intelligence','Perception, spatial reasoning and action'],['Research archive',publicationCount+' public records / '+publicationYears]];
     cards.forEach(([title,caption],i)=>{const y=231+i*99;c.fillStyle='#20272b';c.fillRect(209,y,775,83);c.strokeStyle='#3a4447';c.strokeRect(209,y,775,83);c.fillStyle='#d6c6a7';c.font='23px Georgia';c.fillText(title,231,y+32);c.fillStyle='#98a4a7';c.font='16px Arial';c.fillText(caption,231,y+59);c.fillStyle='#b9c4be';c.font='19px Arial';c.fillText('↗',945,y+44);});
     c.fillStyle='#707e82';c.font='11px monospace';c.fillText('SELECT THE DISPLAY TO EXPLORE',212,554);
   },1024,576);}
@@ -129,7 +130,7 @@ function createSuite() {
   cylinder(.8,.8,.07,2.6,.64,3.4,stone);cylinder(.09,.15,.6,2.6,.3,3.4,bronze);cylinder(.51,.57,.07,2.6,.07,3.4,dark);
   const notes=new THREE.Group();room.add(notes);
   const tablet=round(.68,.045,.48,2.6,.73,3.55,dark,.02,notes);tablet.rotation.y=-.18;
-  const notePanel=panel(.61,.41,2.6,.758,3.55,screenTexture('Field notes','17 PUBLICATIONS',['2022 / 2026','EXPLORE THE ARCHIVE']),notes);notePanel.rotation.x=-Math.PI/2;notePanel.rotation.z=.18;
+  const notePanel=panel(.61,.41,2.6,.758,3.55,screenTexture('Field notes',publicationCount+' PUBLICATIONS',[publicationYears,'EXPLORE THE ARCHIVE']),notes);notePanel.rotation.x=-Math.PI/2;notePanel.rotation.z=.18;
   notes.scale.setScalar(.82);notes.position.set(-4.02,.896,-4.03);notes.rotation.y=.03;
   register(notes,'papers',[-1.8,1.72,-1.2]);
   cylinder(.08,.07,.2,2.13,.8,3.18,paper);cylinder(.071,.071,.005,2.13,.904,3.18,mat('#34251d'));
@@ -176,8 +177,8 @@ function createSuite() {
   cylinder(.1,.13,.5,-3.5,.55,.1,bronze);cylinder(.55,.55,.05,-3.5,.11,.1,dark);
   round(1,.2,1,-3.5,.9,.1,upholstery,.09);round(1,.95,.22,-3.5,1.4,.5,upholstery,.1);
   // The research entrance is the articulated desktop arm, with real joint housings.
-  const lab=placeDeskAsset(deskAssets.robot,-4.85,1.468,-1.72);
-  register(lab,'research',[-4.78,2.3,-1.64]);
+  const lab=placeDeskAsset(deskAssets.robot,-4.82,1.468,-1.64);
+  register(lab,'research',[-4.78,2.48,-1.64]);
   const deskMat=createDeskMat(THREE);placeDeskAsset(deskMat,-3.5,deskTop,-1.05);
   let inputBakeIndex=0;
   for(const group of [deskAssets.keyboard,mouseGroup,deskMat])group.traverse(mesh=>{if(mesh.isMesh&&mesh.material.isMeshStandardMaterial){mesh.geometry=mesh.geometry.index?mesh.geometry.toNonIndexed():mesh.geometry.clone();mesh.userData.inputBakeIndex=inputBakeIndex++;}});
@@ -215,7 +216,7 @@ function createSuite() {
   contact(4.2,2.2,3.4,1.65,.6,.084);contact(3.6,3.5,4.1,-3.25,.68);contact(4.9,2,-3.15,-1.6,.48);contact(1.5,1.5,-3.5,.1,.65);contact(2.3,2.1,2.6,3.4,.48,.084);contact(1.55,1.35,-5.55,1.55,.6);
   // Subtle tabletop contact shadows sit directly below the device feet.
   contact(.52,.34,-3.7,-2.04,.25,1.469);
-  contact(.30,.24,-1.9,-1.77,.23,1.469);contact(.28,.25,-4.85,-1.72,.28,1.469);
+  contact(.30,.24,-1.9,-1.77,.23,1.469);contact(.36,.32,-4.82,-1.64,.28,1.469);
   // Correct architectural proportions: human-scale ceiling and furniture heights.
   room.scale.set(.84,.62,.84);
   for(const anchor of Object.values(anchors))anchor.multiply(room.scale);
@@ -278,7 +279,6 @@ function createSuite() {
   let transitStage='idle';
   function updateVista(vista){
     orbit.setVista(vista);
-    document.querySelector('.intro .eyebrow').lastChild.textContent=vista==='earth'?' A DESK ABOVE THE EARTH':' A DESK NEAR GARGANTUA';
     document.body.dataset.vista=vista;needsRender=true;
   }
   const transit=createVistaTransit({
@@ -287,13 +287,13 @@ function createSuite() {
       orbitalView.setTransit(state);needsRender=true;
       const stage=!state.active?'idle':state.lowMotion?'quiet':state.progress<.25?'charging':state.progress<.7?'transit':'arriving';
       if(stage!==transitStage){transitStage=stage;document.body.dataset.transit=stage;
-        if(state.active)vistaCaption.textContent=(stage==='quiet'?'正在切换至 ':stage==='arriving'?'正在抵达 ':stage==='charging'?'准备跃迁至 ':'穿越中 · ')+vistaName(state.desired);
+        if(state.active)vistaCaption.textContent='正在切换至 '+vistaName(state.desired);
       }
     },
     onState(state){
       vistaControl.setAttribute('aria-busy',String(state.active));document.body.classList.toggle('jumping',state.active);
-      if(state.active)vistaCaption.textContent='正在跃迁至 '+vistaName(state.desired);
-      else vistaCaption.textContent=state.current==='earth'?'地球 · UTC 日自转 / 云层缓流':'卡冈图亚 · 原创流动吸积盘';
+      if(state.active)vistaCaption.textContent='正在切换至 '+vistaName(state.desired);
+      else vistaCaption.textContent='';
     }
   });
   vistaControl.addEventListener('change',e=>{
@@ -331,7 +331,7 @@ function createSuite() {
       document.body.classList.remove('entering');entryControls.hidden=true;
       recenterButton.disabled=motionButton.disabled=replayButton.disabled=false;
       canvas.removeAttribute('aria-busy');canvas.style.cursor='grab';yaw=0;pitch=0;updateLook();
-      status.innerHTML='<span class="pulse"></span> SEATED DESK VIEW / 桌前坐姿 · 可转头';
+      status.textContent='已进入桌前视角';
       hint.textContent='拖动画面转头 · 点击桌面设备';renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
       if(reason!=='unavailable'&&(document.activeElement===skipButton||document.activeElement===replayButton))canvas.focus({preventScroll:true});
     }
@@ -349,7 +349,7 @@ function createSuite() {
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();showFallback('3D 图形连接已中断。所有内容仍可通过下方入口打开，刷新页面可尝试重新进入套房。');});
   window.addEventListener('resize',resize);window.addEventListener('suite-texture-ready',()=>{needsRender=true;});resize();entry.start();
   const projected=new THREE.Vector3();
-  const blockedOverlays=[document.querySelector('.intro'),document.querySelector('.vista-control'),document.querySelector('.top')];
+  const blockedOverlays=[document.querySelector('.vista-control'),document.querySelector('.top')];
   function render(ms){
     if(!viewAvailable)return;
     if(document.hidden){entry.suspend();requestAnimationFrame(render);return;}
