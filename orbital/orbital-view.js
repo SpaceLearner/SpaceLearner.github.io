@@ -1,3 +1,4 @@
+import { quality } from './quality-profile.js';
 // Render only the orbital layer to a small HDR target. The cabin is rendered
 // once, with its original camera and lighting; its depth hides this sky pass.
 // UI remains ordinary DOM and never enters the distortion or bloom pipeline.
@@ -104,7 +105,7 @@ export function createOrbitalView(THREE,scene,orbit) {
       const needed=orbit.vista==='gargantua'||state.active;
       if(!needed){quad.visible=false;orbit.group.visible=true;renderer.render(scene,camera);return;}
       renderer.getDrawingBufferSize(size);
-      const factor=Math.min(1,Math.sqrt(1600000/(size.x*size.y)));
+      const factor=Math.min(1,Math.sqrt(quality.skyPixels/(size.x*size.y)));
       const w=Math.max(1,Math.round(size.x*factor)),h=Math.max(1,Math.round(size.y*factor));
       if(!target){target=new THREE.WebGLRenderTarget(w,h,{type:renderer.extensions.has('EXT_color_buffer_float')?THREE.HalfFloatType:THREE.UnsignedByteType,depthBuffer:true});target.texture.name='Orbital HDR view';}
       if(target.width!==w||target.height!==h)target.setSize(w,h);

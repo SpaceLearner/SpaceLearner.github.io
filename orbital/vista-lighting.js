@@ -2,8 +2,8 @@
 // exposure, baked cabin irradiance and emitter positions stay fixed. This is
 // art-directed reflected illumination, not a radiometric or ray-traced model.
 export function createVistaLighting(THREE,key,fill) {
-  const earth={key:new THREE.Color('#b9d1e0'),fill:new THREE.Color('#b8d5e7'),keyPower:.28,fillPower:.20};
-  const disk={key:new THREE.Color('#dcc4a9'),fill:new THREE.Color('#d8b58a'),keyPower:.24,fillPower:.18};
+  const earth={key:new THREE.Color('#b9d1e0'),fill:new THREE.Color('#b8d5e7'),keyPower:.34,fillPower:.28};
+  const disk={key:new THREE.Color('#dcc4a9'),fill:new THREE.Color('#d8b58a'),keyPower:.29,fillPower:.24};
   let value=0,start=0,target=0,startProgress=0,lastProgress=1,active=false;
   const index=v=>v==='gargantua'?1:0;
   function apply(next){

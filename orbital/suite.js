@@ -1,4 +1,5 @@
 import { textureAsset } from './asset-profile.js';
+import { quality } from './quality-profile.js';
 import * as THREE from './vendor/three.module.min.js';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
 import { RectAreaLightUniformsLib } from './vendor/RectAreaLightUniformsLib.js';
@@ -29,8 +30,14 @@ const objects = [];
 let paused = reduceMotion;
 let renderer;
 let stopEntry=()=>{};
+const health=window.suiteHealth;
+const track=(label,promise)=>health?health.task(label,promise):promise;
+THREE.DefaultLoadingManager.onStart=(_url,loaded,total)=>health?.textures(loaded,total);
+THREE.DefaultLoadingManager.onProgress=(_url,loaded,total)=>health?.textures(loaded,total);
+THREE.DefaultLoadingManager.onError=()=>health?.textureError();
 
 function showFallback(message) {
+  health?.unavailable(message);
   stopEntry();
   document.body.classList.remove('entering');
   document.getElementById('entry-controls').hidden=true;
@@ -45,10 +52,12 @@ function showFallback(message) {
 
 try {
   renderer = new THREE.WebGLRenderer({canvas, antialias: true, alpha: false, powerPreference:'high-performance'});
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.7));
+  renderer.setPixelRatio(quality.pixelRatio(innerWidth,innerHeight));
+  renderer.transmissionResolutionScale=quality.compact?.5:.75;
+  document.body.dataset.quality=quality.textureTier;
   renderer.setSize(innerWidth, canvas.parentElement.clientHeight, false);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.0;
+  renderer.toneMappingExposure = 1.06;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   // Static geometry needs its sunlight, Earthlight and lamp shadow maps only once.
@@ -71,7 +80,8 @@ function createSuite() {
   const stone=mat('#a4a39c',.55,.02),leather=mat('#403a34',.77);
   ivory.sheen=1;ivory.sheenRoughness=.85;ivory.sheenColor=new THREE.Color('#aca99e');upholstery.sheen=.8;upholstery.sheenRoughness=.95;
   walnut.clearcoat=.12;walnut.clearcoatRoughness=.65;
-  const loadTex=(file,repeat,color=false)=>{const t=new THREE.TextureLoader().load(new URL('./textures/'+textureAsset(file),import.meta.url).href,()=>{window.dispatchEvent(new Event('suite-texture-ready'));});t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(...repeat);t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());if(color)t.colorSpace=THREE.SRGBColorSpace;return t;};
+  const textures=new Map();
+  const loadTex=(file,repeat,color=false)=>{const key=[file,...repeat,color].join(':');if(textures.has(key))return textures.get(key);const t=new THREE.TextureLoader().load(new URL('./textures/'+textureAsset(file),import.meta.url).href,()=>{window.dispatchEvent(new Event('suite-texture-ready'));});t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(...repeat);t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());if(color)t.colorSpace=THREE.SRGBColorSpace;textures.set(key,t);return t;};
   walnut.map=loadTex('walnut-color.jpg',[2,2],true);walnut.bumpMap=loadTex('walnut-bump.jpg',[2,2]);walnut.bumpScale=.014;walnut.roughnessMap=loadTex('walnut-roughness.jpg',[2,2]);
   for(const m of [ivory,upholstery,rugMat]){m.map=loadTex('linen-color.jpg',[5,5],true);m.bumpMap=loadTex('linen-bump.jpg',[5,5]);m.bumpScale=.011;m.roughnessMap=loadTex('linen-roughness.jpg',[5,5]);}
   for(const m of [bronze,shell,dark]){m.bumpMap=loadTex('metal-bump.jpg',[3,3]);m.bumpScale=.002;m.roughnessMap=loadTex('metal-roughness.jpg',[3,3]);}
@@ -109,7 +119,7 @@ function createSuite() {
   },1024,576);}
 
   const cabin=createCabinArchitecture(THREE,{walnut,metalBump:bronze.bumpMap,metalRoughness:bronze.roughnessMap});room.add(cabin);
-  applyCabinBake(THREE,cabin).then(({count})=>{
+  track('cabin',applyCabinBake(THREE,cabin)).then(({count})=>{
     document.body.dataset.cabinBake=String(count);
     window.dispatchEvent(new Event('suite-texture-ready'));
   }).catch(error=>{
@@ -120,7 +130,7 @@ function createSuite() {
   round(4.6,.13,5.0,2.9,.01,1.6,rugMat,.055);
   for(let i=0;i<42;i++)box(4.3,.004,.006,2.9,.08,-.65+i*.11,mat('#6f7067',1));
   const bed=createBed(THREE,{walnut});bed.position.set(4.1,0,-3.25);bed.scale.x=.74;room.add(bed);
-  applyBedBake(THREE,bed).then(({count})=>{document.body.dataset.bedBake='ready';document.body.dataset.bedBakeCount=String(count);window.dispatchEvent(new Event('suite-texture-ready'));}).catch(error=>{document.body.dataset.bedBake='unavailable';console.warn('Bed lighting uses its realtime fallback.',error);});
+  track('bed',applyBedBake(THREE,bed)).then(({count})=>{document.body.dataset.bedBake='ready';document.body.dataset.bedBakeCount=String(count);window.dispatchEvent(new Event('suite-texture-ready'));}).catch(error=>{document.body.dataset.bedBake='unavailable';console.warn('Bed lighting uses its realtime fallback.',error);});
   // Lounge sofa, low table and a book left open under a warm pendant.
   round(3.2,.22,1.32,3.4,.39,1.65,leather,.055);
   for(const x of [2,4.8])for(const z of [1.16,2.1])cylinder(.035,.035,.27,x,.17,z,bronze);
@@ -139,7 +149,7 @@ function createSuite() {
   cylinder(.08,.07,.2,2.13,.8,3.18,paper);cylinder(.071,.071,.005,2.13,.904,3.18,mat('#34251d'));
   const hoop=mesh(new THREE.TorusGeometry(.055,.012,12,24),paper,2.03,.81,3.18);hoop.rotation.y=Math.PI/2;
   // Fixed first-person workstation. The tabletop remains true volumetric geometry.
-  const desktopWalnut=walnut.clone();desktopWalnut.map=loadTex('ai-walnut-desktop-v1.png',[1,1],true);desktopWalnut.roughness=.68;desktopWalnut.roughnessMap=null;desktopWalnut.bumpScale=.006;desktopWalnut.clearcoat=.03;
+  const desktopWalnut=walnut.clone();desktopWalnut.map=loadTex('ai-walnut-desktop-v1.png',[1,1],true);desktopWalnut.roughness=.58;desktopWalnut.roughnessMap=null;desktopWalnut.bumpScale=.004;desktopWalnut.clearcoat=.08;
   const desktopSurface=round(4.6,.18,1.7,-3.15,1.35,-1.6,desktopWalnut,.055);desktopSurface.name='Preserved walnut desktop';
   desktopSurface.geometry.computeBoundingBox();
   const deskTop=desktopSurface.position.y+desktopSurface.geometry.boundingBox.max.y,matTop=deskTop+.003/.62;
@@ -170,7 +180,7 @@ function createSuite() {
   cylinder(.12,.19,.115,-4.96,2.29,-1.96,lampBase);
   cylinder(.165,.165,.008,-4.96,2.23,-1.96,warm);
   // A shielded task light: only the downward cone illuminates the work surface.
-  const lampLight=new THREE.SpotLight('#ffe3bc',.22,2.2,Math.PI/3.3,.72,2);
+  const lampLight=new THREE.SpotLight('#ffe3bc',.70,2.2,Math.PI/3.3,.72,2);
   lampLight.position.set(-4.96,2.21,-1.96);lampLight.target.position.set(-4.55,1.44,-1.3);
   lampLight.castShadow=true;lampLight.shadow.mapSize.set(1024,1024);
   lampLight.shadow.camera.near=.08;lampLight.shadow.camera.far=3;
@@ -180,19 +190,19 @@ function createSuite() {
   cylinder(.1,.13,.5,-3.5,.55,.1,bronze);cylinder(.55,.55,.05,-3.5,.11,.1,dark);
   round(1,.2,1,-3.5,.9,.1,upholstery,.09);round(1,.95,.22,-3.5,1.4,.5,upholstery,.1);
   // The research entrance is the articulated desktop arm, with real joint housings.
-  const lab=placeDeskAsset(deskAssets.robot,-4.82,1.468,-1.64);
-  register(lab,'research',[-4.78,2.48,-1.64]);
+  const lab=placeDeskAsset(deskAssets.robot,-4.82,1.468,-1.64,.9,.15);
+  register(lab,'research',[-4.78,2.37,-1.64]);
   const deskMat=createDeskMat(THREE);placeDeskAsset(deskMat,-3.5,deskTop,-1.05);
   let inputBakeIndex=0;
   for(const group of [deskAssets.keyboard,mouseGroup,deskMat])group.traverse(mesh=>{if(mesh.isMesh&&mesh.material.isMeshStandardMaterial){mesh.geometry=mesh.geometry.index?mesh.geometry.toNonIndexed():mesh.geometry.clone();mesh.userData.inputBakeIndex=inputBakeIndex++;}});
-  applyInputBake(THREE,[deskAssets.keyboard,mouseGroup,deskMat]).then(result=>{document.body.dataset.inputBake=String(result.count);window.dispatchEvent(new Event('suite-texture-ready'));}).catch(error=>{document.body.dataset.inputBake='unavailable';console.warn('Desktop detail lighting unavailable:',error);});
+  track('inputs',applyInputBake(THREE,[deskAssets.keyboard,mouseGroup,deskMat])).then(result=>{document.body.dataset.inputBake=String(result.count);window.dispatchEvent(new Event('suite-texture-ready'));}).catch(error=>{document.body.dataset.inputBake='unavailable';console.warn('Desktop detail lighting unavailable:',error);});
   function cable(points,r=.004){return mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p))),32,r,8,false),black);}
   cable([[-3.7,1.51,-2],[-3.9,1.48,-2.2],[-4.4,1.47,-2.2],[-4.5,1.4,-2.3]]);
   cable([[-1.9,1.5,-1.75],[-2.05,1.47,-2],[-2.4,1.47,-2.2]]);
   cylinder(.055,.055,.012,-4.5,1.449,-2.23,dark);
   // Clear iced coffee at the approved cup position; the glass retains real wall thickness.
   placeDeskAsset(deskAssets.mug,-2.5,1.468,-1.9,1.15,-.4);
-  applyMugBake(THREE,deskAssets.mug).then(result=>{document.body.dataset.mugBake=String(result.count);window.dispatchEvent(new Event('suite-texture-ready'));}).catch(error=>{document.body.dataset.mugBake='unavailable';console.warn('Cup detail lighting unavailable:',error);});
+  track('cup',applyMugBake(THREE,deskAssets.mug)).then(result=>{document.body.dataset.mugBake=String(result.count);window.dispatchEvent(new Event('suite-texture-ready'));}).catch(error=>{document.body.dataset.mugBake='unavailable';console.warn('Cup detail lighting unavailable:',error);});
   round(.38,.035,.48,-5.12,1.47,-1.26,leather,.014);
   for(let i=0;i<4;i++)box(.35,.002,.44,-5.12,1.47+i*.004,-1.26,paper);
   const pen=lineBetween([-5.21,1.495,-1.08],[-5.03,1.495,-1.44],.007,bronze);sphere(.009,-5.03,1.495,-1.44,black);
@@ -255,7 +265,9 @@ function createSuite() {
   const windowFill=new THREE.RectAreaLight('#b8d5e7',.20,11,3.5);windowFill.position.set(0,3.4,-5.6);windowFill.lookAt(-3,1.4,-1);room.add(windowFill);
   const vistaLight=createVistaLighting(THREE,earthKey,windowFill);
   const orbitalView=createOrbitalView(THREE,scene,orbit);
-  let viewAvailable=true;
+  let viewAvailable=true,frameRequest=0;
+  function requestFrame(){if(!viewAvailable||document.hidden||frameRequest)return;frameRequest=requestAnimationFrame(render);}
+  function invalidate(){needsRender=true;requestFrame();}
 
   // Seated first-person view: the eye position never moves, only bounded head rotation.
   let width=innerWidth,height=canvas.parentElement.clientHeight,mobile=width<600,needsRender=true;
@@ -268,13 +280,13 @@ function createSuite() {
   const dragThreshold=6,sensitivity=.0025;
   let yaw=0,pitch=0,gesture=null,suppressClick=false,entry=null,objectFocus=null;
   const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
-  function updateLook(){if(entry?.active||objectFocus?.active)return;yaw=THREE.MathUtils.clamp(yaw,-yawLimit,yawLimit);pitch=THREE.MathUtils.clamp(pitch,-pitchLimit,pitchLimit);camera.position.copy(cameraPosition);camera.rotation.set(basePitch+pitch,baseYaw+yaw,0,'YXZ');camera.updateMatrixWorld();needsRender=true;}
-  function resize(){width=canvas.parentElement.clientWidth;height=canvas.parentElement.clientHeight;mobile=width<600;renderer.setSize(width,height,false);camera.aspect=width/height;camera.fov=mobile?79:59;camera.updateProjectionMatrix();if(entry?.active){entryPath.sample(entry.progress,camera);needsRender=true;}else if(objectFocus?.active){objectFocus.resize();layoutReading();}else updateLook();}
+  function updateLook(){if(entry?.active||objectFocus?.active)return;yaw=THREE.MathUtils.clamp(yaw,-yawLimit,yawLimit);pitch=THREE.MathUtils.clamp(pitch,-pitchLimit,pitchLimit);camera.position.copy(cameraPosition);camera.rotation.set(basePitch+pitch,baseYaw+yaw,0,'YXZ');camera.updateMatrixWorld();invalidate();}
+  function resize(){width=canvas.parentElement.clientWidth;height=canvas.parentElement.clientHeight;mobile=width<600;renderer.setPixelRatio(quality.pixelRatio(width,height,!!entry?.active));renderer.setSize(width,height,false);camera.aspect=width/height;camera.fov=mobile?79:59;camera.updateProjectionMatrix();if(entry?.active){entryPath.sample(entry.progress,camera);invalidate();}else if(objectFocus?.active){objectFocus.resize();layoutReading();}else updateLook();}
   const motionButton=document.getElementById('motion');
   const entryControls=document.getElementById('entry-controls'),skipButton=document.getElementById('entry-skip'),replayButton=document.getElementById('entry-replay'),recenterButton=document.getElementById('recenter');
   const hint=document.getElementById('hint');
   function updateMotion(){motionButton.textContent=paused?'继续环境动画':'暂停环境动画';motionButton.setAttribute('aria-pressed',String(paused));motionButton.setAttribute('aria-label',paused?'继续环境动画':'暂停环境动画');}
-  updateMotion();motionButton.addEventListener('click',()=>{paused=!paused;orbit.suspendMotion();if(paused)transit.settle('pause');updateMotion();needsRender=true;});
+  updateMotion();motionButton.addEventListener('click',()=>{paused=!paused;orbit.suspendMotion();if(paused)transit.settle('pause');updateMotion();invalidate();});
   const vistaControl=document.getElementById('vista-control'),vistaCaption=document.getElementById('vista-caption');
   vistaControl.hidden=false;
   vistaControl.querySelector('#vista-value').value='earth';document.body.dataset.vista='earth';
@@ -283,12 +295,12 @@ function createSuite() {
   let transitStage='idle';
   function updateVista(vista){
     orbit.setVista(vista);
-    document.body.dataset.vista=vista;needsRender=true;
+    document.body.dataset.vista=vista;invalidate();
   }
   const transit=createVistaTransit({
     onCommit:updateVista,
     onFrame(state){
-      orbitalView.setTransit(state);vistaLight.update(state);needsRender=true;
+      orbitalView.setTransit(state);vistaLight.update(state);invalidate();
       const stage=!state.active?'idle':state.lowMotion?'quiet':state.progress<.25?'charging':state.progress<.7?'transit':'arriving';
       if(stage!==transitStage){transitStage=stage;document.body.dataset.transit=stage;
         if(state.active)vistaCaption.textContent='正在切换至 '+vistaName(state.desired);
@@ -360,19 +372,19 @@ function createSuite() {
       left=leftSafe+12;top=topSafe+Math.min(196,(height-topSafe-bottomSafe)*.26);
       w=width-leftSafe-rightSafe-24;h=height-top-bottomSafe-12;
     }else{
-      const point=project(notebook.center());w=Math.min(790,width-72);h=Math.min(540,height-120);
+      const point=project(notebook.center());w=Math.min(870,width-112);h=Math.min(650,height-140);
       left=Math.max(24,Math.min(width-w-24,point.x-w/2));top=Math.max(90,Math.min(height-h-44,point.y-h*.65));
     }
     Object.assign(sheet.style,{left:left+'px',top:top+'px',width:w+'px',height:h+'px'});
   }
   objectFocus=createObjectFocus(THREE,{camera,book:notebook,target:focusTarget,reduced:()=>motionPreference.matches,
-    changed(){needsRender=true;layoutReading();},
+    changed(){invalidate();layoutReading();},
     phase(value,kind){
       document.body.dataset.objectFocus=value;document.body.dataset.focusObject=kind;
       recenterButton.disabled=replayButton.disabled=value!=='idle';
       canvas.setAttribute('aria-busy',String(value==='approaching'||value==='returning'));
       if(value==='idle'){canvas.removeAttribute('aria-busy');canvas.style.cursor='grab';}
-      needsRender=true;
+      invalidate();
     }
   });
   window.suiteFocus={
@@ -384,7 +396,7 @@ function createSuite() {
     leave(options){objectFocus.leave(options);},finish(){objectFocus.finish();},layout:layoutReading
   };
   let entryStorage=null;try{entryStorage=window.sessionStorage;}catch{/* Private storage denial defaults to skipping autoplay. */}
-  entry=createEntryPlayback({storage:entryStorage,reduceMotion:reduceMotion||document.getElementById('sheet').open,
+  entry=createEntryPlayback({storage:entryStorage,reduceMotion:()=>motionPreference.matches||document.getElementById('sheet').open,
     onStart(){
       objectFocus.leave({instant:true});transit.settle('entry');
       if(gesture)endGesture({pointerId:gesture.id},true);yaw=0;pitch=0;suppressClick=true;
@@ -392,46 +404,47 @@ function createSuite() {
       recenterButton.disabled=motionButton.disabled=replayButton.disabled=true;
       canvas.setAttribute('aria-busy','true');canvas.style.cursor='default';
       status.textContent='正在入舱 · 约 5 秒';hint.textContent='可随时跳过，直接到桌前';
-      renderer.setPixelRatio(Math.min(devicePixelRatio,mobile?1.25:1.5));
+      renderer.setPixelRatio(quality.pixelRatio(width,height,true));
     },
-    onFrame(progress){entryPath.sample(progress,camera);needsRender=true;},
+    onFrame(progress){entryPath.sample(progress,camera);invalidate();},
     onFinish(reason){
       document.body.classList.remove('entering');entryControls.hidden=true;
       recenterButton.disabled=motionButton.disabled=replayButton.disabled=false;
       canvas.removeAttribute('aria-busy');canvas.style.cursor='grab';yaw=0;pitch=0;updateLook();
       status.textContent='已进入桌前视角';
-      hint.textContent='拖动画面转头 · 点击桌面设备';renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
+      hint.textContent='拖动画面转头 · 点击桌面设备';renderer.setPixelRatio(quality.pixelRatio(width,height));
       if(reason!=='unavailable'&&(document.activeElement===skipButton||document.activeElement===replayButton))canvas.focus({preventScroll:true});
     }
   });
-  stopEntry=()=>{viewAvailable=false;objectFocus.disable();delete window.suiteFocus;window.dispatchEvent(new Event('suite-focus-unavailable'));entry.disable();transit.disable();orbitalView.dispose();};
+  stopEntry=()=>{viewAvailable=false;cancelAnimationFrame(frameRequest);frameRequest=0;objectFocus.disable();delete window.suiteFocus;window.dispatchEvent(new Event('suite-focus-unavailable'));entry.disable();transit.disable();orbitalView.dispose();};
   skipButton.addEventListener('click',()=>entry.skip());
   replayButton.addEventListener('click',()=>{if(!objectFocus.active&&!document.querySelector('dialog[open]'))entry.start({replay:true});});
   window.addEventListener('keydown',e=>{if(e.key==='Escape'&&entry.active){e.preventDefault();entry.skip();}else if(e.key==='Escape'&&transit.active){e.preventDefault();transit.settle('skip');}});
   window.addEventListener('suite-panel-open',()=>{entry.skip();transit.settle('panel');});
   let reading=!!document.querySelector('dialog[open]'),lastSceneFrame=-Infinity;
-  window.addEventListener('suite-reading-change',e=>{reading=e.detail.active;needsRender=true;lastSceneFrame=-Infinity;});
-  document.addEventListener('visibilitychange',()=>{entry.suspend();objectFocus.suspend();orbit.suspendMotion();if(document.hidden)transit.settle('hidden');});
-  window.addEventListener('pagehide',()=>{objectFocus.suspend();orbit.suspendMotion();transit.settle('pagehide');});
-  motionPreference.addEventListener?.('change',e=>{if(e.matches){entry.skip();transit.settle('reduced-motion');objectFocus.finish();paused=true;orbit.suspendMotion();updateMotion();needsRender=true;}});
+  window.addEventListener('suite-reading-change',e=>{reading=e.detail.active;orbit.suspendMotion();invalidate();lastSceneFrame=-Infinity;});
+  document.addEventListener('visibilitychange',()=>{entry.suspend();objectFocus.suspend();orbit.suspendMotion();if(document.hidden){transit.settle('hidden');cancelAnimationFrame(frameRequest);frameRequest=0;}else invalidate();});
+  window.addEventListener('pagehide',()=>{objectFocus.suspend();orbit.suspendMotion();transit.settle('pagehide');cancelAnimationFrame(frameRequest);frameRequest=0;});
+  window.addEventListener('pageshow',()=>invalidate());
+  motionPreference.addEventListener?.('change',e=>{if(e.matches){entry.skip();transit.settle('reduced-motion');objectFocus.finish();paused=true;orbit.suspendMotion();updateMotion();invalidate();}});
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();showFallback('3D 图形连接已中断。所有内容仍可通过下方入口打开，刷新页面可尝试重新进入套房。');});
-  window.addEventListener('resize',resize);window.addEventListener('suite-texture-ready',()=>{needsRender=true;});
+  window.addEventListener('resize',resize);window.addEventListener('suite-texture-ready',()=>{invalidate();});
   // Dynamic browser bars can resize the scene without changing the layout viewport.
   if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(canvas.parentElement);
   resize();entry.start();
   const projected=new THREE.Vector3();
   const blockedOverlays=[document.querySelector('.vista-control'),document.querySelector('.top')];
   function render(ms){
-    if(!viewAvailable)return;
-    if(document.hidden){entry.suspend();requestAnimationFrame(render);return;}
+    frameRequest=0;
+    if(!viewAvailable||document.hidden)return;
     entry.tick(ms);
     transit.tick(ms);
     objectFocus.tick(ms);
     // Earth samples UTC; local environmental motion uses a suspendable clock.
-    // Reading remains at 10 fps without changing its movement speed.
-    if(!paused&&(!reading||entry.active||transit.active||ms-lastSceneFrame>=100)){orbit.setTime(Date.now(),ms);needsRender=true;}
+    // Opaque reading panels freeze the background; user-driven camera motion stays live.
+    if(!paused&&!reading&&ms-lastSceneFrame>=1000/quality.fps){orbit.setTime(Date.now(),ms);needsRender=true;}
     if(needsRender){lastSceneFrame=ms;orbit.update(camera);orbitalView.render(renderer,camera);document.querySelectorAll('[data-anchor]').forEach(b=>{const anchor=anchors[b.dataset.anchor];projected.copy(anchor).project(camera);const x=(projected.x*.5+.5)*width,y=(-projected.y*.5+.5)*height;const visible=!entry.active&&!objectFocus.active&&projected.z<1&&projected.z>-1&&x>58&&x<width-58&&y>110&&y<height-90&&!blockedOverlays.some(el=>{const r=el.getBoundingClientRect();return x+54>r.left&&x-54<r.right&&y>r.top&&y-48<r.bottom;});b.style.left=x+'px';b.style.top=y+'px';b.style.visibility=visible?'visible':'hidden';});needsRender=false;}
-    requestAnimationFrame(render);
+    if((!paused&&!reading)||entry.active||transit.active||objectFocus.moving||needsRender)requestFrame();
   }
-  orbit.update(camera);orbitalView.render(renderer,camera);document.body.classList.add('ready');requestAnimationFrame(render);
+  orbit.update(camera);orbitalView.render(renderer,camera);document.body.classList.add('ready');document.getElementById('fallback').hidden=true;health?.ready();requestFrame();
 }

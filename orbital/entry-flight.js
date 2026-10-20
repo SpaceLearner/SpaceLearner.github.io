@@ -61,8 +61,9 @@ export function createEntryPlayback({storage,reduceMotion=false,onStart,onFrame,
     get progress(){return clamp(elapsed/duration);},
     start({replay=false}={}) {
       if(!available)return false;
-      const skip=!replay&&(reduceMotion||seen());remember();
-      if(skip){finish(reduceMotion?'reduced-motion':'seen');return false;}
+      const lowMotion=typeof reduceMotion==='function'?reduceMotion():reduceMotion;
+      const skip=lowMotion||(!replay&&seen());remember();
+      if(skip){finish(lowMotion?'reduced-motion':'seen');return false;}
       active=true;elapsed=0;last=null;onStart();onFrame(0);return true;
     },
     tick(now) {

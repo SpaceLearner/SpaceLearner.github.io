@@ -1,4 +1,5 @@
 import { textureAsset } from './asset-profile.js';
+import { batchArchitecture } from './static-batch.js';
 // Cycles diffuse lighting uses a separate UV atlas; live lighting still supplies
 // the view-dependent metal/clearcoat reflections. RGBM keeps the lightmap linear.
 export async function applyCabinBake(THREE,cabin) {
@@ -44,14 +45,16 @@ export async function applyCabinBake(THREE,cabin) {
       overrides.set(item.index,item);
     }
   }
-  let count=0;
+  let count=0;const materials=new Map();
   for(const item of manifest.mappings){
     const mesh=meshes.get(item.index);
     if(!mesh.material.isMeshStandardMaterial)continue;
     const alternate=overrides.get(item.index),atlas=alternate?solar:primary,uv=alternate||item;
     mesh.geometry.setAttribute('uv1',new THREE.BufferAttribute(new Float32Array(atlas.buffer,uv.byteOffset,uv.floatCount),2));
-    const material=mesh.material.clone();material.lightMap=atlas.texture;
     const exterior=mesh.name.startsWith('Exterior shell bay')||!!alternate;
+    const key=mesh.material.uuid+':'+atlas.texture.uuid+':'+exterior;
+    if(!materials.has(key)){const material=mesh.material.clone();material.lightMap=atlas.texture;materials.set(key,material);}
+    const material=materials.get(key);
     material.onBeforeCompile=shader=>{
       shader.uniforms.cabinBakeRange={value:atlas.manifest.range};
       shader.fragmentShader='uniform float cabinBakeRange;\n'+shader.fragmentShader;
@@ -70,5 +73,6 @@ export async function applyCabinBake(THREE,cabin) {
     material.customProgramCacheKey=()=> 'cycles-cabin-rgbm-v1-'+exterior;
     mesh.material=material;mesh.userData.bakedIrradiance=true;count++;
   }
-  return {count};
+  const batches=batchArchitecture(THREE,cabin);
+  return {count,batches};
 }

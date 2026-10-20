@@ -8,7 +8,7 @@
   const fullImage=document.getElementById('image-full');
   const stage=document.getElementById('image-stage');
   const scaleButton=document.getElementById('image-scale');
-  const pages={news:['News · 近况','05 / NEWS'],about:['关于我','01 / ABOUT'],research:['研究方向','02 / RESEARCH'],projects:['代表项目','03 / PROJECTS'],papers:['研究论文','04 / PAPERS']};
+  const pages={news:['News · 近况','05 / NEWS'],about:['关于我','01 / ABOUT'],research:['研究方向','02 / RESEARCH'],projects:['代表项目','03 / PROJECTS'],papers:['代表论文','04 / PAPERS']};
   let previousFocus=null,imageFocus=null,currentPage='',currentProject='',historyBusy=false,closeToRoot=false,generation=0;
   const toolbar=dialog.querySelector('.focus-toolbar'),direct=document.getElementById('focus-direct'),back=document.getElementById('focus-return'),tabs=dialog.querySelector('.notebook-tabs');
   const inherited=history.state?.suite;
@@ -49,10 +49,15 @@
     if(record)push(currentPage,currentProject,trigger.dataset.imageTitle);
     imageFocus=trigger;
     resetImageScale();
-    fullImage.src=thumbnail.src;
+    viewer.dataset.imageState='loading';stage.setAttribute('aria-busy','true');
+    document.getElementById('image-load-status').textContent='正在加载高清原图…';
+    const original=trigger.dataset.imageFull||thumbnail.src;
+    fullImage.src=original;
+    fullImage.width=Number(thumbnail.getAttribute('width'))||thumbnail.naturalWidth;
+    fullImage.height=Number(thumbnail.getAttribute('height'))||thumbnail.naturalHeight;
     fullImage.alt=thumbnail.alt;
     document.getElementById('image-title').textContent=trigger.dataset.imageTitle;
-    document.getElementById('image-original').href=thumbnail.src;
+    document.getElementById('image-original').href=original;
     document.getElementById('image-source').href=trigger.dataset.imageSource;
     if(!viewer.open)viewer.showModal();
     viewer.querySelector('.image-close').focus({preventScroll:true});
@@ -71,6 +76,7 @@
       body.scrollTop=0;
     }
     currentPage=id;currentProject=project;
+    document.querySelectorAll('nav [data-open]').forEach(link=>{if(link.dataset.open===id)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');});
     const token=++generation;object=window.suiteFocus?object:'';
     dialog.dataset.object=object;dialog.removeAttribute('style');toolbar.hidden=!object;tabs.hidden=object!=='notebook';
     tabs.querySelectorAll('[data-open]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.open===id)));
@@ -93,12 +99,14 @@
     if(!pages[id]||historyBusy)return;
     const project=trigger?.dataset.project||'';
     const object=options.focus||'';
+    if(currentPage===id&&currentProject===project&&dialog.open&&dialog.dataset.object===object)return;
     if(currentPage!==id||currentProject!==project||!dialog.open||dialog.dataset.object!==object)push(id,project,null,object);
     show(id,trigger,project,object);
   }
   function hide(){
     const token=++generation;hideImage();if(dialog.open)dialog.close();currentPage='';currentProject='';
     dialog.dataset.object='';dialog.dataset.focusPending='false';dialog.removeAttribute('style');
+    document.querySelectorAll('nav [aria-current]').forEach(link=>link.removeAttribute('aria-current'));
     const restoreFocus=()=>{if(token===generation&&previousFocus?.isConnected)previousFocus.focus({preventScroll:true});};
     if(window.suiteFocus)window.suiteFocus.leave({done:restoreFocus});else restoreFocus();
     readingChanged();
@@ -130,7 +138,8 @@
     scaleButton.textContent=actual?'适应窗口':'原始尺寸';
     stage.scrollTop=stage.scrollLeft=0;
   });
-  fullImage.addEventListener('load',()=>{stage.scrollTop=stage.scrollLeft=0;});
+  fullImage.addEventListener('load',()=>{stage.scrollTop=stage.scrollLeft=0;viewer.dataset.imageState='ready';stage.setAttribute('aria-busy','false');document.getElementById('image-load-status').textContent='';});
+  fullImage.addEventListener('error',()=>{viewer.dataset.imageState='error';stage.setAttribute('aria-busy','false');document.getElementById('image-load-status').textContent='图片未能加载。可以打开原图或项目来源查看。';});
   viewer.querySelector('.image-close').addEventListener('click',closeImage);
   viewer.addEventListener('keydown',event=>{
     if(event.key!=='Tab')return;

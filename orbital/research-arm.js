@@ -8,8 +8,8 @@ export function createResearchArm(THREE,shared) {
   robot.userData.units='metres';robot.userData.contactOrigin=true;
   const metal=(color,roughness,metalness)=>new THREE.MeshStandardMaterial({color,roughness,metalness});
   const mats={
-    satin:metal('#939b9e',.40,.78),darkMetal:metal('#353c41',.46,.62),
-    shell:metal('#d0cec4',.50,.08),polymer:metal('#293035',.65,0),
+    satin:metal('#9aa8aa',.33,.82),darkMetal:metal('#303b41',.42,.68),
+    shell:metal('#b1b8b5',.38,.22),polymer:metal('#263037',.62,0),
     seal:metal('#101517',.88,0),steel:metal('#aab1b2',.28,.94),
     recess:metal('#080c0e',.84,0),accent:metal('#b48a50',.53,.28)
   };
