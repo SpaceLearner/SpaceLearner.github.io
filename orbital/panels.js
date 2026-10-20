@@ -9,17 +9,21 @@
   const stage=document.getElementById('image-stage');
   const scaleButton=document.getElementById('image-scale');
   const pages={news:['News · 近况','05 / NEWS'],about:['关于我','01 / ABOUT'],research:['研究方向','02 / RESEARCH'],projects:['代表项目','03 / PROJECTS'],papers:['代表论文','04 / PAPERS']};
+  const scrollPositions=new Map();
+  const scrollKey=()=>currentPage+'@'+(dialog.dataset.object||'');
+  const rememberScroll=()=>{if(currentPage)scrollPositions.set(scrollKey(),body.scrollTop);};
   let previousFocus=null,imageFocus=null,currentPage='',currentProject='',historyBusy=false,closeToRoot=false,generation=0;
   const toolbar=dialog.querySelector('.focus-toolbar'),direct=document.getElementById('focus-direct'),back=document.getElementById('focus-return'),tabs=dialog.querySelector('.notebook-tabs');
   const inherited=history.state?.suite;
   const owner=inherited?.owner||String(Date.now())+Math.random().toString(36).slice(2);
-  const route=()=>{const [id,project='']=location.hash.slice(1).split('/');return {id:pages[id]?id:'',project:['zerosearch','rynnbrain'].includes(project)?project:''};};
+  const defaultObject=id=>({about:'monitor',research:'terminal',projects:'terminal',papers:'notebook'}[id]||'');
+  const route=()=>{const [path,object='']=location.hash.slice(1).split('@');const [id,project='']=path.split('/');return {object:object==='text'?'':['monitor','terminal','notebook'].includes(object)?object:defaultObject(id),id:pages[id]?id:'',project:['zerosearch','rynnbrain'].includes(project)?project:''};};
   const depth=()=>history.state?.suite?.owner===owner?history.state.suite.depth:0;
   const state=(extra={})=>({...history.state,suite:{...history.state?.suite,owner,depth:depth(),...extra}});
-  const url=(id,project='')=>location.pathname+location.search+(id?'#'+id+(project?'/'+project:''):'');
+  const url=(id,project='',object='')=>location.pathname+location.search+(id?'#'+id+(project?'/'+project:'')+(object!==defaultObject(id)?'@'+(object||'text'):''):'');
   history.replaceState(state(),'',location.href);
   function readingChanged(){window.dispatchEvent(new CustomEvent('suite-reading-change',{detail:{active:dialog.open||viewer.open}}));}
-  function push(id,project='',image=null,object=dialog.dataset.object||''){history.pushState(state({depth:depth()+1,image,object}),'',url(id,project));}
+  function push(id,project='',image=null,object=dialog.dataset.object||''){history.pushState(state({depth:depth()+1,image,object}),'',url(id,project,object));}
   function scrollProject(project){
     const target=project&&body.querySelector('[data-project="'+project+'"]');
     if(target){target.scrollIntoView({block:'start',behavior:'instant'});target.querySelector('h3').focus({preventScroll:true});}
@@ -65,6 +69,7 @@
   }
   function show(id,trigger=null,project='',object='') {
     if(!pages[id])return;
+    rememberScroll();
     window.dispatchEvent(new Event('suite-panel-open'));
     hideImage();
     const active=document.activeElement;
@@ -84,11 +89,13 @@
     dialog.dataset.focusPending=String(!!object);direct.hidden=!object;
     dialog.setAttribute('aria-busy',String(!!object));
     if(!dialog.open)dialog.showModal();
+    if(object)window.suiteFocus.layout();
     function ready(){
       if(token!==generation||!dialog.open)return;
       dialog.dataset.focusPending='false';dialog.setAttribute('aria-busy','false');direct.hidden=true;
       window.suiteFocus?.layout();
-      document.getElementById('focus-label').textContent=object==='monitor'?'个人终端':'研究札记';
+      document.getElementById('focus-label').textContent=object==='monitor'?'个人终端':object==='terminal'?'研究 / 项目终端':'研究札记';
+      body.scrollTop=scrollPositions.get(scrollKey())||0;
       if(project)scrollProject(project);else (object?back:dialog.querySelector('.close')).focus({preventScroll:true});
     }
     if(object)window.suiteFocus.enter(object,{done:ready});
@@ -98,13 +105,13 @@
   function open(id,trigger=null,options={}) {
     if(!pages[id]||historyBusy)return;
     const project=trigger?.dataset.project||'';
-    const object=options.focus||'';
+    const object=options.focus??defaultObject(id);
     if(currentPage===id&&currentProject===project&&dialog.open&&dialog.dataset.object===object)return;
     if(currentPage!==id||currentProject!==project||!dialog.open||dialog.dataset.object!==object)push(id,project,null,object);
     show(id,trigger,project,object);
   }
   function hide(){
-    const token=++generation;hideImage();if(dialog.open)dialog.close();currentPage='';currentProject='';
+    rememberScroll();const token=++generation;hideImage();if(dialog.open)dialog.close();currentPage='';currentProject='';
     dialog.dataset.object='';dialog.dataset.focusPending='false';dialog.removeAttribute('style');
     document.querySelectorAll('nav [aria-current]').forEach(link=>link.removeAttribute('aria-current'));
     const restoreFocus=()=>{if(token===generation&&previousFocus?.isConnected)previousFocus.focus({preventScroll:true});};
@@ -119,10 +126,10 @@
   function restore(){
     historyBusy=false;
     if(closeToRoot){closeToRoot=false;history.replaceState(state({image:null}),'',url(''));}
-    const {id,project}=route();
+    const {id,project,object}=route();
     if(!id){hide();return;}
     const image=history.state?.suite?.image;
-    if(currentPage!==id||currentProject!==project||!dialog.open||dialog.dataset.object!==(history.state?.suite?.object||''))show(id,null,project,history.state?.suite?.object||'');
+    if(currentPage!==id||currentProject!==project||!dialog.open||dialog.dataset.object!==(object))show(id,null,project,object);
     if(image){const trigger=[...body.querySelectorAll('.figure-open')].find(el=>el.dataset.imageTitle===image);if(trigger&&!viewer.open)openImage(trigger,false);}
     else hideImage();
   }
@@ -130,7 +137,7 @@
     const imageTrigger=event.target.closest('.figure-open');
     if(imageTrigger){event.preventDefault();openImage(imageTrigger);return;}
     const target=event.target.closest('[data-open]');
-    if(target){event.preventDefault();open(target.dataset.open,target,{focus:event.shiftKey?'':target.dataset.focus||''});}
+    if(target){event.preventDefault();open(target.dataset.open,target,{focus:event.shiftKey?'':target.dataset.focus||defaultObject(target.dataset.open)});}
   });
   scaleButton.addEventListener('click',()=>{
     const actual=viewer.classList.toggle('is-actual');
@@ -161,6 +168,7 @@
   });
   direct.addEventListener('click',()=>window.suiteFocus?.finish());
   back.addEventListener('click',close);
+  window.addEventListener('suite-focus-ready',()=>{const r=route();if(r.id)show(r.id,null,r.project,r.object);});
   window.addEventListener('suite-focus-unavailable',()=>{if(dialog.open)show(currentPage,null,currentProject);});
   dialog.addEventListener('cancel',event=>{event.preventDefault();if(viewer.open)closeImage();else close();});
   // Only a click outside a dialog's rectangle dismisses its backdrop.

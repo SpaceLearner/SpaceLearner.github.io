@@ -17,6 +17,7 @@ import { createVistaTransit } from './vista-transit.js';
 import { createOrbitalView } from './orbital-view.js';
 import { createVistaPicker } from './vista-picker.js';
 import { createVistaLighting } from './vista-lighting.js';
+import { createSurfaceReading } from './surface-reading.js';
 import { createObjectFocus } from './object-focus.js';
 import { createResearchNotebook } from './research-notebook.js';
 
@@ -327,55 +328,17 @@ function createSuite() {
   canvas.addEventListener('pointerup',e=>endGesture(e));
   canvas.addEventListener('pointercancel',e=>endGesture(e,true));
   canvas.addEventListener('lostpointercapture',e=>endGesture(e,true));
-  canvas.addEventListener('click',e=>{if(entry?.active||suppressClick){e.preventDefault();return;}const id=intersect(e.clientX,e.clientY);if(id)window.suiteOpen(id==='papers'?'research':id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':''});});
+  canvas.addEventListener('click',e=>{if(entry?.active||suppressClick){e.preventDefault();return;}const id=intersect(e.clientX,e.clientY);if(id)window.suiteOpen(id==='papers'?'research':id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':id==='research'||id==='projects'?'terminal':''});});
   function recenter(){if(objectFocus?.active)return;if(entry?.active){entry.skip();return;}if(gesture)endGesture({pointerId:gesture.id},true);yaw=0;pitch=0;updateLook();}
   document.getElementById('recenter').addEventListener('click',recenter);
-  canvas.addEventListener('keydown',e=>{const id={1:'about',2:'research',3:'projects',4:'papers'}[e.key];if(id){e.preventDefault();window.suiteOpen(id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':''});return;}const step=THREE.MathUtils.degToRad(3);if(e.key==='Home'){e.preventDefault();recenter();}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();if(entry?.active||objectFocus?.active)return;if(e.key==='ArrowLeft')yaw+=step;if(e.key==='ArrowRight')yaw-=step;if(e.key==='ArrowUp')pitch+=step;if(e.key==='ArrowDown')pitch-=step;updateLook();}});
+  canvas.addEventListener('keydown',e=>{const id={1:'about',2:'research',3:'projects',4:'papers'}[e.key];if(id){e.preventDefault();window.suiteOpen(id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':id==='research'||id==='projects'?'terminal':''});return;}const step=THREE.MathUtils.degToRad(3);if(e.key==='Home'){e.preventDefault();recenter();}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();if(entry?.active||objectFocus?.active)return;if(e.key==='ArrowLeft')yaw+=step;if(e.key==='ArrowRight')yaw-=step;if(e.key==='ArrowUp')pitch+=step;if(e.key==='ArrowDown')pitch-=step;updateLook();}});
   const sheet=document.getElementById('sheet');
-  function focusTarget(kind){
-    room.updateMatrixWorld(true);
-    const pose=new THREE.PerspectiveCamera();pose.fov=camera.fov;
-    if(kind==='monitor'){
-      const screen=deskAssets.monitorScreen,center=screen.mesh.getWorldPosition(new THREE.Vector3());
-      const normal=new THREE.Vector3(0,0,1).transformDirection(screen.mesh.matrixWorld);
-      const size=new THREE.Vector3();screen.mesh.getWorldScale(size);
-      const tangent=Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
-      const distance=Math.max(screen.height*size.y/(2*tangent)*(height/Math.max(180,height-180)),screen.width*size.x/(2*tangent)*(height/Math.max(240,width-72)),.58);
-      pose.position.copy(center).addScaledVector(normal,distance);pose.lookAt(center);
-    }else{
-      const center=notebook.center();
-      pose.position.copy(center).add(new THREE.Vector3(.04,.64,.63));
-      pose.lookAt(center.clone().add(new THREE.Vector3(0,.08,0)));
-    }
-    if(width<=950&&height<=520&&width>height)pose.rotateY(-.5);
-    else if(width<700)pose.rotateX(-.44);
-    return {position:pose.position.clone(),quaternion:pose.quaternion.clone(),fov:pose.fov};
-  }
+  const surfaces=createSurfaceReading(THREE,{camera,sheet,room,
+    screen:kind=>kind==='monitor'?deskAssets.monitorScreen:deskAssets.terminalScreen,
+    notebook,viewport:()=>({width,height})});
+  const focusTarget=kind=>surfaces.target(kind);
   function layoutReading(){
-    if(!objectFocus?.active||sheet.dataset.focusPending==='true'||!sheet.dataset.object)return;
-    const project=p=>{p.project(camera);return {x:(p.x*.5+.5)*width,y:(-.5*p.y+.5)*height};};
-    let left,top,w,h;
-    const style=getComputedStyle(document.documentElement);
-    const safe=side=>parseFloat(style.getPropertyValue('--safe-'+side))||0;
-    const leftSafe=safe('left'),rightSafe=safe('right'),topSafe=safe('top'),bottomSafe=safe('bottom');
-    if(width<=950&&height<=520&&width>height){
-      // A side sheet leaves the focused object visible without squeezing the text.
-      w=Math.min(600,(width-leftSafe-rightSafe)*.68);
-      left=width-rightSafe-12-w;top=topSafe+8;h=height-top-bottomSafe-8;
-    }else if(objectFocus.kind==='monitor'&&width>=700){
-      const screen=deskAssets.monitorScreen;
-      const corners=[[-1,-1],[-1,1],[1,-1],[1,1]].map(([x,y])=>project(screen.mesh.localToWorld(new THREE.Vector3(x*screen.width/2,y*screen.height/2,.001))));
-      left=Math.min(...corners.map(p=>p.x))+5;top=Math.min(...corners.map(p=>p.y))+5;
-      w=Math.max(...corners.map(p=>p.x))-left-5;h=Math.max(...corners.map(p=>p.y))-top-5;
-    }else if(width<700){
-      // On phones the object remains visible above its attached reading surface.
-      left=leftSafe+12;top=topSafe+Math.min(196,(height-topSafe-bottomSafe)*.26);
-      w=width-leftSafe-rightSafe-24;h=height-top-bottomSafe-12;
-    }else{
-      const point=project(notebook.center());w=Math.min(870,width-112);h=Math.min(650,height-140);
-      left=Math.max(24,Math.min(width-w-24,point.x-w/2));top=Math.max(90,Math.min(height-h-44,point.y-h*.65));
-    }
-    Object.assign(sheet.style,{left:left+'px',top:top+'px',width:w+'px',height:h+'px'});
+    if(objectFocus?.active&&sheet.dataset.object)surfaces.layout(objectFocus.kind);
   }
   objectFocus=createObjectFocus(THREE,{camera,book:notebook,target:focusTarget,reduced:()=>motionPreference.matches,
     changed(){invalidate();layoutReading();},
@@ -431,7 +394,7 @@ function createSuite() {
   window.addEventListener('resize',resize);window.addEventListener('suite-texture-ready',()=>{invalidate();});
   // Dynamic browser bars can resize the scene without changing the layout viewport.
   if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(canvas.parentElement);
-  resize();entry.start();
+  resize();entry.start();window.dispatchEvent(new Event('suite-focus-ready'));
   const projected=new THREE.Vector3();
   const blockedOverlays=[document.querySelector('.vista-control'),document.querySelector('.top')];
   function render(ms){

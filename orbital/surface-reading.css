@@ -1,0 +1,25 @@
+/* Geometry and camera own the rectangle at every viewport size. */
+#sheet[data-object]:not([data-object=""]){position:fixed;inset:auto;margin:0;max-width:none;max-height:none;min-width:0;min-height:0;transform-origin:0 0;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible;background:#142023;color:#e3e9e4;display:flex;flex-direction:column}
+#sheet[data-object]:not([data-object=""])::backdrop{background:transparent;backdrop-filter:none}
+#sheet[data-object]:not([data-object=""]) .sheet-head{display:none}
+#sheet[data-object]:not([data-object=""]) .sheet-body{flex:1;min-height:0;overflow:auto;padding:12px 16px!important;font-size:16px!important;line-height:1.65;touch-action:pan-y pinch-zoom;overscroll-behavior:contain;user-select:text;overflow-wrap:anywhere;animation:none}
+#sheet[data-object]:not([data-object=""]) .sheet-body>*{max-width:100%}
+#sheet[data-object]:not([data-object=""]) img{max-width:100%;height:auto}
+#sheet[data-object]:not([data-object=""]) .focus-toolbar{position:absolute;bottom:calc(100% + 8px);left:0;width:100%;padding:0;display:flex;gap:4px;justify-content:center;border:0;white-space:nowrap;color:#edf1e8}
+#sheet[data-object]:not([data-object=""]) .focus-toolbar span{display:none}
+#sheet[data-object]:not([data-object=""]) .focus-toolbar button{background:#152126;min-height:44px;padding:4px 8px;font-size:12px}
+#sheet[data-object="notebook"]:not([data-object=""]){background:transparent;color:#302f27}
+#sheet[data-object="notebook"] .notebook-tabs{flex:none;display:flex;padding:2px 10px;gap:8px}
+#sheet[data-object="notebook"] .notebook-tabs button{min-height:44px;padding:4px 8px}
+#sheet[data-object="terminal"] h3,#sheet[data-object="terminal"] a{color:#dce8d8}
+#sheet[data-object="terminal"] .en,#sheet[data-object="terminal"] .role{color:#a9b9af}
+#sheet[data-focus-pending="true"][data-object]:not([data-object=""]){visibility:hidden;pointer-events:none}
+#sheet[data-object]:not([data-object=""]) [hidden]{display:none!important}
+body[data-object-focus="reading"] .top,body[data-object-focus="approaching"] .top,body[data-object-focus="returning"] .top{visibility:hidden}
+body[data-object-focus="reading"] .controls,body[data-object-focus="reading"] .hint{visibility:hidden}
+#sheet[data-object]:not([data-object=""]) .sheet-body{scrollbar-width:thin}
+@media(max-width:699px){#sheet[data-object]:not([data-object=""]) .focus-toolbar button{padding:4px 6px}}
+body[data-object-focus="reading"] .bottom,body[data-object-focus="approaching"] .bottom{visibility:hidden}
+/* Keep delayed texture progress from painting through the transparent paper.
+   Scene failures leave object focus and retain the existing fallback UI. */
+body[data-object-focus="reading"] #scene-load,body[data-object-focus="approaching"] #scene-load{visibility:hidden}
