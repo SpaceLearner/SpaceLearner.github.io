@@ -15,14 +15,14 @@
     retry.hidden = !failures.size && !unavailable;
     progress.hidden = unavailable || failures.size > 0;
     if (unavailable) {
-      message.textContent = '3D 场景暂不可用';
-      detail.textContent = '研究内容仍可正常阅读。';
+      message.textContent = '3D scene unavailable';
+      detail.textContent = 'Research content remains available.';
     } else if (failures.size) {
-      message.textContent = '部分画面资源未加载';
-      detail.textContent = '已保留基础光照，内容与链接仍可使用。';
+      message.textContent = 'Some scene assets could not be loaded';
+      detail.textContent = 'Basic lighting is available. Content and links still work.';
     } else {
-      message.textContent = ready ? '正在加载光照与材质' : '正在准备太空舱';
-      detail.textContent = slow ? '细节仍在加载，可先打开上方内容。' : textureTotal ? `图像 ${textureLoaded} / ${textureTotal}` : '内容入口已经可用';
+      message.textContent = ready ? 'Loading lighting and materials' : 'Preparing the cabin';
+      detail.textContent = slow ? 'Details are still loading. You can start reading now.' : textureTotal ? `Images ${textureLoaded} / ${textureTotal}` : 'Content is ready to read';
       if (textureTotal) { progress.max = textureTotal; progress.value = textureLoaded; }
       else progress.removeAttribute('value');
     }
@@ -38,9 +38,9 @@
     document.body.classList.remove('ready', 'entering'); document.body.classList.add('no-webgl');
     document.getElementById('space').hidden = true;
     document.getElementById('fallback').hidden = false;
-    document.getElementById('fallback-detail').textContent = reason || '3D 文件未能载入。可以直接阅读研究内容，或重新加载页面。';
+    document.getElementById('fallback-detail').textContent = reason || 'The 3D files could not be loaded. You can read the research content or reload the page.';
     for (const id of ['entry-controls', 'vista-control']) document.getElementById(id).hidden = true;
-    document.getElementById('status').textContent = '普通浏览模式，研究内容可用';
+    document.getElementById('status').textContent = 'Standard browsing mode; research content is available';
     window.dispatchEvent(new Event('suite-startup-unavailable')); paint();
   }
   window.suiteHealth = {
@@ -53,7 +53,7 @@
   const startupTimer = setTimeout(() => {
     if (!ready && !unavailable) {
       slow = true; document.getElementById('fallback').hidden = false;
-      document.getElementById('fallback-detail').textContent = '场景加载较慢。你可以先阅读内容，画面就绪后会自动进入。';
+      document.getElementById('fallback-detail').textContent = 'The scene is taking longer to load. You can read the content now; the scene will appear when ready.';
       paint();
     }
   }, 15000);

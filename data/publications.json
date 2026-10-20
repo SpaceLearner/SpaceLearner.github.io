@@ -427,14 +427,14 @@
       ],
       "links": [
         {
-          "label": "预印本 / RynnVLA-002",
+          "label": "Preprint / RynnVLA-002",
           "url": "https://arxiv.org/abs/2511.17502"
         }
       ],
       "aliases": [
         "RynnVLA-002"
       ],
-      "displayNote": "RynnVLA-002 的正式接收题名。"
+      "displayNote": "The accepted title of RynnVLA-002."
     },
     {
       "id": "embodied_spatiotemporal_neurips_2026",
@@ -553,7 +553,7 @@
         "https://arxiv.org/html/2608.31014v1"
       ],
       "verifiedAt": "2026-10-18",
-      "displayNote": "接收信息依据作者在 arXiv 元数据中的标注。"
+      "displayNote": "Acceptance information follows the authors’ arXiv metadata."
     },
     {
       "id": "unveil_2025",

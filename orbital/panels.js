@@ -8,7 +8,7 @@
   const fullImage=document.getElementById('image-full');
   const stage=document.getElementById('image-stage');
   const scaleButton=document.getElementById('image-scale');
-  const pages={news:['News · 近况','05 / NEWS'],about:['关于我','01 / ABOUT'],research:['研究方向','02 / RESEARCH'],projects:['代表项目','03 / PROJECTS'],papers:['代表论文','04 / PAPERS']};
+  const pages={news:['News','05 / NEWS'],about:['About','01 / ABOUT'],research:['Research directions','02 / RESEARCH'],projects:['Selected projects','03 / PROJECTS'],papers:['Papers','04 / PAPERS']};
   const scrollPositions=new Map();
   const scrollKey=()=>currentPage+'@'+(dialog.dataset.object||'');
   const rememberScroll=()=>{if(currentPage)scrollPositions.set(scrollKey(),body.scrollTop);};
@@ -32,7 +32,7 @@
   function resetImageScale() {
     viewer.classList.remove('is-actual');
     scaleButton.setAttribute('aria-pressed','false');
-    scaleButton.textContent='原始尺寸';
+    scaleButton.textContent='Actual size';
     stage.scrollTop=stage.scrollLeft=0;
   }
   function hideImage() {
@@ -54,7 +54,7 @@
     imageFocus=trigger;
     resetImageScale();
     viewer.dataset.imageState='loading';stage.setAttribute('aria-busy','true');
-    document.getElementById('image-load-status').textContent='正在加载高清原图…';
+    document.getElementById('image-load-status').textContent='Loading the full-resolution image…';
     const original=trigger.dataset.imageFull||thumbnail.src;
     fullImage.src=original;
     fullImage.width=Number(thumbnail.getAttribute('width'))||thumbnail.naturalWidth;
@@ -85,7 +85,7 @@
     const token=++generation;object=window.suiteFocus?object:'';
     dialog.dataset.object=object;dialog.removeAttribute('style');toolbar.hidden=!object;tabs.hidden=object!=='notebook';
     tabs.querySelectorAll('[data-open]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.open===id)));
-    document.getElementById('focus-label').textContent=object==='monitor'?'正在靠近显示屏…':'正在打开札记…';
+    document.getElementById('focus-label').textContent=object==='monitor'?'Approaching the screen…':'Opening the notebook…';
     dialog.dataset.focusPending=String(!!object);direct.hidden=!object;
     dialog.setAttribute('aria-busy',String(!!object));
     if(!dialog.open)dialog.showModal();
@@ -94,7 +94,7 @@
       if(token!==generation||!dialog.open)return;
       dialog.dataset.focusPending='false';dialog.setAttribute('aria-busy','false');direct.hidden=true;
       window.suiteFocus?.layout();
-      document.getElementById('focus-label').textContent=object==='monitor'?'个人终端':object==='terminal'?'研究 / 项目终端':'研究札记';
+      document.getElementById('focus-label').textContent=object==='monitor'?'Personal terminal':object==='terminal'?'Research / Project terminal':'Research notebook';
       body.scrollTop=scrollPositions.get(scrollKey())||0;
       if(project)scrollProject(project);else (object?back:dialog.querySelector('.close')).focus({preventScroll:true});
     }
@@ -142,11 +142,11 @@
   scaleButton.addEventListener('click',()=>{
     const actual=viewer.classList.toggle('is-actual');
     scaleButton.setAttribute('aria-pressed',String(actual));
-    scaleButton.textContent=actual?'适应窗口':'原始尺寸';
+    scaleButton.textContent=actual?'Fit to window':'Actual size';
     stage.scrollTop=stage.scrollLeft=0;
   });
   fullImage.addEventListener('load',()=>{stage.scrollTop=stage.scrollLeft=0;viewer.dataset.imageState='ready';stage.setAttribute('aria-busy','false');document.getElementById('image-load-status').textContent='';});
-  fullImage.addEventListener('error',()=>{viewer.dataset.imageState='error';stage.setAttribute('aria-busy','false');document.getElementById('image-load-status').textContent='图片未能加载。可以打开原图或项目来源查看。';});
+  fullImage.addEventListener('error',()=>{viewer.dataset.imageState='error';stage.setAttribute('aria-busy','false');document.getElementById('image-load-status').textContent='The image could not be loaded. Try the original image or project source.';});
   viewer.querySelector('.image-close').addEventListener('click',closeImage);
   viewer.addEventListener('keydown',event=>{
     if(event.key!=='Tab')return;

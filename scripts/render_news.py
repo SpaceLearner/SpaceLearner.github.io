@@ -25,12 +25,12 @@ def render(entries):
                           + '" target="_blank" rel="noopener noreferrer">'
                           + escape(paper['title']) + '<span aria-hidden="true"> ↗</span></a>'
                           + '<small lang="en">' + escape(paper['track']) + '</small></li>')
-        details = ('<details class="news-papers"><summary>论文与接收信息 <span aria-hidden="true">＋</span></summary>'
+        details = ('<details class="news-papers"><summary>Papers and acceptance details <span aria-hidden="true">＋</span></summary>'
                    + '<ul>' + ''.join(papers) + '</ul></details>') if papers else ''
         rows.append('<li class="news-entry"><time datetime="' + item['date'] + '">'
-                    + f'{date.year} 年 {date.month} 月</time><div><p class="news-summary">'
+                    + date.strftime('%B %Y') + '</time><div><p class="news-summary">'
                     + escape(item['summary']) + '</p>' + details + '</div></li>')
-    return START + '\n<ol class="news-list" aria-label="近况，按时间倒序">' + ''.join(rows) + '</ol>\n' + END
+    return START + '\n<ol class="news-list" aria-label="News, newest first">' + ''.join(rows) + '</ol>\n' + END
 
 
 def update(root, content, check):

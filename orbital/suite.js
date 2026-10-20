@@ -46,7 +46,7 @@ function showFallback(message) {
   document.body.classList.remove('ready');
   document.body.classList.add('no-webgl');
   fallback.hidden = false;
-  status.textContent = 'STANDARD EXPLORER / 普通浏览模式';
+  status.textContent = 'STANDARD EXPLORER / Standard browsing';
   if (message) document.getElementById('fallback-detail').textContent = message;
   canvas.hidden = true;
 }
@@ -68,7 +68,7 @@ try {
   createSuite();
 } catch (error) {
   console.warn('Orbital Suite could not start WebGL:', error);
-  showFallback('当前浏览器未能启用 WebGL 3D。你仍可浏览全部研究内容；在支持 WebGL 的浏览器中打开本页即可探索套房。');
+  showFallback('WebGL 3D is unavailable in this browser. All research content remains accessible. Open this page in a browser with WebGL support to explore the cabin.');
 }
 
 function createSuite() {
@@ -286,13 +286,13 @@ function createSuite() {
   const motionButton=document.getElementById('motion');
   const entryControls=document.getElementById('entry-controls'),skipButton=document.getElementById('entry-skip'),replayButton=document.getElementById('entry-replay'),recenterButton=document.getElementById('recenter');
   const hint=document.getElementById('hint');
-  function updateMotion(){motionButton.textContent=paused?'继续环境动画':'暂停环境动画';motionButton.setAttribute('aria-pressed',String(paused));motionButton.setAttribute('aria-label',paused?'继续环境动画':'暂停环境动画');}
+  function updateMotion(){motionButton.textContent=paused?'Resume ambient motion':'Pause ambient motion';motionButton.setAttribute('aria-pressed',String(paused));motionButton.setAttribute('aria-label',paused?'Resume ambient motion':'Pause ambient motion');}
   updateMotion();motionButton.addEventListener('click',()=>{paused=!paused;orbit.suspendMotion();if(paused)transit.settle('pause');updateMotion();invalidate();});
   const vistaControl=document.getElementById('vista-control'),vistaCaption=document.getElementById('vista-caption');
   vistaControl.hidden=false;
   vistaControl.querySelector('#vista-value').value='earth';document.body.dataset.vista='earth';
   createVistaPicker(vistaControl);
-  const vistaName=v=>v==='earth'?'地球':'卡冈图亚';
+  const vistaName=v=>v==='earth'?'Earth':'Gargantua';
   let transitStage='idle';
   function updateVista(vista){
     orbit.setVista(vista);
@@ -304,12 +304,12 @@ function createSuite() {
       orbitalView.setTransit(state);vistaLight.update(state);invalidate();
       const stage=!state.active?'idle':state.lowMotion?'quiet':state.progress<.25?'charging':state.progress<.7?'transit':'arriving';
       if(stage!==transitStage){transitStage=stage;document.body.dataset.transit=stage;
-        if(state.active)vistaCaption.textContent='正在切换至 '+vistaName(state.desired);
+        if(state.active)vistaCaption.textContent='Switching to '+vistaName(state.desired);
       }
     },
     onState(state){
       vistaControl.setAttribute('aria-busy',String(state.active));document.body.classList.toggle('jumping',state.active);
-      if(state.active)vistaCaption.textContent='正在切换至 '+vistaName(state.desired);
+      if(state.active)vistaCaption.textContent='Switching to '+vistaName(state.desired);
       else vistaCaption.textContent='';
     }
   });
@@ -366,7 +366,7 @@ function createSuite() {
       document.body.classList.add('entering');entryControls.hidden=false;
       recenterButton.disabled=motionButton.disabled=replayButton.disabled=true;
       canvas.setAttribute('aria-busy','true');canvas.style.cursor='default';
-      status.textContent='正在入舱 · 约 5 秒';hint.textContent='可随时跳过，直接到桌前';
+      status.textContent='Entering the cabin · About 5 seconds';hint.textContent='Skip at any time to go straight to the desk';
       renderer.setPixelRatio(quality.pixelRatio(width,height,true));
     },
     onFrame(progress){entryPath.sample(progress,camera);invalidate();},
@@ -374,8 +374,8 @@ function createSuite() {
       document.body.classList.remove('entering');entryControls.hidden=true;
       recenterButton.disabled=motionButton.disabled=replayButton.disabled=false;
       canvas.removeAttribute('aria-busy');canvas.style.cursor='grab';yaw=0;pitch=0;updateLook();
-      status.textContent='已进入桌前视角';
-      hint.textContent='拖动画面转头 · 点击桌面设备';renderer.setPixelRatio(quality.pixelRatio(width,height));
+      status.textContent='At the desk';
+      hint.textContent='Drag to look around · Select a desk object';renderer.setPixelRatio(quality.pixelRatio(width,height));
       if(reason!=='unavailable'&&(document.activeElement===skipButton||document.activeElement===replayButton))canvas.focus({preventScroll:true});
     }
   });
@@ -390,7 +390,7 @@ function createSuite() {
   window.addEventListener('pagehide',()=>{objectFocus.suspend();orbit.suspendMotion();transit.settle('pagehide');cancelAnimationFrame(frameRequest);frameRequest=0;});
   window.addEventListener('pageshow',()=>invalidate());
   motionPreference.addEventListener?.('change',e=>{if(e.matches){entry.skip();transit.settle('reduced-motion');objectFocus.finish();paused=true;orbit.suspendMotion();updateMotion();invalidate();}});
-  canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();showFallback('3D 图形连接已中断。所有内容仍可通过下方入口打开，刷新页面可尝试重新进入套房。');});
+  canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();showFallback('The 3D graphics context was lost. All content is still available below. Reload the page to try the cabin again.');});
   window.addEventListener('resize',resize);window.addEventListener('suite-texture-ready',()=>{invalidate();});
   // Dynamic browser bars can resize the scene without changing the layout viewport.
   if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(canvas.parentElement);

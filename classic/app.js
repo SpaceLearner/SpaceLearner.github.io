@@ -14,9 +14,9 @@ function updatePublications() {
   groups.forEach(group => {
     const visibleCount = [...group.querySelectorAll('.paper')].filter(paper => !paper.hidden).length;
     group.hidden = visibleCount === 0;
-    group.querySelector('.year-count').textContent = `${visibleCount} 条`;
+    group.querySelector('.year-count').textContent = `${visibleCount} ${visibleCount === 1 ? 'paper' : 'papers'}`;
   });
-  document.getElementById('paper-count').textContent = `${count} 条记录`;
+  document.getElementById('paper-count').textContent = `${count} records`;
   document.getElementById('no-papers').hidden = count > 0;
 }
 filters.forEach(button => button.addEventListener('click', () => {
