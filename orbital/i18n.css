@@ -1,0 +1,15 @@
+.language-switch{display:inline-flex;align-items:center;gap:0;flex:0 0 auto;border:1px solid #879a9166;border-radius:5px;background:#101b20e8;white-space:nowrap;font:12px/1.2 Arial,sans-serif;color:#cbd5cf}
+.language-switch button{appearance:none;min-width:34px;min-height:36px;border:0;border-radius:4px;background:transparent;color:inherit;padding:6px 8px;font:inherit;cursor:pointer}
+.language-switch button[aria-pressed="true"]{color:#eee6d2;background:#687c6e44}.language-switch button:focus-visible{outline:2px solid #c5b995;outline-offset:2px}
+.language-dock{position:fixed;z-index:1002;top:calc(16px + env(safe-area-inset-top,0px));right:calc(20px + env(safe-area-inset-right,0px))}
+.header-tools{display:flex;align-items:center;justify-content:flex-end;gap:14px;flex:0 0 auto}
+.header-tools .original{position:static;display:inline-flex;align-items:center;min-height:44px;margin:0;padding:0;font-size:12px}
+#language-home{display:inline-flex;align-items:center}
+.focus-toolbar>.language-switch{margin-left:auto}.sheet-head>.language-switch,.image-head>.language-switch{margin-left:auto;align-self:center}
+.classic-tools{display:flex;align-items:center;gap:16px;flex:0 0 auto}.classic-tools .language-switch{background:#efeee8;color:#45564d}.classic-tools .language-switch button[aria-pressed="true"]{color:#182c20;background:#d9e0d5}.classic-tools .nav-link{white-space:nowrap}
+html[lang="zh-CN"]{font-family:Arial,"PingFang SC","Microsoft YaHei",sans-serif}html[lang="zh-CN"] .sheet-body{line-height:1.85}
+@media(max-width:699px),(max-width:950px) and (max-height:520px){.header-tools{grid-column:2;grid-row:1;gap:8px}.header-tools .original{font-size:11px}.language-switch button{min-height:44px;min-width:36px;padding:6px}.language-dock{right:calc(12px + env(safe-area-inset-right,0px));top:calc(10px + env(safe-area-inset-top,0px))}.focus-toolbar>.language-switch{margin-left:0}.header-tools .language-switch{font-size:11px}}
+@media(max-width:950px) and (max-height:520px) and (orientation:landscape){.header-tools{grid-column:3;grid-row:1}}
+@media(max-width:650px) and (max-height:520px) and (orientation:landscape){.header-tools{grid-column:2;grid-row:1}}
+@media(max-width:1000px){.classic-tools{grid-column:2;grid-row:1;gap:10px}}
+@media print{.language-switch,.language-dock{display:none!important}}
