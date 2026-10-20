@@ -18,6 +18,7 @@ import { createOrbitalView } from './orbital-view.js';
 import { createVistaPicker } from './vista-picker.js';
 import { createVistaLighting } from './vista-lighting.js';
 import { createSurfaceReading } from './surface-reading.js';
+import { createArmDemo } from './arm-demo.js';
 import { createObjectFocus } from './object-focus.js';
 import { createResearchNotebook } from './research-notebook.js';
 
@@ -74,7 +75,7 @@ try {
 function createSuite() {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#010205');
-  const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 260);
+  const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 260);camera.layers.enable(2);
   const room = new THREE.Group(); scene.add(room);
   const mat = (color, roughness=.65, metalness=.05) => new THREE.MeshPhysicalMaterial({color, roughness, metalness});
   const walnut=mat('#ffffff',.49), bronze=mat('#858c8b',.42,.72), shell=mat('#747672',.47,.7), dark=mat('#292d2e',.5,.55), ivory=mat('#c7c3b9',.92), upholstery=mat('#98958c',.96), rugMat=mat('#77766c',1), black=mat('#131719',.38,.32), paper=mat('#d7d0bc',.95);
@@ -191,7 +192,8 @@ function createSuite() {
   cylinder(.1,.13,.5,-3.5,.55,.1,bronze);cylinder(.55,.55,.05,-3.5,.11,.1,dark);
   round(1,.2,1,-3.5,.9,.1,upholstery,.09);round(1,.95,.22,-3.5,1.4,.5,upholstery,.1);
   // The research entrance is the articulated desktop arm, with real joint housings.
-  const lab=placeDeskAsset(deskAssets.robot,-4.82,1.468,-1.64,.9,.15);
+  const lab=placeDeskAsset(deskAssets.robot,-4.82,deskTop,-1.64,.9,.15);
+  let armDemo=null;
   register(lab,'research',[-4.78,2.37,-1.64]);
   const deskMat=createDeskMat(THREE);placeDeskAsset(deskMat,-3.5,deskTop,-1.05);
   let inputBakeIndex=0;
@@ -280,14 +282,14 @@ function createSuite() {
   const yawLimit=THREE.MathUtils.degToRad(30),pitchLimit=THREE.MathUtils.degToRad(15);
   const dragThreshold=6,sensitivity=.0025;
   let yaw=0,pitch=0,gesture=null,suppressClick=false,entry=null,objectFocus=null;
-  const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
+  const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();raycaster.layers.enable(2);
   function updateLook(){if(entry?.active||objectFocus?.active)return;yaw=THREE.MathUtils.clamp(yaw,-yawLimit,yawLimit);pitch=THREE.MathUtils.clamp(pitch,-pitchLimit,pitchLimit);camera.position.copy(cameraPosition);camera.rotation.set(basePitch+pitch,baseYaw+yaw,0,'YXZ');camera.updateMatrixWorld();invalidate();}
   function resize(){width=canvas.parentElement.clientWidth;height=canvas.parentElement.clientHeight;mobile=width<600;renderer.setPixelRatio(quality.pixelRatio(width,height,!!entry?.active));renderer.setSize(width,height,false);camera.aspect=width/height;camera.fov=mobile?79:59;camera.updateProjectionMatrix();if(entry?.active){entryPath.sample(entry.progress,camera);invalidate();}else if(objectFocus?.active){objectFocus.resize();layoutReading();}else updateLook();}
   const motionButton=document.getElementById('motion');
   const entryControls=document.getElementById('entry-controls'),skipButton=document.getElementById('entry-skip'),replayButton=document.getElementById('entry-replay'),recenterButton=document.getElementById('recenter');
   const hint=document.getElementById('hint');
   function updateMotion(){motionButton.textContent=paused?'Resume ambient motion':'Pause ambient motion';motionButton.setAttribute('aria-pressed',String(paused));motionButton.setAttribute('aria-label',paused?'Resume ambient motion':'Pause ambient motion');}
-  updateMotion();motionButton.addEventListener('click',()=>{paused=!paused;orbit.suspendMotion();if(paused)transit.settle('pause');updateMotion();invalidate();});
+  updateMotion();motionButton.addEventListener('click',()=>{paused=!paused;armDemo?.suspend('ambient',paused);orbit.suspendMotion();if(paused)transit.settle('pause');updateMotion();invalidate();});
   const vistaControl=document.getElementById('vista-control'),vistaCaption=document.getElementById('vista-caption');
   vistaControl.hidden=false;
   vistaControl.querySelector('#vista-value').value='earth';document.body.dataset.vista='earth';
@@ -317,7 +319,7 @@ function createSuite() {
     if(e.target.name!=='vista')return;
     transit.request(e.target.value,{quiet:paused||motionPreference.matches||entry?.active||objectFocus?.active});
   });
-  function intersect(x,y){const r=canvas.getBoundingClientRect();pointer.set((x-r.left)/r.width*2-1,-(y-r.top)/r.height*2+1);raycaster.setFromCamera(pointer,camera);return raycaster.intersectObjects(objects,false)[0]?.object.userData.panel;}
+  function intersect(x,y){const r=canvas.getBoundingClientRect();pointer.set((x-r.left)/r.width*2-1,-(y-r.top)/r.height*2+1);raycaster.setFromCamera(pointer,camera);return raycaster.intersectObjects(objects.filter(mesh=>mesh.visible),false)[0]?.object.userData.panel;}
   canvas.addEventListener('pointerdown',e=>{if(entry?.active||objectFocus?.active||e.isPrimary===false||e.button!==0||gesture)return;suppressClick=false;gesture={id:e.pointerId,x:e.clientX,y:e.clientY,yaw,pitch,dragging:false};canvas.focus({preventScroll:true});canvas.setPointerCapture(e.pointerId);});
   canvas.addEventListener('pointermove',e=>{
     if(entry?.active||objectFocus?.active)return;
@@ -336,7 +338,16 @@ function createSuite() {
   const surfaces=createSurfaceReading(THREE,{camera,sheet,room,
     screen:kind=>kind==='monitor'?deskAssets.monitorScreen:deskAssets.terminalScreen,
     notebook,viewport:()=>({width,height})});
-  const focusTarget=kind=>surfaces.target(kind);
+  const focusTarget=kind=>{
+    if(kind!=='arm')return surfaces.target(kind);
+    const robot=deskAssets.robot;robot.updateWorldMatrix(true,true);
+    const center=robot.localToWorld(new THREE.Vector3(.12,.32,.08));
+    const direction=new THREE.Vector3(.30,.20,1).transformDirection(robot.matrixWorld);
+    const tangent=Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
+    const distance=Math.max(.9,.66/(2*tangent)*height/Math.max(120,height-220),.74/(2*tangent)*height/Math.max(200,width-40));
+    const pose=new THREE.PerspectiveCamera();pose.fov=camera.fov;pose.position.copy(center).addScaledVector(direction,distance);pose.lookAt(center);
+    return {position:pose.position,quaternion:pose.quaternion,fov:pose.fov};
+  };
   function layoutReading(){
     if(objectFocus?.active&&sheet.dataset.object)surfaces.layout(objectFocus.kind);
   }
@@ -347,12 +358,14 @@ function createSuite() {
       recenterButton.disabled=replayButton.disabled=value!=='idle';
       canvas.setAttribute('aria-busy',String(value==='approaching'||value==='returning'));
       if(value==='idle'){canvas.removeAttribute('aria-busy');canvas.style.cursor='grab';}
+      document.getElementById('arm-demo-controls').hidden=kind!=='arm'||value!=='reading';
       invalidate();
     }
   });
   window.suiteFocus={
     enter(kind,options){
       if(gesture)endGesture({pointerId:gesture.id},true);
+      if(kind!=='arm')armDemo?.pause();
       entry?.skip();transit.settle('object-reading');
       return objectFocus.enter(kind,options);
     },
@@ -361,7 +374,7 @@ function createSuite() {
   let entryStorage=null;try{entryStorage=window.sessionStorage;}catch{/* Private storage denial defaults to skipping autoplay. */}
   entry=createEntryPlayback({storage:entryStorage,reduceMotion:()=>motionPreference.matches||document.getElementById('sheet').open,
     onStart(){
-      objectFocus.leave({instant:true});transit.settle('entry');
+      armDemo?.pause();objectFocus.leave({instant:true});transit.settle('entry');
       if(gesture)endGesture({pointerId:gesture.id},true);yaw=0;pitch=0;suppressClick=true;
       document.body.classList.add('entering');entryControls.hidden=false;
       recenterButton.disabled=motionButton.disabled=replayButton.disabled=true;
@@ -379,21 +392,48 @@ function createSuite() {
       if(reason!=='unavailable'&&(document.activeElement===skipButton||document.activeElement===replayButton))canvas.focus({preventScroll:true});
     }
   });
-  stopEntry=()=>{viewAvailable=false;cancelAnimationFrame(frameRequest);frameRequest=0;objectFocus.disable();delete window.suiteFocus;window.dispatchEvent(new Event('suite-focus-unavailable'));entry.disable();transit.disable();orbitalView.dispose();};
+  stopEntry=()=>{armDemo?.pause();document.getElementById('arm-demo-open').hidden=true;document.getElementById('arm-demo-controls').hidden=true;viewAvailable=false;cancelAnimationFrame(frameRequest);frameRequest=0;objectFocus.disable();delete window.suiteFocus;window.dispatchEvent(new Event('suite-focus-unavailable'));entry.disable();transit.disable();orbitalView.dispose();};
   skipButton.addEventListener('click',()=>entry.skip());
   replayButton.addEventListener('click',()=>{if(!objectFocus.active&&!document.querySelector('dialog[open]'))entry.start({replay:true});});
   window.addEventListener('keydown',e=>{if(e.key==='Escape'&&entry.active){e.preventDefault();entry.skip();}else if(e.key==='Escape'&&transit.active){e.preventDefault();transit.settle('skip');}});
-  window.addEventListener('suite-panel-open',()=>{entry.skip();transit.settle('panel');});
+  window.addEventListener('suite-panel-open',()=>{armDemo?.pause();entry.skip();transit.settle('panel');});
   let reading=!!document.querySelector('dialog[open]'),lastSceneFrame=-Infinity;
-  window.addEventListener('suite-reading-change',e=>{reading=e.detail.active;orbit.suspendMotion();invalidate();lastSceneFrame=-Infinity;});
-  document.addEventListener('visibilitychange',()=>{entry.suspend();objectFocus.suspend();orbit.suspendMotion();if(document.hidden){transit.settle('hidden');cancelAnimationFrame(frameRequest);frameRequest=0;}else invalidate();});
-  window.addEventListener('pagehide',()=>{objectFocus.suspend();orbit.suspendMotion();transit.settle('pagehide');cancelAnimationFrame(frameRequest);frameRequest=0;});
-  window.addEventListener('pageshow',()=>invalidate());
-  motionPreference.addEventListener?.('change',e=>{if(e.matches){entry.skip();transit.settle('reduced-motion');objectFocus.finish();paused=true;orbit.suspendMotion();updateMotion();invalidate();}});
+  window.addEventListener('suite-reading-change',e=>{reading=e.detail.active;armDemo?.suspend('reading',reading);orbit.suspendMotion();invalidate();lastSceneFrame=-Infinity;});
+  document.addEventListener('visibilitychange',()=>{armDemo?.suspend('hidden',document.hidden);entry.suspend();objectFocus.suspend();orbit.suspendMotion();if(document.hidden){transit.settle('hidden');cancelAnimationFrame(frameRequest);frameRequest=0;}else invalidate();});
+  window.addEventListener('pagehide',()=>{armDemo?.suspend('hidden',true);objectFocus.suspend();orbit.suspendMotion();transit.settle('pagehide');cancelAnimationFrame(frameRequest);frameRequest=0;});
+  window.addEventListener('pageshow',()=>{armDemo?.suspend('hidden',document.hidden);invalidate();});
+  motionPreference.addEventListener?.('change',e=>{if(e.matches){entry.skip();transit.settle('reduced-motion');objectFocus.finish();paused=true;armDemo?.reducedChanged();armDemo?.suspend('ambient',true);orbit.suspendMotion();updateMotion();invalidate();}else if(armDemo)demoUI(armDemo.state);});
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();showFallback('The 3D graphics context was lost. All content is still available below. Reload the page to try the cabin again.');});
   window.addEventListener('resize',resize);window.addEventListener('suite-texture-ready',()=>{invalidate();});
   // Dynamic browser bars can resize the scene without changing the layout viewport.
   if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(canvas.parentElement);
+  const demoOpen=document.getElementById('arm-demo-open'),demoRun=document.getElementById('arm-demo-run'),demoPause=document.getElementById('arm-demo-pause'),demoStep=document.getElementById('arm-demo-step'),demoReset=document.getElementById('arm-demo-reset');
+  let lastArmActive=false,lastArmShadow=-Infinity;
+  // Keep shadows cached at rest; refresh all shadow casters at a capped rate
+  // during the short demonstration so links do not leave stale shadows.
+  scene.traverse(light=>{if(light.isLight&&light.shadow){light.shadow.autoUpdate=false;light.shadow.needsUpdate=true;}});
+  function demoUI(state){
+    if(lastArmActive!==state.active){lastArmActive=state.active;scene.traverse(light=>{if(light.isLight&&light.shadow)light.shadow.needsUpdate=true;});renderer.shadowMap.needsUpdate=true;lastArmShadow=-Infinity;}
+
+    demoRun.disabled=state.active;demoPause.hidden=!state.active||state.stepMode;demoStep.hidden=!state.active||!state.stepMode;
+    demoPause.textContent=state.paused?'Resume':'Pause';demoReset.disabled=!state.active||state.resetting;
+    document.getElementById('arm-demo-status').textContent=(state.active&&state.paused&&!state.stepMode?'Paused · ':'')+state.phase;
+    document.getElementById('arm-demo-note').textContent=state.stepMode?'Step-by-step · Scripted motion, not a physics simulation':'Scripted motion · Not a physics simulation';
+    demoRun.textContent=motionPreference.matches?'View steps':'Run once';
+    document.body.dataset.armDemo=state.active?(state.stepMode?'steps':state.paused?'paused':'running'):'idle';
+  }
+  armDemo=createArmDemo(THREE,deskAssets.robot,{changed(){scene.traverse(light=>{if(light.isLight&&light.shadow)light.shadow.needsUpdate=true;});renderer.shadowMap.needsUpdate=true;invalidate();},onState:demoUI,reduced:()=>motionPreference.matches});
+  armDemo.suspend('ambient',paused);demoOpen.hidden=false;
+  demoOpen.addEventListener('click',()=>window.suiteFocus.enter('arm',{done:()=>demoRun.focus({preventScroll:true})}));
+  demoRun.addEventListener('click',()=>{armDemo.start();invalidate();if(armDemo.state.stepMode)demoStep.focus({preventScroll:true});});
+  demoPause.addEventListener('click',()=>{if(armDemo.state.paused){paused=false;armDemo.suspend('ambient',false);updateMotion();armDemo.resume();}else armDemo.pause();invalidate();});
+  demoStep.addEventListener('click',()=>{armDemo.step();invalidate();});
+  demoReset.addEventListener('click',()=>{armDemo.reset();invalidate();});
+  function leaveDemo(){armDemo.pause();objectFocus.leave({done:()=>demoOpen.focus({preventScroll:true})});}
+  document.getElementById('arm-demo-back').addEventListener('click',leaveDemo);
+  window.addEventListener('keydown',event=>{if(event.key==='Escape'&&objectFocus.kind==='arm'){event.preventDefault();leaveDemo();}});
+  // Optional local review instrumentation, absent from normal visits.
+  if(new URLSearchParams(location.search).has('arm-debug'))window.armDemoDebug={demo:armDemo,robot:deskAssets.robot,camera,renderer,scene,obstacles:{keyboard:deskAssets.keyboard,coffee:deskAssets.mug,monitor:deskAssets.monitor,terminal:deskAssets.terminal,mouse:mouseGroup,lamp:room.children.filter(m=>m.isMesh&&[lampBase,lampStem,warm].includes(m.material))},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,rigCalls:deskAssets.robot.armRig.drawCalls})};
   resize();entry.start();window.dispatchEvent(new Event('suite-focus-ready'));
   const projected=new THREE.Vector3();
   const blockedOverlays=[document.querySelector('.vista-control'),document.querySelector('.top')];
@@ -403,11 +443,12 @@ function createSuite() {
     entry.tick(ms);
     transit.tick(ms);
     objectFocus.tick(ms);
+    if(ms-lastSceneFrame>=1000/quality.fps)armDemo?.tick(ms);
     // Earth samples UTC; local environmental motion uses a suspendable clock.
     // Opaque reading panels freeze the background; user-driven camera motion stays live.
     if(!paused&&!reading&&ms-lastSceneFrame>=1000/quality.fps){orbit.setTime(Date.now(),ms);needsRender=true;}
-    if(needsRender){lastSceneFrame=ms;orbit.update(camera);orbitalView.render(renderer,camera);document.querySelectorAll('[data-anchor]').forEach(b=>{const anchor=anchors[b.dataset.anchor];projected.copy(anchor).project(camera);const x=(projected.x*.5+.5)*width,y=(-projected.y*.5+.5)*height;const visible=!entry.active&&!objectFocus.active&&projected.z<1&&projected.z>-1&&x>58&&x<width-58&&y>110&&y<height-90&&!blockedOverlays.some(el=>{const r=el.getBoundingClientRect();return x+54>r.left&&x-54<r.right&&y>r.top&&y-48<r.bottom;});b.style.left=x+'px';b.style.top=y+'px';b.style.visibility=visible?'visible':'hidden';});needsRender=false;}
-    if((!paused&&!reading)||entry.active||transit.active||objectFocus.moving||needsRender)requestFrame();
+    if(needsRender){if(armDemo?.moving&&lastArmShadow!==-Infinity&&ms-lastArmShadow<1000/(quality.constrained||quality.compact?10:15))scene.traverse(light=>{if(light.isLight&&light.shadow)light.shadow.needsUpdate=false;});else if(renderer.shadowMap.needsUpdate)lastArmShadow=ms;lastSceneFrame=ms;orbit.update(camera);orbitalView.render(renderer,camera);document.querySelectorAll('[data-anchor]').forEach(b=>{const anchor=anchors[b.dataset.anchor];projected.copy(anchor).project(camera);const x=(projected.x*.5+.5)*width,y=(-projected.y*.5+.5)*height;const visible=!entry.active&&!objectFocus.active&&projected.z<1&&projected.z>-1&&x>58&&x<width-58&&y>110&&y<height-90&&!blockedOverlays.some(el=>{const r=el.getBoundingClientRect();return x+54>r.left&&x-54<r.right&&y>r.top&&y-48<r.bottom;});b.style.left=x+'px';b.style.top=y+'px';b.style.visibility=visible?'visible':'hidden';});needsRender=false;}
+    if((!paused&&!reading)||entry.active||transit.active||objectFocus.moving||armDemo?.moving||needsRender)requestFrame();
   }
   orbit.update(camera);orbitalView.render(renderer,camera);document.body.classList.add('ready');document.getElementById('fallback').hidden=true;health?.ready();requestFrame();
 }
