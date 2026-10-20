@@ -191,10 +191,10 @@ function createSuite() {
   // Desk chair.
   cylinder(.1,.13,.5,-3.5,.55,.1,bronze);cylinder(.55,.55,.05,-3.5,.11,.1,dark);
   round(1,.2,1,-3.5,.9,.1,upholstery,.09);round(1,.95,.22,-3.5,1.4,.5,upholstery,.1);
-  // The research entrance is the articulated desktop arm, with real joint housings.
+  // The articulated desktop arm opens its pick-up demonstration.
   const lab=placeDeskAsset(deskAssets.robot,-4.82,deskTop,-1.64,.9,.15);
   let armDemo=null;
-  register(lab,'research',[-4.78,2.37,-1.64]);
+  register(lab,'arm',[-4.78,2.37,-1.64]);
   const deskMat=createDeskMat(THREE);placeDeskAsset(deskMat,-3.5,deskTop,-1.05);
   let inputBakeIndex=0;
   for(const group of [deskAssets.keyboard,mouseGroup,deskMat])group.traverse(mesh=>{if(mesh.isMesh&&mesh.material.isMeshStandardMaterial){mesh.geometry=mesh.geometry.index?mesh.geometry.toNonIndexed():mesh.geometry.clone();mesh.userData.inputBakeIndex=inputBakeIndex++;}});
@@ -268,8 +268,8 @@ function createSuite() {
   const windowFill=new THREE.RectAreaLight('#b8d5e7',.20,11,3.5);windowFill.position.set(0,3.4,-5.6);windowFill.lookAt(-3,1.4,-1);room.add(windowFill);
   const vistaLight=createVistaLighting(THREE,earthKey,windowFill);
   const orbitalView=createOrbitalView(THREE,scene,orbit);
-  let viewAvailable=true,frameRequest=0;
-  function requestFrame(){if(!viewAvailable||document.hidden||frameRequest)return;frameRequest=requestAnimationFrame(render);}
+  let viewAvailable=true,frameRequest=0,startupComplete=false;
+  function requestFrame(){if(!startupComplete||!viewAvailable||document.hidden||frameRequest)return;frameRequest=requestAnimationFrame(render);}
   function invalidate(){needsRender=true;requestFrame();}
 
   // Seated first-person view: the eye position never moves, only bounded head rotation.
@@ -330,7 +330,7 @@ function createSuite() {
   canvas.addEventListener('pointerup',e=>endGesture(e));
   canvas.addEventListener('pointercancel',e=>endGesture(e,true));
   canvas.addEventListener('lostpointercapture',e=>endGesture(e,true));
-  canvas.addEventListener('click',e=>{if(entry?.active||suppressClick){e.preventDefault();return;}const id=intersect(e.clientX,e.clientY);if(id)window.suiteOpen(id==='papers'?'research':id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':id==='research'||id==='projects'?'terminal':''});});
+  canvas.addEventListener('click',e=>{if(entry?.active||suppressClick){e.preventDefault();return;}const id=intersect(e.clientX,e.clientY);if(id==='arm'){demoOpen.click();return;}if(id)window.suiteOpen(id==='papers'?'research':id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':id==='research'||id==='projects'?'terminal':''});});
   function recenter(){if(objectFocus?.active)return;if(entry?.active){entry.skip();return;}if(gesture)endGesture({pointerId:gesture.id},true);yaw=0;pitch=0;updateLook();}
   document.getElementById('recenter').addEventListener('click',recenter);
   canvas.addEventListener('keydown',e=>{const id={1:'about',2:'research',3:'projects',4:'papers'}[e.key];if(id){e.preventDefault();window.suiteOpen(id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':id==='research'||id==='projects'?'terminal':''});return;}const step=THREE.MathUtils.degToRad(3);if(e.key==='Home'){e.preventDefault();recenter();}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();if(entry?.active||objectFocus?.active)return;if(e.key==='ArrowLeft')yaw+=step;if(e.key==='ArrowRight')yaw-=step;if(e.key==='ArrowUp')pitch+=step;if(e.key==='ArrowDown')pitch-=step;updateLook();}});
@@ -372,7 +372,7 @@ function createSuite() {
     leave(options){objectFocus.leave(options);},finish(){objectFocus.finish();},layout:layoutReading
   };
   let entryStorage=null;try{entryStorage=window.sessionStorage;}catch{/* Private storage denial defaults to skipping autoplay. */}
-  entry=createEntryPlayback({storage:entryStorage,reduceMotion:()=>motionPreference.matches||document.getElementById('sheet').open,
+  entry=createEntryPlayback({storage:entryStorage,reduceMotion:()=>motionPreference.matches||document.getElementById('sheet').open||!!location.hash&&location.hash!=='#home',
     onStart(){
       armDemo?.pause();objectFocus.leave({instant:true});transit.settle('entry');
       if(gesture)endGesture({pointerId:gesture.id},true);yaw=0;pitch=0;suppressClick=true;
@@ -424,7 +424,8 @@ function createSuite() {
   }
   armDemo=createArmDemo(THREE,deskAssets.robot,{changed(){scene.traverse(light=>{if(light.isLight&&light.shadow)light.shadow.needsUpdate=true;});renderer.shadowMap.needsUpdate=true;invalidate();},onState:demoUI,reduced:()=>motionPreference.matches});
   armDemo.suspend('ambient',paused);demoOpen.hidden=false;
-  demoOpen.addEventListener('click',()=>window.suiteFocus.enter('arm',{done:()=>demoRun.focus({preventScroll:true})}));
+  function openDemo(){window.suiteFocus.enter('arm',{done:()=>demoRun.focus({preventScroll:true})});}
+  demoOpen.addEventListener('click',openDemo);document.querySelector('button[data-arm-demo]').addEventListener('click',openDemo);
   demoRun.addEventListener('click',()=>{armDemo.start();invalidate();if(armDemo.state.stepMode)demoStep.focus({preventScroll:true});});
   demoPause.addEventListener('click',()=>{if(armDemo.state.paused){paused=false;armDemo.suspend('ambient',false);updateMotion();armDemo.resume();}else armDemo.pause();invalidate();});
   demoStep.addEventListener('click',()=>{armDemo.step();invalidate();});
@@ -434,7 +435,7 @@ function createSuite() {
   window.addEventListener('keydown',event=>{if(event.key==='Escape'&&objectFocus.kind==='arm'){event.preventDefault();leaveDemo();}});
   // Optional local review instrumentation, absent from normal visits.
   if(new URLSearchParams(location.search).has('arm-debug'))window.armDemoDebug={demo:armDemo,robot:deskAssets.robot,camera,renderer,scene,obstacles:{keyboard:deskAssets.keyboard,coffee:deskAssets.mug,monitor:deskAssets.monitor,terminal:deskAssets.terminal,mouse:mouseGroup,lamp:room.children.filter(m=>m.isMesh&&[lampBase,lampStem,warm].includes(m.material))},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,rigCalls:deskAssets.robot.armRig.drawCalls})};
-  resize();entry.start();window.dispatchEvent(new Event('suite-focus-ready'));
+  resize();
   const projected=new THREE.Vector3();
   const blockedOverlays=[document.querySelector('.vista-control'),document.querySelector('.top')];
   function render(ms){
@@ -450,5 +451,16 @@ function createSuite() {
     if(needsRender){if(armDemo?.moving&&lastArmShadow!==-Infinity&&ms-lastArmShadow<1000/(quality.constrained||quality.compact?10:15))scene.traverse(light=>{if(light.isLight&&light.shadow)light.shadow.needsUpdate=false;});else if(renderer.shadowMap.needsUpdate)lastArmShadow=ms;lastSceneFrame=ms;orbit.update(camera);orbitalView.render(renderer,camera);document.querySelectorAll('[data-anchor]').forEach(b=>{const anchor=anchors[b.dataset.anchor];projected.copy(anchor).project(camera);const x=(projected.x*.5+.5)*width,y=(-projected.y*.5+.5)*height;const visible=!entry.active&&!objectFocus.active&&projected.z<1&&projected.z>-1&&x>58&&x<width-58&&y>110&&y<height-90&&!blockedOverlays.some(el=>{const r=el.getBoundingClientRect();return x+54>r.left&&x-54<r.right&&y>r.top&&y-48<r.bottom;});b.style.left=x+'px';b.style.top=y+'px';b.style.visibility=visible?'visible':'hidden';});needsRender=false;}
     if((!paused&&!reading)||entry.active||transit.active||objectFocus.moving||armDemo?.moving||needsRender)requestFrame();
   }
-  orbit.update(camera);orbitalView.render(renderer,camera);document.body.classList.add('ready');document.getElementById('fallback').hidden=true;health?.ready();requestFrame();
+  window.addEventListener('suite-startup-unavailable',()=>stopEntry());
+  health.ready(async()=>{
+    if(entry.willAutoplay&&!location.hash.includes('@'))entryPath.sample(0,camera);
+    orbit.update(camera);
+    if(renderer.compileAsync)await renderer.compileAsync(scene,camera);
+    if(!viewAvailable)return;
+    orbitalView.render(renderer,camera);
+  },()=>{
+    if(!viewAvailable)return;
+    startupComplete=true;document.body.classList.add('ready');document.getElementById('fallback').hidden=true;
+    entry.start();window.dispatchEvent(new Event('suite-focus-ready'));requestFrame();
+  });
 }

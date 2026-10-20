@@ -178,8 +178,9 @@
     if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dismiss();
   });
   document.querySelector('.brand').addEventListener('click',event=>{event.preventDefault();if(dialog.open)close();});
-  restore();
+  if(['ready','failed'].includes(document.body.dataset.startup))restore();
+  window.addEventListener('suite-startup-unavailable',restore);
   window.suiteOpen=open;
-  window.addEventListener('popstate',restore);
-  window.addEventListener('hashchange',restore);
+  window.addEventListener('popstate',()=>{if(['ready','failed'].includes(document.body.dataset.startup))restore();});
+  window.addEventListener('hashchange',()=>{if(['ready','failed'].includes(document.body.dataset.startup))restore();});
 })();

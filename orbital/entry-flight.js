@@ -58,6 +58,7 @@ export function createEntryPlayback({storage,reduceMotion=false,onStart,onFrame,
   }
   return {
     get active(){return active;},
+    get willAutoplay(){return available&&!(typeof reduceMotion==='function'?reduceMotion():reduceMotion)&&!seen();},
     get progress(){return clamp(elapsed/duration);},
     start({replay=false}={}) {
       if(!available)return false;
