@@ -2,10 +2,10 @@
 // Exact URLs and processing are recorded in ./textures/orbit-sources.json.
 // Orbit composition is independent of the cabin and of the camera's flight path.
 // The Earth is a depth-tested world-space sphere, never a camera-facing backdrop.
-import {createStarField} from './star-field.js';
-import {createDistantStation} from './distant-station.js';
-import {createGargantua} from './gargantua.js';
-import {sampleOrbitalMotion,createOrbitalMotionClock} from './orbital-motion.js';
+import {createStarField} from './star-field.js?v=844245f51357b75c';
+import {createDistantStation} from './distant-station.js?v=72784225738a51fe';
+import {createGargantua} from './gargantua.js?v=0872165e20334530';
+import {sampleOrbitalMotion,createOrbitalMotionClock} from './orbital-motion.js?v=743ef3180e115eb3';
 // A clock-synced visual day, not an astronomical ephemeris. UTC milliseconds
 // avoid timezone/DST changes; the existing orientation is the midnight datum.
 export function earthRotationAt(timestamp=Date.now()) {

@@ -1,4 +1,4 @@
-import { quality } from './quality-profile.js';
+import { quality } from './quality-profile.js?v=72ab348954d7850d';
 // Render only the orbital layer to a small HDR target. The cabin is rendered
 // once, with its original camera and lighting; its depth hides this sky pass.
 // UI remains ordinary DOM and never enters the distortion or bloom pipeline.

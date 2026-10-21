@@ -1,6 +1,6 @@
-import {createKeyboard} from './desk-inputs.js';
-import {createCoffeeMug} from './coffee-mug.js';
-import {createResearchArm} from './research-arm.js';
+import {createKeyboard} from './desk-inputs.js?v=0d6f67de8d5e8209';
+import {createCoffeeMug} from './coffee-mug.js?v=3b18c44ab7a38c04';
+import {createResearchArm} from './research-arm.js?v=4595f80e5861bbed';
 import { RoundedBoxGeometry } from './vendor/DeskRoundedBoxGeometry.js';
 
 /** Original desktop models. Metres, +Y up, +Z toward the seated viewer.
