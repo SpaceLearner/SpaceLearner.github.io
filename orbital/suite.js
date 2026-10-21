@@ -19,6 +19,7 @@ import { createVistaPicker } from './vista-picker.js';
 import { createVistaLighting } from './vista-lighting.js';
 import { createSurfaceReading } from './surface-reading.js';
 import { createArmDemo } from './arm-demo.js';
+import { createCabinInteractions } from './cabin-interactions.js';
 import { createObjectFocus } from './object-focus.js';
 import { createResearchNotebook } from './research-notebook.js';
 
@@ -166,9 +167,18 @@ function createSuite() {
     g.scale.setScalar(scale);g.rotation.y=angle;mount.add(g);return mount;
   }
   const monitor=placeDeskAsset(deskAssets.monitor,-3.7,1.468,-2,1.3);
-  register(monitor,'about',[-3.7,2.6,-1.96]);
+  register(monitor,'research',[-3.7,2.6,-1.96]);
   const terminal=placeDeskAsset(deskAssets.terminal,-1.9,1.468,-1.73,1.2,-.12);
   register(terminal,'projects',[-1.9,2.12,-1.7]);
+  // Small desktop nameplate and language rocker, seated beside the monitor foot.
+  const plaque=new THREE.Group();
+  box(.43,.012,.065,0,.006,0,dark,plaque);
+  const plaqueBody=box(.43,.11,.025,0,.065,0,bronze,plaque);
+  const plaqueFace=panel(.41,.09,0,.065,.013,texture((c,w,h)=>{c.fillStyle='#343934';c.fillRect(0,0,w,h);c.fillStyle='#d5cbb4';c.font='48px Georgia';c.textAlign='center';c.fillText('Jiayan Guo',w/2,h*.64);},512,128),plaque);
+  placeDeskAsset(plaque,-3.15,deskTop,-1.66,1,-.08);register(plaque,'about',[-3.15,1.56,-1.66]);
+  const languagePanel=new THREE.Group();box(.29,.012,.065,0,.006,0,dark,languagePanel);box(.29,.12,.025,0,.066,0,dark,languagePanel);
+  const languageFace=panel(.27,.10,0,.066,.013,texture((c,w,h)=>{c.fillStyle='#202621';c.fillRect(0,0,w,h);c.fillStyle='#c9c4b3';c.font='36px Arial';c.textAlign='center';c.fillText('中 / EN',w/2,h*.64);},256,128),languagePanel);
+  placeDeskAsset(languagePanel,-2.7,deskTop,-1.45,1,-.08);
   // Screen fill leaves the front surface, aimed slightly down at the desk.
   for(const [group,screen,intensity]of [[deskAssets.monitor,deskAssets.monitorScreen,.45],[deskAssets.terminal,deskAssets.terminalScreen,.24]]){
     const fill=new THREE.RectAreaLight('#c1cfd2',intensity,screen.width,screen.height);
@@ -327,16 +337,17 @@ function createSuite() {
   canvas.addEventListener('pointermove',e=>{
     if(entry?.active||objectFocus?.active)return;
     if(gesture&&gesture.id===e.pointerId){const dx=e.clientX-gesture.x,dy=e.clientY-gesture.y;if(!gesture.dragging&&dx*dx+dy*dy>dragThreshold*dragThreshold)gesture.dragging=true;if(gesture.dragging){suppressClick=true;yaw=gesture.yaw+dx*sensitivity;pitch=gesture.pitch+dy*sensitivity;updateLook();canvas.style.cursor='grabbing';}return;}
-    if(!gesture)canvas.style.cursor=intersect(e.clientX,e.clientY)?'pointer':'grab';
+    if(!gesture){const id=intersect(e.clientX,e.clientY);canvas.style.cursor=id?'pointer':'grab';cabinInteractions?.hover(id);}
   });
+  canvas.addEventListener('pointerleave',()=>cabinInteractions?.hover(null));
   function endGesture(e,cancelled=false){if(!gesture||gesture.id!==e.pointerId)return;suppressClick=cancelled||gesture.dragging;gesture=null;canvas.style.cursor='grab';if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);}
   canvas.addEventListener('pointerup',e=>endGesture(e));
   canvas.addEventListener('pointercancel',e=>endGesture(e,true));
   canvas.addEventListener('lostpointercapture',e=>endGesture(e,true));
-  canvas.addEventListener('click',e=>{if(entry?.active||suppressClick){e.preventDefault();return;}const id=intersect(e.clientX,e.clientY);if(id==='arm'){demoOpen.click();return;}if(id)window.suiteOpen(id==='papers'?'research':id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':id==='research'||id==='projects'?'terminal':''});});
+  canvas.addEventListener('click',e=>{if(entry?.active||suppressClick){e.preventDefault();return;}const id=intersect(e.clientX,e.clientY);if(id==='arm'){demoOpen.click();return;}if(id)window.suiteOpen(id==='papers'?'research':id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':id==='research'?'monitor':id==='projects'?'terminal':''});});
   function recenter(){if(objectFocus?.active)return;if(entry?.active){entry.skip();return;}if(gesture)endGesture({pointerId:gesture.id},true);yaw=0;pitch=0;updateLook();}
   document.getElementById('recenter').addEventListener('click',recenter);
-  canvas.addEventListener('keydown',e=>{const id={1:'about',2:'research',3:'projects',4:'papers'}[e.key];if(id){e.preventDefault();window.suiteOpen(id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':id==='research'||id==='projects'?'terminal':''});return;}const step=THREE.MathUtils.degToRad(3);if(e.key==='Home'){e.preventDefault();recenter();}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();if(entry?.active||objectFocus?.active)return;if(e.key==='ArrowLeft')yaw+=step;if(e.key==='ArrowRight')yaw-=step;if(e.key==='ArrowUp')pitch+=step;if(e.key==='ArrowDown')pitch-=step;updateLook();}});
+  canvas.addEventListener('keydown',e=>{const id={1:'about',2:'research',3:'projects',4:'papers'}[e.key];if(id){e.preventDefault();window.suiteOpen(id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':id==='research'?'monitor':id==='projects'?'terminal':''});return;}const step=THREE.MathUtils.degToRad(3);if(e.key==='Home'){e.preventDefault();recenter();}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();if(entry?.active||objectFocus?.active)return;if(e.key==='ArrowLeft')yaw+=step;if(e.key==='ArrowRight')yaw-=step;if(e.key==='ArrowUp')pitch+=step;if(e.key==='ArrowDown')pitch-=step;updateLook();}});
   const sheet=document.getElementById('sheet');
   const surfaces=createSurfaceReading(THREE,{camera,sheet,room,
     screen:kind=>kind==='monitor'?deskAssets.monitorScreen:deskAssets.terminalScreen,
@@ -433,14 +444,15 @@ function createSuite() {
   demoPause.addEventListener('click',()=>{if(armDemo.state.paused){paused=false;armDemo.suspend('ambient',false);updateMotion();armDemo.resume();}else armDemo.pause();invalidate();});
   demoStep.addEventListener('click',()=>{armDemo.step();invalidate();});
   demoReset.addEventListener('click',()=>{armDemo.reset();invalidate();});
-  function leaveDemo(){armDemo.pause();objectFocus.leave({done:()=>demoOpen.focus({preventScroll:true})});}
+  function leaveDemo(){armDemo.pause();objectFocus.leave({done:()=>requestAnimationFrame(()=>{const target=getComputedStyle(demoOpen).visibility==='visible'?demoOpen:document.querySelector('#cabin-menu summary');target.focus({preventScroll:true});})});}
   document.getElementById('arm-demo-back').addEventListener('click',leaveDemo);
   window.addEventListener('keydown',event=>{if(event.key==='Escape'&&objectFocus.kind==='arm'){event.preventDefault();leaveDemo();}});
   // Optional local review instrumentation, absent from normal visits.
-  if(new URLSearchParams(location.search).has('arm-debug'))window.armDemoDebug={demo:armDemo,robot:deskAssets.robot,camera,renderer,scene,obstacles:{keyboard:deskAssets.keyboard,coffee:deskAssets.mug,monitor:deskAssets.monitor,terminal:deskAssets.terminal,mouse:mouseGroup,lamp:room.children.filter(m=>m.isMesh&&[lampBase,lampStem,warm].includes(m.material))},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,rigCalls:deskAssets.robot.armRig.drawCalls})};
+  if(new URLSearchParams(location.search).has('arm-debug'))window.armDemoDebug={controls:{plaqueFace,languageFace},demo:armDemo,robot:deskAssets.robot,camera,renderer,scene,obstacles:{keyboard:deskAssets.keyboard,coffee:deskAssets.mug,monitor:deskAssets.monitor,terminal:deskAssets.terminal,mouse:mouseGroup,lamp:room.children.filter(m=>m.isMesh&&[lampBase,lampStem,warm].includes(m.material))},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,rigCalls:deskAssets.robot.armRig.drawCalls})};
   resize();
   const projected=new THREE.Vector3();
-  const blockedOverlays=[document.querySelector('.vista-control'),document.querySelector('.top')];
+  const cabinInteractions=createCabinInteractions(THREE,{scene,camera,canvas,viewport:()=>({width,height}),inactive:()=>entry.active||objectFocus.active,
+    targets:{about:()=>plaqueFace.getWorldPosition(new THREE.Vector3()),research:()=>deskAssets.monitorScreen.mesh.getWorldPosition(new THREE.Vector3()),projects:()=>deskAssets.terminalScreen.mesh.getWorldPosition(new THREE.Vector3()),arm:()=>deskAssets.robot.localToWorld(new THREE.Vector3(.03,.25,.09)),papers:()=>notebook.group.localToWorld(new THREE.Vector3(.03,.04,0))},languageFace,changed:invalidate});
   function render(ms){
     frameRequest=0;
     if(!viewAvailable||document.hidden)return;
@@ -451,7 +463,7 @@ function createSuite() {
     // Earth samples UTC; local environmental motion uses a suspendable clock.
     // Opaque reading panels freeze the background; user-driven camera motion stays live.
     if(!paused&&!reading&&ms-lastSceneFrame>=1000/quality.fps){orbit.setTime(Date.now(),ms);needsRender=true;}
-    if(needsRender){if(armDemo?.moving&&lastArmShadow!==-Infinity&&ms-lastArmShadow<1000/(quality.constrained||quality.compact?10:15))scene.traverse(light=>{if(light.isLight&&light.shadow)light.shadow.needsUpdate=false;});else if(renderer.shadowMap.needsUpdate)lastArmShadow=ms;lastSceneFrame=ms;orbit.update(camera);orbitalView.render(renderer,camera);document.querySelectorAll('[data-anchor]').forEach(b=>{const anchor=anchors[b.dataset.anchor];projected.copy(anchor).project(camera);let x=(projected.x*.5+.5)*width,y=(-projected.y*.5+.5)*height;if(b.dataset.anchor==='arm'&&mobile){x=Math.max(72,Math.min(width-72,x));y=Math.max(200,Math.min(height-150,y));}const visible=!entry.active&&!objectFocus.active&&projected.z<1&&projected.z>-1&&x>58&&x<width-58&&y>110&&y<height-90&&!blockedOverlays.some(el=>{const r=el.getBoundingClientRect();return x+54>r.left&&x-54<r.right&&y>r.top&&y-48<r.bottom;});b.style.left=x+'px';b.style.top=y+'px';b.style.visibility=visible?'visible':'hidden';});needsRender=false;}
+    if(needsRender){if(armDemo?.moving&&lastArmShadow!==-Infinity&&ms-lastArmShadow<1000/(quality.constrained||quality.compact?10:15))scene.traverse(light=>{if(light.isLight&&light.shadow)light.shadow.needsUpdate=false;});else if(renderer.shadowMap.needsUpdate)lastArmShadow=ms;lastSceneFrame=ms;orbit.update(camera);orbitalView.render(renderer,camera);cabinInteractions.layout();needsRender=false;}
     if((!paused&&!reading)||entry.active||transit.active||objectFocus.moving||armDemo?.moving||needsRender)requestFrame();
   }
   window.addEventListener('suite-startup-unavailable',()=>stopEntry());

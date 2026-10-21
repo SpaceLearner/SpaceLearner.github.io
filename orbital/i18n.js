@@ -307,6 +307,9 @@ const zh={
   "Filter papers by year": "按年份筛选论文",
   "JIAYAN GUO / ORBITAL RESEARCH": "JIAYAN GUO / 轨道研究站",
   "JIAYAN GUO / RESEARCH DESKTOP": "JIAYAN GUO / 研究工作台",
+  "Cabin controls": "舱内控制",
+  "About · Desk nameplate": "关于 · 桌面名牌",
+  "Research · Main display": "研究 · 主显示器",
   "Switch to Chinese": "切换为中文",
   "Switch to English": "切换为英文"
 };
@@ -365,8 +368,8 @@ const zh={
     const modal=document.querySelector('#image-viewer[open]')||document.querySelector('#sheet[open]');
     const starting=['loading','preparing','revealing'].includes(document.body.dataset.startup);
     const focused=document.body.dataset.objectFocus && document.body.dataset.objectFocus!=='idle';
-    const host=modal?(modal.dataset.object?modal.querySelector('.focus-toolbar'):modal.querySelector('.sheet-head,.image-head')):(starting||focused)?dock:home;
-    if(host&&control.parentNode!==host)host.append(control);
+    const host=modal?(modal.dataset.object?modal.querySelector('.focus-toolbar'):modal.querySelector('.sheet-head,.image-head')):(starting||focused)?dock:document.body.dataset.sceneLanguage==='visible'?document.getElementById('scene-language'):home;
+    if(host&&control.parentNode!==host){const focused=control.contains(document.activeElement)?document.activeElement:null;host.append(control);focused?.focus({preventScroll:true});}
     for(const b of control.children){setAttr(b,'aria-pressed',String(b.dataset.language===language));setAttr(b,'aria-label',t(b.dataset.language==='zh'?'Switch to Chinese':'Switch to English'));}
   }
   function setLanguage(next){
@@ -384,6 +387,6 @@ const zh={
   new MutationObserver(records=>{
     const roots=new Set();for(const r of records){if(r.type==='attributes'){if(observedAttributes.includes(r.attributeName))attribute(r.target,r.attributeName);}else if(r.type==='characterData')text(r.target);else for(const n of r.addedNodes)roots.add(n);}
     for(const root of roots)scan(root);controls();
-  }).observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:[...observedAttributes,'open','data-object','data-startup','data-object-focus']});
+  }).observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:[...observedAttributes,'open','data-object','data-startup','data-object-focus','data-scene-language']});
   scan(document.documentElement);document.addEventListener('DOMContentLoaded',()=>{scan(document.documentElement);controls();});
 })();

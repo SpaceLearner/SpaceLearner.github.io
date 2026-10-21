@@ -114,7 +114,7 @@
     rememberScroll();const token=++generation;hideImage();if(dialog.open)dialog.close();currentPage='';currentProject='';
     dialog.dataset.object='';dialog.dataset.focusPending='false';dialog.removeAttribute('style');
     document.querySelectorAll('nav [aria-current]').forEach(link=>link.removeAttribute('aria-current'));
-    const restoreFocus=()=>{if(token===generation&&previousFocus?.isConnected)previousFocus.focus({preventScroll:true});};
+    const restoreFocus=()=>{if(token===generation&&previousFocus?.isConnected){const visible=previousFocus.getClientRects().length&&getComputedStyle(previousFocus).visibility!=='hidden';(visible?previousFocus:document.querySelector('#cabin-menu summary')||returnTarget).focus({preventScroll:true});}};
     if(window.suiteFocus)window.suiteFocus.leave({done:restoreFocus});else restoreFocus();
     readingChanged();
   }
