@@ -363,12 +363,12 @@ const zh={
     if(!control){
       dock=document.createElement('div');dock.className='language-dock';document.body.append(dock);
       control=document.createElement('div');control.className='language-switch';control.setAttribute('role','group');control.setAttribute('aria-label','Language / 语言');
-      for(const [value,label]of [['zh','中'],['en','EN']]){const b=document.createElement('button');b.type='button';b.dataset.language=value;b.lang=value==='zh'?'zh-CN':'en';b.textContent=label;b.addEventListener('click',()=>setLanguage(value));control.append(b);}
+      for(const [value,label]of [['zh','中'],['en','EN']]){const b=document.createElement('button');b.type='button';b.dataset.language=value;b.lang=value==='zh'?'zh-CN':'en';b.textContent=label;b.addEventListener('click',()=>window.suiteLanguageFlip?window.suiteLanguageFlip.request(value):setLanguage(value));control.append(b);}
     }
     const modal=document.querySelector('#image-viewer[open]')||document.querySelector('#sheet[open]');
     const starting=['loading','preparing','revealing'].includes(document.body.dataset.startup);
     const focused=document.body.dataset.objectFocus && document.body.dataset.objectFocus!=='idle';
-    const host=modal?(modal.dataset.object?modal.querySelector('.focus-toolbar'):modal.querySelector('.sheet-head,.image-head')):(starting||focused)?dock:document.body.dataset.sceneLanguage==='visible'?document.getElementById('scene-language'):home;
+    const host=modal?(modal.dataset.object?modal.querySelector('.focus-toolbar'):modal.querySelector('.sheet-head,.image-head')):(starting||focused)?dock:home;
     if(host&&control.parentNode!==host){const focused=control.contains(document.activeElement)?document.activeElement:null;host.append(control);focused?.focus({preventScroll:true});}
     for(const b of control.children){setAttr(b,'aria-pressed',String(b.dataset.language===language));setAttr(b,'aria-label',t(b.dataset.language==='zh'?'Switch to Chinese':'Switch to English'));}
   }

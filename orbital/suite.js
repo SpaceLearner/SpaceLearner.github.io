@@ -19,6 +19,7 @@ import { createVistaPicker } from './vista-picker.js';
 import { createVistaLighting } from './vista-lighting.js';
 import { createSurfaceReading } from './surface-reading.js';
 import { createArmDemo } from './arm-demo.js';
+import { createLanguagePlacard } from './language-placard.js';
 import { createCabinInteractions } from './cabin-interactions.js';
 import { createObjectFocus } from './object-focus.js';
 import { createResearchNotebook } from './research-notebook.js';
@@ -177,8 +178,12 @@ function createSuite() {
   const plaqueFace=panel(.41,.09,0,.065,.013,texture((c,w,h)=>{c.fillStyle='#343934';c.fillRect(0,0,w,h);c.fillStyle='#d5cbb4';c.font='48px Georgia';c.textAlign='center';c.fillText('Jiayan Guo',w/2,h*.64);},512,128),plaque);
   placeDeskAsset(plaque,-3.15,deskTop,-1.66,1,-.08);register(plaque,'about',[-3.15,1.56,-1.66]);
   const languagePanel=new THREE.Group();box(.29,.012,.065,0,.006,0,dark,languagePanel);box(.29,.12,.025,0,.066,0,dark,languagePanel);
-  const languageFace=panel(.27,.10,0,.066,.013,texture((c,w,h)=>{c.fillStyle='#202621';c.fillRect(0,0,w,h);c.fillStyle='#c9c4b3';c.font='36px Arial';c.textAlign='center';c.fillText('中 / EN',w/2,h*.64);},256,128),languagePanel);
+  // Independent outward-facing textures keep both faces readable, never mirrored.
+  const languageTexture=label=>texture((c,w,h)=>{c.fillStyle='#202621';c.fillRect(0,0,w,h);c.fillStyle='#d5cbb4';c.font='64px Arial';c.textAlign='center';c.fillText(label,w/2,h*.68);},256,128);
+  const languageFace=panel(.27,.10,0,.066,.013,languageTexture('EN'),languagePanel);
+  const languageBack=panel(.27,.10,0,.066,-.013,languageTexture('中'),languagePanel);languageBack.rotation.y=Math.PI;
   placeDeskAsset(languagePanel,-2.7,deskTop,-1.45,1,-.08);
+  languagePanel.traverse(o=>{if(o.isMesh){o.userData.panel='language';objects.push(o);}});
   // Screen fill leaves the front surface, aimed slightly down at the desk.
   for(const [group,screen,intensity]of [[deskAssets.monitor,deskAssets.monitorScreen,.45],[deskAssets.terminal,deskAssets.terminalScreen,.24]]){
     const fill=new THREE.RectAreaLight('#c1cfd2',intensity,screen.width,screen.height);
@@ -344,7 +349,7 @@ function createSuite() {
   canvas.addEventListener('pointerup',e=>endGesture(e));
   canvas.addEventListener('pointercancel',e=>endGesture(e,true));
   canvas.addEventListener('lostpointercapture',e=>endGesture(e,true));
-  canvas.addEventListener('click',e=>{if(entry?.active||suppressClick){e.preventDefault();return;}const id=intersect(e.clientX,e.clientY);if(id==='arm'){demoOpen.click();return;}if(id)window.suiteOpen(id==='papers'?'research':id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':id==='research'?'monitor':id==='projects'?'terminal':''});});
+  canvas.addEventListener('click',e=>{if(entry?.active||suppressClick){e.preventDefault();return;}const id=intersect(e.clientX,e.clientY);if(id==='language'){languageFlip.toggle();return;}if(id==='arm'){demoOpen.click();return;}if(id)window.suiteOpen(id==='papers'?'research':id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':id==='research'?'monitor':id==='projects'?'terminal':''});});
   function recenter(){if(objectFocus?.active)return;if(entry?.active){entry.skip();return;}if(gesture)endGesture({pointerId:gesture.id},true);yaw=0;pitch=0;updateLook();}
   document.getElementById('recenter').addEventListener('click',recenter);
   canvas.addEventListener('keydown',e=>{const id={1:'about',2:'research',3:'projects',4:'papers'}[e.key];if(id){e.preventDefault();window.suiteOpen(id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':id==='research'?'monitor':id==='projects'?'terminal':''});return;}const step=THREE.MathUtils.degToRad(3);if(e.key==='Home'){e.preventDefault();recenter();}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();if(entry?.active||objectFocus?.active)return;if(e.key==='ArrowLeft')yaw+=step;if(e.key==='ArrowRight')yaw-=step;if(e.key==='ArrowUp')pitch+=step;if(e.key==='ArrowDown')pitch-=step;updateLook();}});
@@ -447,24 +452,37 @@ function createSuite() {
   function leaveDemo(){armDemo.pause();objectFocus.leave({done:()=>requestAnimationFrame(()=>{const target=getComputedStyle(demoOpen).visibility==='visible'?demoOpen:document.querySelector('#cabin-menu summary');target.focus({preventScroll:true});})});}
   document.getElementById('arm-demo-back').addEventListener('click',leaveDemo);
   window.addEventListener('keydown',event=>{if(event.key==='Escape'&&objectFocus.kind==='arm'){event.preventDefault();leaveDemo();}});
+  let applyingLanguage=false;
+  const languageFlip=createLanguagePlacard({group:languagePanel,language:()=>window.suiteI18n.language,
+    apply(next){applyingLanguage=true;try{window.suiteI18n.setLanguage(next);}finally{applyingLanguage=false;}},
+    changed(){scene.traverse(light=>{if(light.isLight&&light.shadow)light.shadow.needsUpdate=true;});renderer.shadowMap.needsUpdate=true;invalidate();},
+    reduced:()=>motionPreference.matches,ready:()=>startupComplete,
+    facing(){const normal=languageFace.getWorldDirection(new THREE.Vector3()),center=languageFace.getWorldPosition(new THREE.Vector3());return normal.dot(camera.position.clone().sub(center))>=0?'en':'zh';}});
+  window.suiteLanguageFlip=languageFlip;
+  window.addEventListener('suite-language-change',()=>{if(!applyingLanguage)languageFlip.sync();});
+  motionPreference.addEventListener('change',()=>{if(motionPreference.matches)languageFlip.settle();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)languageFlip.settle();});
+  window.addEventListener('pagehide',()=>languageFlip.settle());
+  window.addEventListener('suite-startup-unavailable',()=>languageFlip.disable());
   // Optional local review instrumentation, absent from normal visits.
-  if(new URLSearchParams(location.search).has('arm-debug'))window.armDemoDebug={controls:{plaqueFace,languageFace},demo:armDemo,robot:deskAssets.robot,camera,renderer,scene,obstacles:{keyboard:deskAssets.keyboard,coffee:deskAssets.mug,monitor:deskAssets.monitor,terminal:deskAssets.terminal,mouse:mouseGroup,lamp:room.children.filter(m=>m.isMesh&&[lampBase,lampStem,warm].includes(m.material))},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,rigCalls:deskAssets.robot.armRig.drawCalls})};
+  if(new URLSearchParams(location.search).has('arm-debug'))window.armDemoDebug={controls:{plaqueFace,languageFace,languageBack,languagePanel,languageFlip},demo:armDemo,robot:deskAssets.robot,camera,renderer,scene,obstacles:{keyboard:deskAssets.keyboard,coffee:deskAssets.mug,monitor:deskAssets.monitor,terminal:deskAssets.terminal,mouse:mouseGroup,lamp:room.children.filter(m=>m.isMesh&&[lampBase,lampStem,warm].includes(m.material))},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,rigCalls:deskAssets.robot.armRig.drawCalls})};
   resize();
   const projected=new THREE.Vector3();
   const cabinInteractions=createCabinInteractions(THREE,{scene,camera,canvas,viewport:()=>({width,height}),inactive:()=>entry.active||objectFocus.active,
-    targets:{about:()=>plaqueFace.getWorldPosition(new THREE.Vector3()),research:()=>deskAssets.monitorScreen.mesh.getWorldPosition(new THREE.Vector3()),projects:()=>deskAssets.terminalScreen.mesh.getWorldPosition(new THREE.Vector3()),arm:()=>deskAssets.robot.localToWorld(new THREE.Vector3(.03,.25,.09)),papers:()=>notebook.group.localToWorld(new THREE.Vector3(.03,.04,0))},languageFace,changed:invalidate});
+    targets:{about:()=>plaqueFace.getWorldPosition(new THREE.Vector3()),research:()=>deskAssets.monitorScreen.mesh.getWorldPosition(new THREE.Vector3()),projects:()=>deskAssets.terminalScreen.mesh.getWorldPosition(new THREE.Vector3()),arm:()=>deskAssets.robot.localToWorld(new THREE.Vector3(.03,.25,.09)),papers:()=>notebook.group.localToWorld(new THREE.Vector3(.03,.04,0))},languageFace,languagePanel,languageFlip,changed:invalidate});
   function render(ms){
     frameRequest=0;
     if(!viewAvailable||document.hidden)return;
     entry.tick(ms);
     transit.tick(ms);
     objectFocus.tick(ms);
+    languageFlip.tick(ms);
     if(ms-lastSceneFrame>=1000/quality.fps)armDemo?.tick(ms);
     // Earth samples UTC; local environmental motion uses a suspendable clock.
     // Opaque reading panels freeze the background; user-driven camera motion stays live.
     if(!paused&&!reading&&ms-lastSceneFrame>=1000/quality.fps){orbit.setTime(Date.now(),ms);needsRender=true;}
-    if(needsRender){if(armDemo?.moving&&lastArmShadow!==-Infinity&&ms-lastArmShadow<1000/(quality.constrained||quality.compact?10:15))scene.traverse(light=>{if(light.isLight&&light.shadow)light.shadow.needsUpdate=false;});else if(renderer.shadowMap.needsUpdate)lastArmShadow=ms;lastSceneFrame=ms;orbit.update(camera);orbitalView.render(renderer,camera);cabinInteractions.layout();needsRender=false;}
-    if((!paused&&!reading)||entry.active||transit.active||objectFocus.moving||armDemo?.moving||needsRender)requestFrame();
+    if(needsRender){if((armDemo?.moving||languageFlip.moving)&&lastArmShadow!==-Infinity&&ms-lastArmShadow<1000/(quality.constrained||quality.compact?10:15))scene.traverse(light=>{if(light.isLight&&light.shadow)light.shadow.needsUpdate=false;});else if(renderer.shadowMap.needsUpdate)lastArmShadow=ms;lastSceneFrame=ms;orbit.update(camera);orbitalView.render(renderer,camera);cabinInteractions.layout();needsRender=false;}
+    if((!paused&&!reading)||entry.active||transit.active||objectFocus.moving||armDemo?.moving||languageFlip.moving||needsRender)requestFrame();
   }
   window.addEventListener('suite-startup-unavailable',()=>stopEntry());
   health.ready(async()=>{
