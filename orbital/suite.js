@@ -168,15 +168,10 @@ function createSuite() {
     g.scale.setScalar(scale);g.rotation.y=angle;mount.add(g);return mount;
   }
   const monitor=placeDeskAsset(deskAssets.monitor,-3.7,1.468,-2,1.3);
-  register(monitor,'research',[-3.7,2.6,-1.96]);
+  register(monitor,'monitor',[-3.7,2.6,-1.96]);
   const terminal=placeDeskAsset(deskAssets.terminal,-1.9,1.468,-1.73,1.2,-.12);
   register(terminal,'projects',[-1.9,2.12,-1.7]);
-  // Small desktop nameplate and language rocker, seated beside the monitor foot.
-  const plaque=new THREE.Group();
-  box(.43,.012,.065,0,.006,0,dark,plaque);
-  const plaqueBody=box(.43,.11,.025,0,.065,0,bronze,plaque);
-  const plaqueFace=panel(.41,.09,0,.065,.013,texture((c,w,h)=>{c.fillStyle='#343934';c.fillRect(0,0,w,h);c.fillStyle='#d5cbb4';c.font='48px Georgia';c.textAlign='center';c.fillText('Jiayan Guo',w/2,h*.64);},512,128),plaque);
-  placeDeskAsset(plaque,-3.15,deskTop,-1.66,1,-.08);register(plaque,'about',[-3.15,1.56,-1.66]);
+  // Independent physical language placard beside the monitor foot.
   const languagePanel=new THREE.Group();box(.29,.012,.065,0,.006,0,dark,languagePanel);box(.29,.12,.025,0,.066,0,dark,languagePanel);
   // Independent outward-facing textures keep both faces readable, never mirrored.
   const languageTexture=label=>texture((c,w,h)=>{c.fillStyle='#202621';c.fillRect(0,0,w,h);c.fillStyle='#d5cbb4';c.font='64px Arial';c.textAlign='center';c.fillText(label,w/2,h*.68);},256,128);
@@ -349,7 +344,7 @@ function createSuite() {
   canvas.addEventListener('pointerup',e=>endGesture(e));
   canvas.addEventListener('pointercancel',e=>endGesture(e,true));
   canvas.addEventListener('lostpointercapture',e=>endGesture(e,true));
-  canvas.addEventListener('click',e=>{if(entry?.active||suppressClick){e.preventDefault();return;}const id=intersect(e.clientX,e.clientY);if(id==='language'){languageFlip.toggle();return;}if(id==='arm'){demoOpen.click();return;}if(id)window.suiteOpen(id==='papers'?'research':id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':id==='research'?'monitor':id==='projects'?'terminal':''});});
+  canvas.addEventListener('click',e=>{if(entry?.active||suppressClick){e.preventDefault();return;}const id=intersect(e.clientX,e.clientY);if(id==='language'){languageFlip.toggle();return;}if(id==='arm'){demoOpen.click();return;}if(id)window.suiteOpen(id==='monitor'?'about':id==='papers'?'research':id,canvas,{focus:id==='about'||id==='monitor'?'monitor':id==='papers'?'notebook':id==='research'?'monitor':id==='projects'?'terminal':''});});
   function recenter(){if(objectFocus?.active)return;if(entry?.active){entry.skip();return;}if(gesture)endGesture({pointerId:gesture.id},true);yaw=0;pitch=0;updateLook();}
   document.getElementById('recenter').addEventListener('click',recenter);
   canvas.addEventListener('keydown',e=>{const id={1:'about',2:'research',3:'projects',4:'papers'}[e.key];if(id){e.preventDefault();window.suiteOpen(id,canvas,{focus:id==='about'?'monitor':id==='papers'?'notebook':id==='research'?'monitor':id==='projects'?'terminal':''});return;}const step=THREE.MathUtils.degToRad(3);if(e.key==='Home'){e.preventDefault();recenter();}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();if(entry?.active||objectFocus?.active)return;if(e.key==='ArrowLeft')yaw+=step;if(e.key==='ArrowRight')yaw-=step;if(e.key==='ArrowUp')pitch+=step;if(e.key==='ArrowDown')pitch-=step;updateLook();}});
@@ -465,11 +460,11 @@ function createSuite() {
   window.addEventListener('pagehide',()=>languageFlip.settle());
   window.addEventListener('suite-startup-unavailable',()=>languageFlip.disable());
   // Optional local review instrumentation, absent from normal visits.
-  if(new URLSearchParams(location.search).has('arm-debug'))window.armDemoDebug={controls:{plaqueFace,languageFace,languageBack,languagePanel,languageFlip},demo:armDemo,robot:deskAssets.robot,camera,renderer,scene,obstacles:{keyboard:deskAssets.keyboard,coffee:deskAssets.mug,monitor:deskAssets.monitor,terminal:deskAssets.terminal,mouse:mouseGroup,lamp:room.children.filter(m=>m.isMesh&&[lampBase,lampStem,warm].includes(m.material))},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,rigCalls:deskAssets.robot.armRig.drawCalls})};
+  if(new URLSearchParams(location.search).has('arm-debug'))window.armDemoDebug={controls:{languageFace,languageBack,languagePanel,languageFlip},demo:armDemo,robot:deskAssets.robot,camera,renderer,scene,obstacles:{keyboard:deskAssets.keyboard,coffee:deskAssets.mug,monitor:deskAssets.monitor,terminal:deskAssets.terminal,mouse:mouseGroup,lamp:room.children.filter(m=>m.isMesh&&[lampBase,lampStem,warm].includes(m.material))},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,rigCalls:deskAssets.robot.armRig.drawCalls})};
   resize();
   const projected=new THREE.Vector3();
   const cabinInteractions=createCabinInteractions(THREE,{scene,camera,canvas,viewport:()=>({width,height}),inactive:()=>entry.active||objectFocus.active,
-    targets:{about:()=>plaqueFace.getWorldPosition(new THREE.Vector3()),research:()=>deskAssets.monitorScreen.mesh.getWorldPosition(new THREE.Vector3()),projects:()=>deskAssets.terminalScreen.mesh.getWorldPosition(new THREE.Vector3()),arm:()=>deskAssets.robot.localToWorld(new THREE.Vector3(.03,.25,.09)),papers:()=>notebook.group.localToWorld(new THREE.Vector3(.03,.04,0))},languageFace,languagePanel,languageFlip,changed:invalidate});
+    targets:{monitor:()=>deskAssets.monitorScreen.mesh.getWorldPosition(new THREE.Vector3()),projects:()=>deskAssets.terminalScreen.mesh.getWorldPosition(new THREE.Vector3()),arm:()=>deskAssets.robot.localToWorld(new THREE.Vector3(.03,.25,.09)),papers:()=>notebook.group.localToWorld(new THREE.Vector3(.03,.04,0))},languageFace,languagePanel,languageFlip,changed:invalidate});
   function render(ms){
     frameRequest=0;
     if(!viewAvailable||document.hidden)return;

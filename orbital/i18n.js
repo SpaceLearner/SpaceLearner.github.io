@@ -308,8 +308,7 @@ const zh={
   "JIAYAN GUO / ORBITAL RESEARCH": "JIAYAN GUO / 轨道研究站",
   "JIAYAN GUO / RESEARCH DESKTOP": "JIAYAN GUO / 研究工作台",
   "Cabin controls": "舱内控制",
-  "About · Desk nameplate": "关于 · 桌面名牌",
-  "Research · Main display": "研究 · 主显示器",
+  "About · Main display": "关于 · 主显示器",
   "Switch to Chinese": "切换为中文",
   "Switch to English": "切换为英文"
 };
