@@ -74,7 +74,7 @@ const zh={
   "NeurIPS 2026 · Poster": "NeurIPS 2026 · 海报展示",
   "NeurIPS 2026 · Evaluations and Datasets Track · Poster": "NeurIPS 2026 · 评测与数据集赛道 · 海报展示",
   "I work on post-training for general-purpose agents at Tencent. I focus on how agents organize tasks, use tools, and carry out multi-step workflows.": "我在 Tencent 从事通用智能体的后训练研究，关注智能体如何组织任务、使用工具并完成多步骤工作流程。",
-  "Previously, I worked on embodied intelligence at Alibaba DAMO Academy. I led the development of": "此前，我在 Alibaba DAMO Academy 从事具身智能研究。我主导开发了",
+  "Previously, at Alibaba DAMO Academy, I conducted research on multimodal agents and embodied foundation models, exploring agents’ capabilities to perceive, understand, and act in the physical world. I led the development of": "此前，我在 Alibaba DAMO Academy 从事多模态智能体与具身基础模型研究，探索智能体对物理世界的感知、理解与行动能力。我主导开发了",
   ", a training framework for search agents. I was also one of the project leads for": "这一搜索智能体训练框架。我也是",
   ", where I was responsible for model pre-training and post-training. My research covers search agents, multimodal learning, and embodied intelligence.": "的项目负责人之一，负责模型的预训练与后训练。我的研究涵盖搜索智能体、多模态学习与具身智能。",
   "Experience & Education": "工作与教育经历",
