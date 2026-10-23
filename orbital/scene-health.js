@@ -15,9 +15,9 @@
     if(revealed||unavailable)return;
     const pending=[...tasks.values()].filter(v=>!v).length;
     document.body.dataset.sceneResources=pending||!initialized?'loading':'ready';
-    message.textContent=preparing?'Preparing the view':textureTotal?'Loading the cabin':'Starting the observatory';
-    detail.textContent=preparing?(basicLighting?'Preparing the view with basic lighting. Essential scene assets are ready.':'Compiling materials and preparing the first frame.'):textureTotal?`${textureLoaded} of ${textureTotal} images loaded · ${pending} asset groups pending`:'Establishing the scene and locating its assets.';
-    document.getElementById('scene-load-help').textContent=slow?'This is taking longer than usual. You can use the text-only page at any time.':'A quiet workspace, above the world.';
+    message.textContent=preparing?'Setting the light':textureTotal?'Loading the cabin':'Powering up the cabin';
+    detail.textContent=preparing?(basicLighting?'Preparing the view with basic lighting. Essential scene assets are ready.':'Compiling materials and preparing the first frame.'):textureTotal?`${textureLoaded} of ${textureTotal} images loaded · ${pending} asset groups pending`:'Locating the cabin and its furnishings.';
+    document.getElementById('scene-load-help').textContent=slow?'This is taking longer than usual. You can use the text-only page at any time.':'A quiet desk, four hundred kilometres up.';
     // This measures image requests only, never a fabricated overall percentage.
     progress.hidden=false;
     if(textureTotal&&!preparing){progress.max=textureTotal;progress.value=textureLoaded;progress.setAttribute('aria-label','Scene images loaded');}
@@ -39,7 +39,7 @@
     preparing=true;stage('preparing');paint();
     try{
       await prepareScene();if(unavailable)return;
-      clearTimeout(deadline);clearTimeout(slowTimer);message.textContent='Ready for approach';detail.textContent='The cabin is ready.';progress.max=1;progress.value=1;progress.setAttribute('aria-label','Scene preparation complete');
+      clearTimeout(deadline);clearTimeout(slowTimer);message.textContent='Ready for approach';detail.textContent='Welcome aboard.';progress.max=1;progress.value=1;progress.setAttribute('aria-label','Scene preparation complete');
       box.querySelectorAll('[data-startup-step]').forEach(el=>el.dataset.state='complete');
       // The first prepared frame becomes visible beneath this real visual transition.
       stage('revealing');

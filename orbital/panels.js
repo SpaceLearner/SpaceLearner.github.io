@@ -8,7 +8,7 @@
   const fullImage=document.getElementById('image-full');
   const stage=document.getElementById('image-stage');
   const scaleButton=document.getElementById('image-scale');
-  const pages={news:['News','05 / NEWS'],about:['About','01 / ABOUT'],research:['Research directions','02 / RESEARCH'],projects:['Selected projects','03 / PROJECTS'],papers:['Papers','04 / PAPERS']};
+  const pages={news:['News','05 / NEWS'],about:['About','01 / ABOUT'],research:['Research','02 / RESEARCH'],projects:['Selected work','03 / PROJECTS'],papers:['Papers','04 / PAPERS']};
   const scrollPositions=new Map();
   const scrollKey=()=>currentPage+'@'+(dialog.dataset.object||'');
   const rememberScroll=()=>{if(currentPage)scrollPositions.set(scrollKey(),body.scrollTop);};

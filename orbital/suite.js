@@ -120,9 +120,9 @@ function createSuite() {
     c.fillStyle='#1c2226';c.fillRect(0,36,177,h-36);c.fillStyle='#d5c6a9';c.font='bold 20px Georgia';c.fillText('JG /',25,89);
     ['Overview','Research','Projects','Publications'].forEach((label,i)=>{c.fillStyle=(projects?i===2:i===0)?'#343b3e':'#1c2226';c.fillRect(14,123+i*47,148,34);c.fillStyle=(projects?i===2:i===0)?'#ece5d5':'#8c979b';c.font='15px Arial';c.fillText(label,27,145+i*47);});
     c.fillStyle='#899591';c.font='12px monospace';c.fillText('PERSONAL WORKSPACE',211,85);c.fillStyle='#e7e3d9';c.font='46px Georgia';c.fillText(projects?'Selected research':'Jiayan Guo',209,151);
-    const cards=projects?[['ZeroSearch','Search agents / reinforcement learning'],['RynnBrain','Embodied foundation models'],['WorldVLA · RynnVLA','Vision, language and action']]:[['01 / Generalist Agents','Search, tools and multi-step reasoning'],['02 / Physical Intelligence','Perception, spatial reasoning and action'],['Research archive',publicationCount+' public records / '+publicationYears]];
+    const cards=projects?[['ZeroSearch','Search agents / reinforcement learning'],['RynnBrain','Embodied foundation models'],['WorldVLA · RynnVLA','Vision, language and action']]:[['01 / Search and reasoning','Finding information, using tools, reasoning in steps'],['02 / Embodied interaction','From what an agent sees to what it does'],['Research archive',publicationCount+' public records / '+publicationYears]];
     cards.forEach(([title,caption],i)=>{const y=231+i*99;c.fillStyle='#20272b';c.fillRect(209,y,775,83);c.strokeStyle='#3a4447';c.strokeRect(209,y,775,83);c.fillStyle='#d6c6a7';c.font='23px Georgia';c.fillText(title,231,y+32);c.fillStyle='#98a4a7';c.font='16px Arial';c.fillText(caption,231,y+59);c.fillStyle='#b9c4be';c.font='19px Arial';c.fillText('↗',945,y+44);});
-    c.fillStyle='#707e82';c.font='11px monospace';c.fillText('SELECT THE DISPLAY TO EXPLORE',212,554);
+    c.fillStyle='#707e82';c.font='11px monospace';c.fillText('SELECT THE SCREEN TO READ',212,554);
   },1024,576);}
 
   const cabin=createCabinArchitecture(THREE,{walnut,metalBump:bronze.bumpMap,metalRoughness:bronze.roughnessMap});room.add(cabin);
@@ -402,7 +402,7 @@ function createSuite() {
       recenterButton.disabled=motionButton.disabled=replayButton.disabled=false;
       canvas.removeAttribute('aria-busy');canvas.style.cursor='grab';yaw=0;pitch=0;updateLook();
       status.textContent='At the desk';
-      hint.textContent='Drag to look around · Select a desk object';renderer.setPixelRatio(quality.pixelRatio(width,height));
+      hint.textContent='Drag to look around · Click anything on the desk';renderer.setPixelRatio(quality.pixelRatio(width,height));
       if(reason!=='unavailable'&&(document.activeElement===skipButton||document.activeElement===replayButton))canvas.focus({preventScroll:true});
     }
   });

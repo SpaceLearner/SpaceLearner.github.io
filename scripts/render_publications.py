@@ -40,38 +40,42 @@ if news_path.exists():
 years=sorted({p['year'] for p in items},reverse=True)
 selection_count=sum(p['selected'] for p in items)
 if selection_count!=5:raise ValueError(f'Expected five retained selected papers, found {selection_count}')
-parts=[f'''    <section id="publications" class="publications section wrap" aria-labelledby="publications-title">
-      <div class="section-heading"><div class="section-label"><span>04 / PUBLICATIONS</span><h2 id="publications-title">Papers & Publications</h2></div><a class="text-link" href="https://scholar.google.com/citations?user=M-AFBG4AAAAJ&hl=en" target="_blank" rel="noopener noreferrer">Google Scholar <span aria-hidden="true">↗</span></a></div>
-      <div class="publication-toolbar"><div class="filters" role="group" aria-label="Choose a paper list"><button class="filter active" type="button" data-filter="all" aria-pressed="true">All papers <span>{len(items)}</span></button><button class="filter" type="button" data-filter="selected" aria-pressed="false">Selected papers <span>{selection_count}</span></button></div><div class="year-control"><label for="year-filter">Year</label><select id="year-filter" aria-label="Filter papers by year"><option value="all">All years</option>{''.join(f'<option value="{y}">{y}</option>' for y in years)}</select></div></div>
-      <div class="publication-context"><span>Published papers and preprints, organized by year</span><span id="paper-count" class="paper-count" aria-live="polite">{len(items)} records</span></div>
-      <div class="paper-list">''']
+parts=[f'''    <section id="publications" class="section wrap" aria-labelledby="publications-title">
+      <header class="section-head"><p class="section-no">03</p><h2 id="publications-title">Papers</h2></header>
+      <div class="section-body">
+        <div class="paper-toolbar"><div class="filters" role="group" aria-label="Choose a paper list"><button class="filter" type="button" data-filter="selected" aria-pressed="false">Selected <span>{selection_count}</span></button><button class="filter" type="button" data-filter="all" aria-pressed="true">All <span>{len(items)}</span></button></div><a href="https://scholar.google.com/citations?user=M-AFBG4AAAAJ&amp;hl=en" target="_blank" rel="noopener noreferrer">Google Scholar <span aria-hidden="true">↗</span></a></div>
+        <div class="paper-list" data-view="all">''']
 for year in years:
  group=[p for p in items if p['year']==year]
- parts.append(f'<section class="paper-year-group" data-year="{year}" aria-labelledby="year-{year}"><div class="year-heading"><h3 id="year-{year}">{year}</h3><span class="year-line"></span><span class="year-count">{len(group)} papers</span></div>')
- for i,p in enumerate(group,1):
-  featured=p['selected'];extra='';role='';award='';authors='';display_note=''
-  if p.get('displayNote'):display_note=f'<p class="paper-note">{e(p["displayNote"])}</p>'
+ parts.append(f'<section class="paper-year" data-has-selected="{str(any(p["selected"] for p in group)).lower()}" aria-labelledby="year-{year}"><h3 id="year-{year}">{year}</h3><ol>')
+ for p in group:
+  note=f' <span class="paper-note">{e(p["displayNote"])}</span>' if p.get('displayNote') else ''
   link_label={'Record':'Record','arXiv':'arXiv','OpenReview':'OpenReview'}.get(p.get('linkLabel'),'Paper')
-  if p.get('summary'):extra=f'<p>{e(p["summary"])}</p>'
-  if p.get('contribution'):role=f'<div class="contribution">{e(p["contribution"])}</div>'
+  summary=f'<p class="paper-summary">{e(p["summary"])}</p>' if p.get('summary') else ''
+  authors=''
   if p.get('authors'):
    names=p['authors'] if isinstance(p['authors'],list) else [p['authors']]
-   author_html=', '.join('<strong>'+e(name)+'</strong>' if name=='Jiayan Guo' else e(name) for name in names)
-   authors=f'<div class="paper-authors">{author_html}</div>' if len(names)<=12 else f'<details class="authors-details"><summary>View authors</summary><div class="paper-authors">{author_html}</div></details>'
-  if p.get('award'):award=f'<a class="award" href="{e(p["award"]["url"])}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">✧</span> {e(p["award"]["label"])} <span aria-hidden="true">↗</span></a>'
-  code=f'<a href="{e(p["code"])}" target="_blank" rel="noopener noreferrer">Code <span aria-hidden="true">↗</span></a>' if p.get('code') else ''
+   if len(names)>12:
+    # ponytail: long author lists collapse around Jiayan Guo's position.
+    k=names.index('Jiayan Guo') if 'Jiayan Guo' in names else 0
+    names=names[:max(k+1,3)]+[f'… {len(names)-max(k+1,3)} more']
+   authors='<p class="paper-authors">'+', '.join('<strong>'+e(n)+'</strong>' if n=='Jiayan Guo' else e(n) for n in names)+'</p>'
+  links=f'<a href="{e(p["url"])}" target="_blank" rel="noopener noreferrer">{link_label}</a>'
+  if p.get('code'):links+=f'<a href="{e(p["code"])}" target="_blank" rel="noopener noreferrer">Code</a>'
   for link in p.get('links',[]):
    if not link['url'].startswith('https://'):raise ValueError('Invalid additional source URL')
-   code+=f'<a href="{e(link["url"])}" target="_blank" rel="noopener noreferrer">{e(link["label"])} <span aria-hidden="true">↗</span></a>'
-  selected_badge='<span class="selected-badge">SELECTED</span>' if featured else ''
+   links+=f'<a href="{e(link["url"])}" target="_blank" rel="noopener noreferrer">{e(link["label"])}</a>'
   venue_raw=p.get('venue') or 'Preprint'
-  if venue_raw=='arXiv':venue_raw='arXiv · Preprint'
-  if 'Intelligent Systems and Technology' in venue_raw:venue_raw='TIST '+str(year)
+  if venue_raw=='arXiv':venue_raw='arXiv preprint'
+  if 'Intelligent Systems and Technology' in venue_raw:venue_raw='ACM TIST '+str(year)
   if 'The Web Conference' in venue_raw:venue_raw='WWW '+str(year)
-  venue=e(venue_raw)
-  parts.append(f'''<article class="paper" data-selected="{str(featured).lower()}" data-year="{year}"><div class="paper-meta"><span class="venue">{venue}</span>{selected_badge}</div><div class="paper-main"><h4><a href="{e(p['url'])}" target="_blank" rel="noopener noreferrer">{e(p['title'])}</a></h4>{authors}{extra}{role}{award}{display_note}<div class="paper-links"><a href="{e(p['url'])}" target="_blank" rel="noopener noreferrer">{link_label} <span aria-hidden="true">↗</span></a>{code}</div></div><span class="paper-index" aria-hidden="true">{i:02}</span></article>''')
- parts.append('</section>')
-parts.append('''      </div><p id="no-papers" class="no-papers" hidden>No selected papers for this year. Choose another year or view all papers.</p><p class="publication-footnote">Compiled from public profiles, code repositories, and original papers. Published papers and preprints are labeled separately.</p>
+  role=f'<span class="paper-role">{e(p["contribution"].replace("Jiayan Guo · ",""))}</span>' if p.get('contribution') else ''
+  award=f'<a class="paper-award" href="{e(p["award"]["url"])}" target="_blank" rel="noopener noreferrer">{e(p["award"]["label"])}</a>' if p.get('award') else ''
+  parts.append(f'''<li class="paper" data-selected="{str(p['selected']).lower()}"><a class="paper-title" href="{e(p['url'])}" target="_blank" rel="noopener noreferrer">{e(p['title'])}</a>{authors}{summary}<p class="paper-meta"><span class="venue">{e(venue_raw)}</span>{role}{award}{links}{note}</p></li>''')
+ parts.append('</ol></section>')
+parts.append('''        </div>
+        <p class="aside">Compiled from public profiles, code repositories, and the papers themselves. Preprints are labeled as such.</p>
+      </div>
     </section>''')
 def venue_label(p):
  value=p.get('venue') or 'Preprint'
@@ -91,7 +95,7 @@ def update(root,classic_path,orbital_path,full_page):
   note=f'<small>{e(p["displayNote"])}</small>' if p.get('displayNote') else ''
   for link in p.get('links',[]):
    note+=f'<small><a href="{e(link["url"])}" target="_blank" rel="noopener noreferrer">{e(link["label"])}</a></small>'
-  entries.append(f'<li data-paper-id="{e(p["id"])}"><a href="{e(p["url"])}" target="_blank" rel="noopener noreferrer">{e(p["title"])}</a><small>{p["year"]} · {e(venue_label(p))}</small>{note}</li>')
+  entries.append(f'<li data-paper-id="{e(p["id"])}"><a lang="en" href="{e(p["url"])}" target="_blank" rel="noopener noreferrer">{e(p["title"])}</a><small>{p["year"]} · {e(venue_label(p))}</small>{note}</li>')
  year_range=f'{min(years)} — {max(years)}'
  template=f'<template id="papers"><p class="note">{min(years)}—{max(years)} · {len(items)} papers, including published papers and preprints.</p><ol class="publications" data-years="{year_range}">'+''.join(entries)+f'</ol><a class="quiet-link" href="{full_page}#publications">All papers and author details ↗</a></template>'
  page=root/orbital_path;old=page.read_text()

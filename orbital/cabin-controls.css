@@ -87,3 +87,44 @@ body.no-webgl #scene-language{display:none}
 #language-flip:focus-visible{outline:2px solid #d5c59e;outline-offset:3px}
 body[data-scene-language="visible"] #language-home{display:none}
 body.no-webgl #language-home{display:inline-flex}
+/* Typographic finish: one serif, one sans, hairlines and tracking instead of boxes. */
+:root{--reading-serif:"Iowan Old Style","Palatino Linotype",Charter,"Source Serif Pro",Georgia,"Songti SC","Noto Serif CJK SC",serif}
+body{font-kerning:normal}
+.brand{font:400 23px/1 var(--reading-serif);letter-spacing:-.01em;color:#f2ecdf}
+/* Startup console: name, a single line of state, a hairline of progress. */
+#scene-load.scene-load{background:radial-gradient(120% 80% at 50% 110%,#13222a 0%,#080f14 60%)}
+.startup-console{width:min(100%,420px)}
+.startup-eyebrow{font:500 11px/1.6 var(--ui-font);letter-spacing:.24em;color:#8f9e9a}
+.startup-mark{width:72px;height:72px;margin:40px 0 36px;border-color:#2f4950}
+.startup-mark i{inset:10px;border-color:#22383f}
+.startup-mark b{font:italic 400 21px/1 var(--reading-serif);letter-spacing:0;color:#d2c49f}
+.startup-mark:before,.startup-mark:after{left:33.5px}
+@media(prefers-reduced-motion:no-preference){.startup-mark{animation:startup-orbit 14s linear infinite}.startup-mark b{animation:startup-orbit 14s linear infinite reverse}}
+@keyframes startup-orbit{to{transform:rotate(1turn)}}
+#scene-load #scene-load-message{font:400 clamp(28px,4.4vw,38px)/1.2 var(--reading-serif);letter-spacing:-.02em;color:#ece8dc;margin-bottom:10px}
+#scene-load #scene-load-detail{font:14px/1.65 var(--ui-font);color:#8fa2a3;font-variant-numeric:tabular-nums}
+#scene-load progress{height:1px;margin:20px 0 28px;background:#1d3036}
+#scene-load progress::-webkit-progress-bar{background:#1d3036}
+#scene-load progress::-webkit-progress-value{background:#d2c49f}
+#scene-load progress::-moz-progress-bar{background:#d2c49f}
+.startup-steps{border-top:0;margin-bottom:28px}
+.startup-steps li{border-bottom-color:#18292f;padding:11px 0;font:13px/1.5 var(--ui-font);color:#5b6f73;transition:color .3s}
+.startup-steps span{font:500 11px/1.5 var(--ui-font);letter-spacing:.08em;font-variant-numeric:tabular-nums;color:inherit;min-width:20px}
+.startup-steps [data-state="active"]{color:#ece8dc}.startup-steps [data-state="active"] span{color:#d2c49f}
+.startup-steps [data-state="complete"]{color:#8fa79b}.startup-steps [data-state="complete"]:after{color:#d2c49f}
+#scene-load #scene-load-help{font:italic 16px/1.5 var(--reading-serif);color:#9aaaa6;margin-bottom:8px}
+#scene-load .scene-load-actions a{font:13px var(--ui-font);color:#b8c4bf;text-decoration-color:#b8c4bf55;text-underline-offset:4px}
+/* Object labels: a small engraved caption, not a tooltip box. */
+.hotspots button::before,.ready .hotspots button::before{padding:4px 8px;font:500 11px/1.4 var(--ui-font);letter-spacing:.08em;text-transform:uppercase;color:#efe9da;background:#141a17e6;border:1px solid #d3c9aa33;border-radius:2px;transition:opacity .18s}
+.hotspots button::after{transition:opacity .18s}
+/* Reading surfaces: serif headings, a comfortable measure, quieter metadata. */
+.sheet-head h2,.image-head h2{font-family:var(--reading-serif);letter-spacing:-.015em}
+.sheet-body h3{font:400 22px/1.35 var(--reading-serif);letter-spacing:-.01em}
+.sheet-body>p,.sheet-body .project>p{max-width:62ch}
+.sheet-body .en{font:500 11px/1.6 var(--ui-font);letter-spacing:.16em}
+.sheet-body .project .role{font:13px/1.6 var(--ui-font);margin:4px 0 12px}
+.timeline span{font:500 11px/1.6 var(--ui-font);letter-spacing:.14em}
+.fallback h2{font:400 30px/1.25 var(--reading-serif);letter-spacing:-.015em}
+.fallback .eyebrow{font:500 11px/1.6 var(--ui-font);letter-spacing:.2em}
+@media(prefers-reduced-motion:reduce){.hotspots button::before,.hotspots button::after,.startup-steps li{transition:none}}
+@media(max-height:650px){.startup-mark{width:56px;height:56px;margin:20px 0}.startup-mark:before,.startup-mark:after{left:25.5px}}
