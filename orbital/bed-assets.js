@@ -1,4 +1,4 @@
-import { textureAsset } from './asset-profile.js?v=e25ce7cd2bccf128';
+import { textureAsset } from './asset-profile.js?v=15091979dc992eb7';
 import { RoundedBoxGeometry } from './vendor/DeskRoundedBoxGeometry.js';
 
 // The existing walnut platform, oatmeal headboard and greige foot throw remain.
@@ -92,7 +92,7 @@ export function createBed(THREE,{walnut}) {
 export async function applyBedBake(THREE,bed){
   const base=new URL('./baked-bed/',import.meta.url),get=async file=>{const r=await fetch(new URL(file,base));if(!r.ok)throw Error('Bed lighting asset unavailable: '+file);return r;};
   const manifest=await(await get('manifest.json')).json();
-  const [buffer,map]=await Promise.all([get('uv.bin').then(r=>r.arrayBuffer()),new THREE.TextureLoader().loadAsync(new URL(textureAsset('irradiance-rgbm.png'),base).href)]);
+  const [buffer,map]=await Promise.all([get('uv.bin').then(r=>r.arrayBuffer()),new THREE.TextureLoader().loadAsync(new URL(textureAsset('irradiance-rgbm.webp'),base).href)]);
   const targets=new Map();bed.traverse(o=>{if(o.userData.bedBakeIndex!==undefined)targets.set(o.userData.bedBakeIndex,o);});
   if(manifest.version!==1||manifest.mappings.length!==targets.size||!Number.isFinite(manifest.range)||manifest.range<=0)throw Error('Bed bake manifest mismatch');
   for(const entry of manifest.mappings){const o=targets.get(entry.index);if(!o||o.name!==entry.name||o.geometry.attributes.position.count!==entry.vertexCount||entry.floatCount!==entry.vertexCount*2||entry.byteOffset<0||entry.byteOffset%4||entry.byteOffset+entry.floatCount*4>buffer.byteLength)throw Error('Bed bake geometry mismatch');for(const v of new Float32Array(buffer,entry.byteOffset,entry.floatCount))if(!Number.isFinite(v)||v<0||v>1)throw Error('Bed bake UV invalid');}

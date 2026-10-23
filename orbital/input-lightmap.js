@@ -1,4 +1,4 @@
-import { textureAsset } from './asset-profile.js?v=e25ce7cd2bccf128';
+import { textureAsset } from './asset-profile.js?v=15091979dc992eb7';
 // Original desk props: offline diffuse bounce light, live specular highlights.
 export async function applyInputBake(THREE,groups){
   const base=new URL('./baked-inputs/',import.meta.url);
