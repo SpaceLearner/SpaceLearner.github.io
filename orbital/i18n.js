@@ -1,5 +1,9 @@
 // English remains the source of truth; only explicitly catalogued UI and prose are localized.
 const zh={
+  "InterLV-Search evaluates whether agents can use visual evidence to guide subsequent search, rather than only answer a final question. Its three-level benchmark covers active visual evidence seeking, controlled offline search, and open-web interleaved search. It connects search control with multimodal evidence integration.": "InterLV-Search 评测智能体能否利用视觉证据引导后续搜索，而不只是回答最终问题。基准分为主动视觉证据获取、受控离线搜索和开放网络交错搜索三个层级，将搜索决策与多模态证据整合联系起来。",
+  "InterLV-Search complements search-policy training by evaluating how agents use textual and visual evidence to decide what to search for next.": "InterLV-Search 从评测角度补充搜索策略训练，考察智能体如何利用文本与视觉证据决定下一步搜索。",
+  "MULTIMODAL AGENTIC SEARCH": "多模态智能体搜索",
+
   "Jiayan Guo · General-purpose Agents": "Jiayan Guo · 通用智能体",
   "Research on general-purpose agents.": "通用智能体研究。",
   "03 / FEATURED WORK": "03 / 精选工作",
