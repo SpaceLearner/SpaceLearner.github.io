@@ -1,11 +1,11 @@
 {
   "title": "Earth imagery credits for orbital preview",
-  "credit": "NASA/GSFC, Blue Marble; Reto Stockli and NASA Earth Observatory.",
+  "credit": "NASA/GSFC, Blue Marble; Reto Stockli and NASA Earth Observatory. City lights: Craig Mayhew and Robert Simmon, NASA GSFC; data courtesy Marc Imhoff (NASA GSFC) and Christopher Elvidge (NOAA NGDC).",
   "context": "Historical satellite-observation composites, not a live Earth view. Artistic scene scale and lighting. No NASA endorsement.",
   "collection": "https://svs.gsfc.nasa.gov/2915/",
   "usage_guidelines": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
   "downloaded": "2026-10-16",
-  "rendering_changes": "Shader saturation adjustment, separate cloud blend, scene-Sun lighting and thin atmospheric limb. Each source map wraps exactly once.",
+  "rendering_changes": "Shader saturation adjustment, separate cloud blend, scene-Sun lighting and thin atmospheric limb. Each source map wraps exactly once. Night side adds the city-lights map, gated by the solar terminator; ocean sun glint is derived from the surface map's blue dominance.",
   "files": [
     {
       "file": "nasa-earth-surface.jpg",
@@ -34,8 +34,18 @@
       "processing": "Resampled to 4096 x 2048 and encoded as JPEG quality 90 with macOS sips. No cloud-pattern edits.",
       "bytes": 3746712,
       "sha256": "804f058fe1fa2da51edb431dc2eb47ec7531a2b167f33eb5392b3e8438f84a09"
+    },
+    {
+      "file": "nasa-earth-lights.jpg",
+      "source_url": "https://eoimages.gsfc.nasa.gov/images/imagerecords/55000/55167/earth_lights_lrg.jpg",
+      "source_bytes": 547269,
+      "source_sha256": "2e38950e8d135a74dce5e5267894fbc6c697e891496a25e1f5c0aeff67ac6a30",
+      "processing": "Converted to greyscale, resampled to 2048 x 1024 (Lanczos), JPEG quality 88 with Pillow. Mobile variant 1024 x 512, quality 85. No geographic edits.",
+      "bytes": 245772,
+      "sha256": "21a15bb377bb81491a88c1ec9bcfd4c4ffc1576b847f69adc859ffc9261661ef"
     }
   ],
   "runtime_selection": "The starfield-first scene loads the 2048px Earth maps on all viewport sizes. 4096px files are retained source variants and are not requested by this scene.",
-  "sky_background": "Art-directed procedural fixed stars and faint galactic dust band, generated in star-field.js. Not a photographic image or astronomical catalogue."
+  "sky_background": "Art-directed procedural fixed stars and faint galactic dust band, generated in star-field.js. Not a photographic image or astronomical catalogue.",
+  "downloaded_city_lights": "2026-10-24"
 }

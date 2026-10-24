@@ -6,6 +6,7 @@ const variants=new Map([
   ['solar-irradiance-rgbm.webp','solar-irradiance-rgbm.webp'],
   ['ai-walnut-desktop-v1.png','ai-walnut-desktop-v1.jpg'],
   ['nasa-earth-surface.jpg','nasa-earth-surface.jpg'],
-  ['nasa-earth-clouds.jpg','nasa-earth-clouds.jpg']
+  ['nasa-earth-clouds.jpg','nasa-earth-clouds.jpg'],
+  ['nasa-earth-lights.jpg','nasa-earth-lights.jpg']
 ]);
 export function textureAsset(file){if(compact&&variants.has(file))return 'mobile/'+variants.get(file);return file==='ai-walnut-desktop-v1.png'?'ai-walnut-desktop-v1.jpg':file;}

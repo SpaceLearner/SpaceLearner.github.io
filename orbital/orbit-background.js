@@ -3,7 +3,7 @@
 // Orbit composition is independent of the cabin and of the camera's flight path.
 // The Earth is a depth-tested world-space sphere, never a camera-facing backdrop.
 import {createStarField} from './star-field.js?v=844245f51357b75c';
-import {createDistantStation} from './distant-station.js?v=72784225738a51fe';
+import {createDistantStation} from './distant-station.js?v=7b2dc2527788d5f2';
 import {createGargantua} from './gargantua.js?v=0872165e20334530';
 import {sampleOrbitalMotion,createOrbitalMotionClock} from './orbital-motion.js?v=743ef3180e115eb3';
 // A clock-synced visual day, not an astronomical ephemeris. UTC milliseconds
@@ -12,7 +12,7 @@ export function earthRotationAt(timestamp=Date.now()) {
   const day=86400000;
   return ((timestamp%day)+day)%day/day*Math.PI*2;
 }
-export function createOrbitalBackground(THREE, surface, clouds) {
+export function createOrbitalBackground(THREE, surface, clouds, lights) {
   const group=new THREE.Group();group.name='Orbital sky and Earth';
   // Both destinations share one world-space focal point. Their silhouettes,
   // sizes and motion stay independent, while arrival preserves the sightline.
@@ -22,8 +22,9 @@ export function createOrbitalBackground(THREE, surface, clouds) {
   surface.colorSpace=THREE.SRGBColorSpace;
   clouds.repeat.set(1,1);clouds.wrapS=THREE.RepeatWrapping;clouds.wrapT=THREE.ClampToEdgeWrapping;
   clouds.colorSpace=THREE.NoColorSpace;
+  if(lights){lights.repeat.set(1,1);lights.wrapS=THREE.RepeatWrapping;lights.wrapT=THREE.ClampToEdgeWrapping;lights.colorSpace=THREE.NoColorSpace;}
   const material=new THREE.ShaderMaterial({
-    uniforms:{surface:{value:surface},clouds:{value:clouds},cloudDrift:{value:0},sunDirection:{value:sunDirection}},
+    uniforms:{surface:{value:surface},clouds:{value:clouds},lights:{value:lights||null},hasLights:{value:lights?1:0},cloudDrift:{value:0},sunDirection:{value:sunDirection}},
     vertexShader:`
       varying vec2 vUv;varying vec3 vNormalW;varying vec3 vWorldP;varying vec3 vEastW;varying vec3 vNorthW;
       void main(){
@@ -33,7 +34,7 @@ export function createOrbitalBackground(THREE, surface, clouds) {
         vec4 p=modelMatrix*vec4(position,1.);vWorldP=p.xyz;gl_Position=projectionMatrix*viewMatrix*p;
       }`,
     fragmentShader:`
-      uniform sampler2D surface;uniform sampler2D clouds;uniform float cloudDrift;uniform vec3 sunDirection;
+      uniform sampler2D surface;uniform sampler2D clouds;uniform sampler2D lights;uniform float hasLights;uniform float cloudDrift;uniform vec3 sunDirection;
       varying vec2 vUv;varying vec3 vNormalW;varying vec3 vWorldP;varying vec3 vEastW;varying vec3 vNorthW;
       void main(){
         vec3 n=normalize(vNormalW),viewDir=normalize(cameraPosition-vWorldP);
@@ -64,6 +65,17 @@ export function createOrbitalBackground(THREE, surface, clouds) {
         vec3 cloudLight=vec3(.88,.90,.92)*(.0007+cloudDay*(.065+.94*pow(cloudMu,.72)));
         float coverage=smoothstep(.09,.84,cloud)*.94;
         light=mix(light,cloudLight,coverage);
+        // Ocean sun glint. The Blue Marble map has no water mask, so open water is
+        // inferred from blue dominance and low brightness; ice and land stay matte.
+        vec3 halfV=normalize(sunDirection+viewDir);
+        float water=smoothstep(.02,.09,albedo.b-max(albedo.r,albedo.g))*(1.-smoothstep(.35,.55,dot(albedo,vec3(.333))));
+        float spec=pow(max(dot(n,halfV),0.),220.)*1.6+pow(max(dot(n,halfV),0.),28.)*.06;
+        float fresnel=.02+.98*pow(1.-max(dot(halfV,viewDir),0.),5.);
+        light+=vec3(1.,.93,.82)*spec*fresnel*water*day*(1.-coverage)*6.;
+        // City lights on the night side, faded through the terminator and dimmed under cloud.
+        float night=1.-smoothstep(-.18,.04,mu);
+        float city=hasLights>.5?texture2D(lights,vUv).r:0.;
+        light+=vec3(1.,.72,.38)*pow(city,1.6)*night*(1.-coverage*.75)*.09;
         // Very shallow blue grazing scatter, restricted to the illuminated rim.
         // The dark hemisphere stays dark instead of carrying an all-around halo.
         float grazing=pow(1.-max(dot(n,viewDir),0.),5.);
@@ -90,14 +102,18 @@ export function createOrbitalBackground(THREE, surface, clouds) {
       void main(){vec4 p=modelViewMatrix*vec4(position,1.);n=normalize(normalMatrix*normal);v=normalize(-p.xyz);nw=normalize(mat3(modelMatrix)*normal);gl_Position=projectionMatrix*p;}`,
     fragmentShader:`uniform vec3 sunDirection;varying vec3 n;varying vec3 v;varying vec3 nw;
       void main(){
-        float limb=pow(1.-abs(dot(normalize(n),normalize(v))),5.);
-        float day=smoothstep(-.055,.25,dot(normalize(nw),sunDirection));
-        gl_FragColor=vec4(.08,.25,.48,limb*(.002+day*.27));
+        float limb=pow(1.-abs(dot(normalize(n),normalize(v))),3.2);
+        float mu=dot(normalize(nw),sunDirection);
+        float day=smoothstep(-.08,.3,mu);
+        // Light skimming the terminator travels through more air and reddens.
+        float twilight=exp(-pow((mu+.02)/.09,2.));
+        vec3 color=mix(vec3(.10,.30,.62),vec3(.95,.48,.20),twilight*.75);
+        gl_FragColor=vec4(color,limb*(.003+day*.36+twilight*.22));
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }`
   });
-  const airRadius=radius*1.0030;
+  const airRadius=radius*1.0085;
   const air=new THREE.Mesh(new THREE.SphereGeometry(airRadius,192,128),atmosphere);
   air.name='Thin sunlit atmospheric limb';air.position.copy(center);air.userData.safetySphere={radius:airRadius};group.add(air);
   const stars=createStarField(THREE);group.add(stars.group);
@@ -112,6 +128,7 @@ export function createOrbitalBackground(THREE, surface, clouds) {
     station.quaternion.copy(stationOrientation).multiply(driftQuaternion.setFromEuler(driftRotation));
     stars.group.rotation.set(...motion.starRotation);
     material.uniforms.cloudDrift.value=motion.cloudDrift;
+    station.userData.setBlink?.(seconds);
     gargantua.setMotion(motion.diskPhase);
   }
   setMotion(0);

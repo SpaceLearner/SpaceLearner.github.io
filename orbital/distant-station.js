@@ -54,6 +54,22 @@ export function createDistantStation(THREE){
   }
   bar([-.4,.1,-3.8],[-1.4,1.65,-4.4],.04);bar([-1.4,1.65,-4.4],[-.5,1.65,-4.4],.025);
   for(const [name,b]of batches){const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(b.positions,3));geometry.setAttribute('normal',new THREE.Float32BufferAttribute(b.normals,3));geometry.computeBoundingSphere();const m=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial(definitions[name]));m.name='Distant station '+name;m.castShadow=m.receiveShadow=false;station.add(m);}
+  // Navigation lights: port red, starboard green, white strobes at the truss ends.
+  // Additive sprites, fixed screen size, so they read at 300 m without lighting cost.
+  const dot=document.createElement('canvas');dot.width=dot.height=64;
+  const g=dot.getContext('2d'),grad=g.createRadialGradient(32,32,0,32,32,32);
+  grad.addColorStop(0,'#fff');grad.addColorStop(.18,'#ffffffcc');grad.addColorStop(.45,'#ffffff22');grad.addColorStop(1,'#fff0');g.fillStyle=grad;g.fillRect(0,0,64,64);
+  const glow=new THREE.CanvasTexture(dot);
+  const navLights=[[[-12,0,0],'#ff3b30',0],[[12,0,0],'#34d17a',0],[[-12,.3,0],'#ffffff',1],[[12,.3,0],'#ffffff',1.3],[[0,-.55,5.86],'#ffffff',.6]].map(([position,color,phase])=>{
+    const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,sizeAttenuation:false,toneMapped:false}));
+    sprite.position.set(...position);sprite.scale.setScalar(.012);sprite.userData={phase,strobe:color==='#ffffff'};station.add(sprite);return sprite;
+  });
+  station.userData.setBlink=seconds=>{for(const l of navLights){
+    // Steady coloured lights breathe gently; white strobes fire a short double flash.
+    const t=(seconds+l.userData.phase)%1.6;
+    l.material.opacity=l.userData.strobe?(t<.08||(t>.2&&t<.28)?1:.06):.75+.25*Math.sin(seconds*2.1+l.userData.phase);
+  }};
+  station.userData.setBlink(0);
   station.userData.worldAnchored=true;station.userData.noDynamicLights=true;
   return station;
 }

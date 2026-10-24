@@ -1,17 +1,17 @@
-import { textureAsset } from './asset-profile.js?v=15091979dc992eb7';
+import { textureAsset } from './asset-profile.js?v=a67911eab6f13824';
 import { quality } from './quality-profile.js?v=72ab348954d7850d';
 import * as THREE from './vendor/three.module.min.js';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
 import { RectAreaLightUniformsLib } from './vendor/RectAreaLightUniformsLib.js';
 import { createDeskAssets } from './desk-assets.js?v=78c55fe838c3bc94';
 import { createMouse, createDeskMat } from './desk-inputs.js?v=0d6f67de8d5e8209';
-import { applyInputBake } from './input-lightmap.js?v=e582df2112ea409d';
+import { applyInputBake } from './input-lightmap.js?v=6cc46599476c0c1b';
 import { applyMugBake } from './coffee-mug.js?v=3b18c44ab7a38c04';
 import { createShelfBooks } from './book-assets.js?v=3a17e0c9ea70dfa8';
-import { createBed, applyBedBake } from './bed-assets.js?v=7eb4c19116e1ef1d';
+import { createBed, applyBedBake } from './bed-assets.js?v=fd218e1f2e52272a';
 import { createCabinArchitecture } from './cabin-architecture.js?v=9e44c4e9e4da1bf9';
-import { applyCabinBake } from './cabin-lightmap.js?v=e7ea06bd197eb1b2';
-import { createOrbitalBackground } from './orbit-background.js?v=c80e74d6761c3bee';
+import { applyCabinBake } from './cabin-lightmap.js?v=15f447780e7e70d1';
+import { createOrbitalBackground } from './orbit-background.js?v=f1413e0b9d82c157';
 import { createEntryHatch } from './entry-hatch.js?v=fbffef56921dcdef';
 import { createEntryFlight, createEntryPlayback } from './entry-flight.js?v=95e58690863af5a6';
 import { createVistaTransit } from './vista-transit.js?v=b6d66b3c8e4010ae';
@@ -23,6 +23,7 @@ import { createArmDemo } from './arm-demo.js?v=2b4b3be0fa35603c';
 import { createLanguagePlacard } from './language-placard.js?v=1f98c8a79072db46';
 import { createCabinInteractions } from './cabin-interactions.js?v=8244840e6ff54774';
 import { createObjectFocus } from './object-focus.js?v=25e2e646187e94da';
+import { createPlant } from './plant.js?v=a91bcf41a243fdc0';
 import { createResearchNotebook } from './research-notebook.js?v=bafef615e3309dee';
 
 const canvas = document.getElementById('space');
@@ -241,7 +242,7 @@ function createSuite() {
   const shelfBooks=createShelfBooks(THREE);shelfBooks.position.set(-5.72,bookshelf.position.y+bookshelf.geometry.boundingBox.max.y,-4.25);
   shelfBooks.scale.set(1/.84,1/.62,1/.84);room.add(shelfBooks);
   cylinder(.32,.22,.62,5.68,.4,3.3,bronze);
-  for(let i=0;i<8;i++){const ang=i*2.4;const x=5.68+Math.cos(ang)*.38,z=3.3+Math.sin(ang)*.3,y=1.2+i*.13;lineBetween([5.68,.7,3.3],[x,y,z],.015,mat('#415d46'));const leaf=sphere(.23,x,y,z,mat(i%2?'#54715b':'#344e43'));leaf.scale.set(.53,1.8,.3);leaf.rotation.z=Math.cos(ang)*.75;}
+  const plant=createPlant(THREE,{});plant.position.set(5.68,.71,3.3);plant.scale.set(1/.84*1.15,1/.62*1.15,1/.84*1.15);room.add(plant);
   lineBetween([2.6,6.1,-.1],[2.6,3.7,-.1],.015,bronze);
   const pendant=mesh(new THREE.TorusGeometry(.48,.025,16,80),bronze,2.6,3.65,-.1);pendant.rotation.x=Math.PI/2;
   const diffuser=mesh(new THREE.TorusGeometry(.48,.012,12,80),warm,2.6,3.626,-.1);diffuser.rotation.x=Math.PI/2;
@@ -266,7 +267,8 @@ function createSuite() {
   // At this apparent size the 2k maps are sufficient, including on desktop.
   const planetMap=loadTex('nasa-earth-surface.jpg',[1,1],true);
   const cloudMap=loadTex('nasa-earth-clouds.jpg',[1,1]);
-  const orbit=createOrbitalBackground(THREE,planetMap,cloudMap);scene.add(orbit.group);
+  const lightsMap=loadTex('nasa-earth-lights.jpg',[1,1]);
+  const orbit=createOrbitalBackground(THREE,planetMap,cloudMap,lightsMap);scene.add(orbit.group);
   const {sunDirection}=orbit;camera.far=800;camera.updateProjectionMatrix();
 
   scene.add(new THREE.HemisphereLight('#c9d4da','#7a6f60',.32));
