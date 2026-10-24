@@ -4,7 +4,7 @@ import {RoundedBoxGeometry} from './vendor/DeskRoundedBoxGeometry.js';
 export function createCabinArchitecture(THREE, {walnut,metalBump,metalRoughness}) {
   const cabin=new THREE.Group();cabin.name='Continuous orbital cabin';
   const material=(color,roughness,metalness=0)=>new THREE.MeshPhysicalMaterial({color,roughness,metalness});
-  const ceramic=material('#b4bdbd',.67), lining=material('#c6c2b6',.81), graphite=material('#30383d',.42,.68);
+  const ceramic=material('#c2beb3',.64), lining=material('#cec6b6',.84), graphite=material('#30383d',.42,.68);
   const titanium=material('#929e9f',.30,.94), seal=material('#20282c',.94), solar=material('#102333',.30,.34);
   ceramic.clearcoat=.04;ceramic.clearcoatRoughness=.65;ceramic.envMapIntensity=.45;
   for(const m of [ceramic,titanium,graphite]){m.bumpMap=metalBump;m.bumpScale=m===ceramic?.0007:.0012;if(m!==ceramic)m.roughnessMap=metalRoughness;}
@@ -105,7 +105,7 @@ export function createCabinArchitecture(THREE, {walnut,metalBump,metalRoughness}
     for(let i=-5;i<=5;i++)wingBox(wingWidth-.14,.017,.012,0,.064,i*(wingDepth-.16)/11,titanium,'Cell row');
   }
   // Concealed warm ceiling coves are a quiet, architectural light source.
-  const cove=new THREE.MeshBasicMaterial({color:'#cfc5ae',toneMapped:true});
+  const cove=new THREE.MeshBasicMaterial({color:'#ffe0b4',toneMapped:true});
   for(const x of [-5.35,5.35])box(.035,.018,10.8,x,5.98,0,cove,'Recessed ceiling cove');
   let bakeIndex=0;cabin.traverse(o=>{if(o.isMesh&&!o.material.transparent){o.geometry=o.geometry.index?o.geometry.toNonIndexed():o.geometry;o.userData.bakeIndex=bakeIndex++;}});
   return cabin;

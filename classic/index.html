@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="description" content="Jiayan Guo studies general-purpose agents: how they understand complex environments, use tools, and carry out long-horizon tasks reliably. Research, selected work, papers, and experience.">
+  <meta name="description" content="Jiayan Guo studies agents that plan, call tools, observe, and adapt over long multi-step tasks, from agentic search to embodied robots. Research, selected work, papers, and experience.">
   <meta name="theme-color" content="#f7f5ef">
   <meta property="og:title" content="Jiayan Guo · General-purpose Agents">
-  <meta property="og:description" content="Research on general-purpose agents: understanding complex environments, using tools, and carrying out long-horizon tasks reliably.">
+  <meta property="og:description" content="Agents that plan, call tools, observe, and adapt over long multi-step tasks, from agentic search to embodied robots.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://spacelearner.github.io/classic/">
   <title>Jiayan Guo · General-purpose Agents</title>
@@ -28,9 +28,9 @@
   <main id="top">
     <section class="hero wrap" aria-labelledby="hero-title">
       <div class="hero-copy" id="content" tabindex="-1">
-        <p class="hero-kicker">General-purpose agents</p>
+        <p class="hero-kicker">Agents that plan, act, and learn</p>
         <h1 id="hero-title">Jiayan Guo</h1>
-        <p class="hero-lede">I study general-purpose agents: how they come to understand complex environments, use tools, and carry out long-horizon tasks reliably.</p>
+        <p class="hero-lede">I study agents that act: they plan, call tools, observe what happens, and adjust, over long multi-step tasks in digital and physical environments.</p>
         <p class="hero-meta">At <strong>Tencent</strong>, I work on model post-training for general-purpose agents. Previously at <strong>Alibaba DAMO Academy</strong> on multimodal agents and embodied foundation models. Ph.D., Peking University.</p>
         <ul class="hero-links">
           <li><a href="https://scholar.google.com/citations?user=M-AFBG4AAAAJ&amp;hl=en" target="_blank" rel="noopener noreferrer">Google Scholar <span aria-hidden="true">↗</span></a></li>
@@ -56,18 +56,18 @@
     <section id="research" class="section wrap" aria-labelledby="research-title">
       <header class="section-head"><p class="section-no">01</p><h2 id="research-title">Research</h2></header>
       <div class="section-body">
-        <p class="lede">My work asks what it takes for an agent to finish a long task on its own: finding the right information, grounding what it sees, and turning both into action.</p>
+        <p class="lede">The question behind my work: what does an agent need to finish a long task on its own? It has to decide what to do next, act through tools or a body, and learn from the feedback.</p>
         <ol class="threads">
           <li>
-            <h3><span>I</span>Search and reasoning</h3>
-            <p>How does an agent decide what to look for next? <a href="#project-zerosearch">ZeroSearch</a> trains search policies with reinforcement learning against a simulated retriever, so training no longer depends on a live search engine. <a href="#project-interlv-search">InterLV-Search</a> measures the complementary skill: using textual and visual evidence to steer the next query.</p>
+            <h3><span>I</span>Agentic search and tool use</h3>
+            <p>Search is an agent's most basic tool: decide what to look for, query, read, and decide again. <a href="#project-zerosearch">ZeroSearch</a> trains that loop with reinforcement learning against a simulated retriever, so the policy learns from interaction without a live search engine. <a href="#project-interlv-search">InterLV-Search</a> evaluates the same loop with images in it: can an agent use visual evidence to choose its next search step?</p>
           </li>
           <li>
-            <h3><span>II</span>Multimodal understanding and embodied interaction</h3>
-            <p>How does an agent connect what it sees to what it does? <a href="#project-rynnbrain">RynnBrain</a> grounds egocentric perception in space and time for physical reasoning and planning; <a href="#project-worldvla">WorldVLA</a> and the <a href="#project-rynnvla">RynnVLA series</a> tie visual states to robot actions.</p>
+            <h3><span>II</span>Embodied agents: from perception to action</h3>
+            <p>An embodied agent closes the same loop through a body: perceive, plan, act, and see the consequences. <a href="#project-rynnbrain">RynnBrain</a> provides perception and planning: egocentric grounding in space and time, physical reasoning, and task plans. <a href="#project-worldvla">WorldVLA</a> and the <a href="#project-rynnvla">RynnVLA series</a> turn plans into robot actions and predict what those actions will look like.</p>
           </li>
         </ol>
-        <p>Across both threads, I work on training and execution: how feedback from interaction shapes behavior, and how agents organize tools and multi-step workflows. The long-term goal is agents that carry out long-horizon tasks reliably in complex environments.</p>
+        <p>Across both, I work on agentic post-training: learning from interaction feedback rather than static demonstrations, and teaching agents to organize tools and multi-step workflows. The long-term goal is agents that carry out long-horizon tasks reliably in complex environments.</p>
         <p class="aside">Earlier work: generative decision-making, graph learning, and recommender systems.</p>
       </div>
     </section>
@@ -75,12 +75,12 @@
     <section id="projects" class="section wrap" aria-labelledby="projects-title">
       <header class="section-head"><p class="section-no">02</p><h2 id="projects-title">Selected work</h2></header>
       <div class="section-body">
-        <p class="group-label"><span>I</span>Search and reasoning</p>
+        <p class="group-label"><span>I</span>Agentic search and tool use</p>
         <article class="work work--figure" aria-labelledby="project-zerosearch">
           <div class="work-text">
             <h3 id="project-zerosearch">ZeroSearch</h3>
             <p class="work-role">Corresponding author · 2025</p>
-            <p>Teaches language models to search without calling a real search engine during training. A simulated retriever supplies documents of controlled quality, and reinforcement learning with a curriculum shapes the search policy.</p>
+            <p>Trains LLM agents to search: the agent issues queries and reasons over the results across turns. During RL training a simulated retriever stands in for the search engine, supplying documents of controlled quality on a curriculum.</p>
             <p class="work-links"><a href="https://arxiv.org/abs/2505.04588" target="_blank" rel="noopener noreferrer">Paper <span aria-hidden="true">↗</span></a><a href="https://github.com/Alibaba-NLP/ZeroSearch" target="_blank" rel="noopener noreferrer">Code <span aria-hidden="true">↗</span></a></p>
           </div>
           <figure class="work-figure"><a href="../research-assets/zerosearch-model.jpg" target="_blank" rel="noopener noreferrer" aria-label="Open the full-resolution ZeroSearch training diagram"><img src="../research-assets/zerosearch-model.jpg" width="2957" height="1229" alt="ZeroSearch method: a policy model interacts with a simulated retrieval model, trained with PPO or GRPO." loading="lazy" decoding="async"></a><figcaption>Training framework (PPO / GRPO) · <a href="https://github.com/Alibaba-NLP/ZeroSearch/blob/main/assets/model.jpg" target="_blank" rel="noopener noreferrer">source</a></figcaption></figure>
@@ -92,12 +92,12 @@
           <p class="work-links"><a href="https://arxiv.org/abs/2605.07510" target="_blank" rel="noopener noreferrer">Paper <span aria-hidden="true">↗</span></a><a href="https://github.com/hbhalpha/InterLV-Search-Bench" target="_blank" rel="noopener noreferrer">Code <span aria-hidden="true">↗</span></a></p>
         </article>
 
-        <p class="group-label"><span>II</span>Multimodal understanding and embodied interaction</p>
+        <p class="group-label"><span>II</span>Embodied agents: from perception to action</p>
         <article class="work work--figure" aria-labelledby="project-rynnbrain">
           <div class="work-text">
             <h3 id="project-rynnbrain">RynnBrain</h3>
             <p class="work-role">One of the project leads · 2026</p>
-            <p>An open embodied foundation model that unifies egocentric perception, spatiotemporal grounding, physical reasoning, and planning. I contributed to pre-training, Chain-of-Point reasoning, VLA, and training infrastructure.</p>
+            <p>An open embodied foundation model that serves as an agent's brain: egocentric perception, spatiotemporal grounding, physical reasoning, and planning in one model. I contributed to pre-training, Chain-of-Point reasoning, VLA, and training infrastructure.</p>
             <p class="work-links"><a href="https://arxiv.org/abs/2602.14979" target="_blank" rel="noopener noreferrer">Paper <span aria-hidden="true">↗</span></a><a href="https://github.com/alibaba-damo-academy/RynnBrain" target="_blank" rel="noopener noreferrer">Code <span aria-hidden="true">↗</span></a><a href="https://arxiv.org/html/2602.14979v1#A1" target="_blank" rel="noopener noreferrer">Contributions <span aria-hidden="true">↗</span></a><a href="https://arxiv.org/abs/2607.17977" target="_blank" rel="noopener noreferrer">RynnBrain 1.1 <span aria-hidden="true">↗</span></a></p>
           </div>
           <figure class="work-figure"><a href="../research-assets/rynnbrain-framework.png" target="_blank" rel="noopener noreferrer" aria-label="Open the full-resolution RynnBrain 1.0 architecture diagram"><img src="../research-assets/rynnbrain-framework-preview.png" width="3840" height="2160" alt="RynnBrain architecture: images, video, and instructions pass through a visual encoder and a Dense/MoE decoder to produce spatial grounding, reasoning, and action plans." loading="lazy" decoding="async"></a><figcaption>RynnBrain 1.0 architecture · <a href="https://github.com/alibaba-damo-academy/RynnBrain/blob/rynnbrain1.0/cookbooks/assets/framework.png" target="_blank" rel="noopener noreferrer">source</a></figcaption></figure>
@@ -106,7 +106,7 @@
           <article class="work" aria-labelledby="project-worldvla">
             <h3 id="project-worldvla">WorldVLA</h3>
             <p class="work-role">Co-author · 2025</p>
-            <p>A single autoregressive model for both robot actions and future frames, so that generating an action is tied to predicting what it will look like.</p>
+            <p>An action model with a built-in world model: one autoregressive network generates robot actions and predicts the frames they lead to, so the agent anticipates consequences as it acts.</p>
             <p class="work-note">Precedes RynnVLA-002; the original repository now redirects there.</p>
             <p class="work-links"><a href="https://arxiv.org/abs/2506.21539" target="_blank" rel="noopener noreferrer">Paper <span aria-hidden="true">↗</span></a><a href="https://github.com/alibaba-damo-academy/WorldVLA" target="_blank" rel="noopener noreferrer">Code <span aria-hidden="true">↗</span></a><a href="https://huggingface.co/Alibaba-DAMO-Academy/WorldVLA" target="_blank" rel="noopener noreferrer">Model <span aria-hidden="true">↗</span></a></p>
           </article>

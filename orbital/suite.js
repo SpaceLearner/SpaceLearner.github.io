@@ -9,10 +9,10 @@ import { applyInputBake } from './input-lightmap.js?v=e582df2112ea409d';
 import { applyMugBake } from './coffee-mug.js?v=3b18c44ab7a38c04';
 import { createShelfBooks } from './book-assets.js?v=3a17e0c9ea70dfa8';
 import { createBed, applyBedBake } from './bed-assets.js?v=7eb4c19116e1ef1d';
-import { createCabinArchitecture } from './cabin-architecture.js?v=779ea87a6940b778';
+import { createCabinArchitecture } from './cabin-architecture.js?v=9e44c4e9e4da1bf9';
 import { applyCabinBake } from './cabin-lightmap.js?v=e7ea06bd197eb1b2';
 import { createOrbitalBackground } from './orbit-background.js?v=c80e74d6761c3bee';
-import { createEntryHatch } from './entry-hatch.js?v=98b4379d43aab670';
+import { createEntryHatch } from './entry-hatch.js?v=fbffef56921dcdef';
 import { createEntryFlight, createEntryPlayback } from './entry-flight.js?v=95e58690863af5a6';
 import { createVistaTransit } from './vista-transit.js?v=b6d66b3c8e4010ae';
 import { createOrbitalView } from './orbital-view.js?v=7d837311c6382278';
@@ -84,8 +84,8 @@ function createSuite() {
   const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 260);camera.layers.enable(2);
   const room = new THREE.Group(); scene.add(room);
   const mat = (color, roughness=.65, metalness=.05) => new THREE.MeshPhysicalMaterial({color, roughness, metalness});
-  const walnut=mat('#ffffff',.49), bronze=mat('#858c8b',.42,.72), shell=mat('#747672',.47,.7), dark=mat('#292d2e',.5,.55), ivory=mat('#c7c3b9',.92), upholstery=mat('#98958c',.96), rugMat=mat('#77766c',1), black=mat('#131719',.38,.32), paper=mat('#d7d0bc',.95);
-  const stone=mat('#a4a39c',.55,.02),leather=mat('#403a34',.77);
+  const walnut=mat('#ffffff',.49), bronze=mat('#a3845a',.36,.88), shell=mat('#747672',.47,.7), dark=mat('#292d2e',.5,.55), ivory=mat('#c7c3b9',.92), upholstery=mat('#ab9f8a',.96), rugMat=mat('#77766c',1), black=mat('#131719',.38,.32), paper=mat('#d7d0bc',.95);
+  const stone=mat('#a4a39c',.55,.02),leather=mat('#6a4630',.62);
   ivory.sheen=1;ivory.sheenRoughness=.85;ivory.sheenColor=new THREE.Color('#aca99e');upholstery.sheen=.8;upholstery.sheenRoughness=.95;
   walnut.clearcoat=.12;walnut.clearcoatRoughness=.65;
   const textures=new Map();
@@ -95,7 +95,7 @@ function createSuite() {
   for(const m of [bronze,shell,dark]){m.bumpMap=loadTex('metal-bump.jpg',[3,3]);m.bumpScale=.002;m.roughnessMap=loadTex('metal-roughness.jpg',[3,3]);}
   stone.map=loadTex('stone-color.jpg',[2,2],true);stone.bumpMap=loadTex('stone-bump.jpg',[2,2]);stone.bumpScale=.01;stone.roughnessMap=loadTex('stone-roughness.jpg',[2,2]);
   leather.bumpMap=loadTex('leather-bump.jpg',[3,3]);leather.bumpScale=.006;leather.roughnessMap=loadTex('leather-roughness.jpg',[3,3]);
-  const warm=new THREE.MeshBasicMaterial({color:'#d5c4a5'}), cool=new THREE.MeshBasicMaterial({color:'#8a989c'});
+  const warm=new THREE.MeshBasicMaterial({color:'#ffdcae'}), cool=new THREE.MeshBasicMaterial({color:'#8a989c'});
   const environment=new RoomEnvironment();const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromScene(environment,.04).texture;scene.environmentIntensity=.29;environment.dispose();pmrem.dispose();
   // Every furnishing is a volumetric mesh, with a real perspective camera and ray-cast hit testing.
   function mesh(geo, material, x=0,y=0,z=0,parent=room) { const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m; }
@@ -121,7 +121,7 @@ function createSuite() {
     c.fillStyle='#1c2226';c.fillRect(0,36,177,h-36);c.fillStyle='#d5c6a9';c.font='bold 20px Georgia';c.fillText('JG /',25,89);
     ['Overview','Research','Projects','Publications'].forEach((label,i)=>{c.fillStyle=(projects?i===2:i===0)?'#343b3e':'#1c2226';c.fillRect(14,123+i*47,148,34);c.fillStyle=(projects?i===2:i===0)?'#ece5d5':'#8c979b';c.font='15px Arial';c.fillText(label,27,145+i*47);});
     c.fillStyle='#899591';c.font='12px monospace';c.fillText('PERSONAL WORKSPACE',211,85);c.fillStyle='#e7e3d9';c.font='46px Georgia';c.fillText(projects?'Selected research':'Jiayan Guo',209,151);
-    const cards=projects?[['ZeroSearch','Search agents / reinforcement learning'],['RynnBrain','Embodied foundation models'],['WorldVLA · RynnVLA','Vision, language and action']]:[['01 / Search and reasoning','Finding information, using tools, reasoning in steps'],['02 / Embodied interaction','From what an agent sees to what it does'],['Research archive',publicationCount+' public records / '+publicationYears]];
+    const cards=projects?[['ZeroSearch','Search agents / reinforcement learning'],['RynnBrain','Embodied foundation models'],['WorldVLA · RynnVLA','Vision, language and action']]:[['01 / Agentic search and tool use','Query, read, reason, act on evidence'],['02 / Embodied agents','From what an agent sees to what it does'],['Research archive',publicationCount+' public records / '+publicationYears]];
     cards.forEach(([title,caption],i)=>{const y=231+i*99;c.fillStyle='#20272b';c.fillRect(209,y,775,83);c.strokeStyle='#3a4447';c.strokeRect(209,y,775,83);c.fillStyle='#d6c6a7';c.font='23px Georgia';c.fillText(title,231,y+32);c.fillStyle='#98a4a7';c.font='16px Arial';c.fillText(caption,231,y+59);c.fillStyle='#b9c4be';c.font='19px Arial';c.fillText('↗',945,y+44);});
     c.fillStyle='#707e82';c.font='11px monospace';c.fillText('SELECT THE SCREEN TO READ',212,554);
   },1024,576);}
@@ -191,14 +191,14 @@ function createSuite() {
   const keyboardMount=placeDeskAsset(deskAssets.keyboard,-3.65,matTop,-1.02,1.15);
   const mouseGroup=createMouse(THREE);placeDeskAsset(mouseGroup,-3.08,matTop,-1);
   // Compact ceramic/aluminium task lamp, kept below the window horizon.
-  const lampBase=mat('#d2d0c6',.66,.08),lampStem=mat('#4b5658',.46,.72);
+  const lampBase=mat('#d2d0c6',.66,.08),lampStem=mat('#a3845a',.34,.9);
   cylinder(.13,.16,.045,-5.12,1.49,-1.96,lampBase);
   lineBetween([-5.12,1.52,-1.96],[-5.12,2.28,-1.96],.014,lampStem);
   lineBetween([-5.12,2.28,-1.96],[-4.96,2.33,-1.96],.014,lampStem);
   cylinder(.12,.19,.115,-4.96,2.29,-1.96,lampBase);
   cylinder(.165,.165,.008,-4.96,2.23,-1.96,warm);
   // A shielded task light: only the downward cone illuminates the work surface.
-  const lampLight=new THREE.SpotLight('#ffe3bc',.70,2.2,Math.PI/3.3,.72,2);
+  const lampLight=new THREE.SpotLight('#ffd3a0',1.05,2.4,Math.PI/3.1,.78,2);
   lampLight.position.set(-4.96,2.21,-1.96);lampLight.target.position.set(-4.55,1.44,-1.3);
   lampLight.castShadow=true;lampLight.shadow.mapSize.set(1024,1024);
   lampLight.shadow.camera.near=.08;lampLight.shadow.camera.far=3;
@@ -236,7 +236,7 @@ function createSuite() {
   lineBetween([2.6,6.1,-.1],[2.6,3.7,-.1],.015,bronze);
   const pendant=mesh(new THREE.TorusGeometry(.48,.025,16,80),bronze,2.6,3.65,-.1);pendant.rotation.x=Math.PI/2;
   const diffuser=mesh(new THREE.TorusGeometry(.48,.012,12,80),warm,2.6,3.626,-.1);diffuser.rotation.x=Math.PI/2;
-  const pendantLight=new THREE.PointLight('#ffe4c1',.55,4,2);pendantLight.position.set(2.6,3.4,-.1);room.add(pendantLight);
+  const pendantLight=new THREE.PointLight('#ffd6a8',.7,4.2,2);pendantLight.position.set(2.6,3.4,-.1);room.add(pendantLight);
 
   // Thin upholstery piping, mattress seams, hardware and layered construction.
   const seam=mat('#a09b8e',.97);
@@ -260,7 +260,7 @@ function createSuite() {
   const orbit=createOrbitalBackground(THREE,planetMap,cloudMap);scene.add(orbit.group);
   const {sunDirection}=orbit;camera.far=800;camera.updateProjectionMatrix();
 
-  scene.add(new THREE.HemisphereLight('#c8d5dc','#777267',.40));
+  scene.add(new THREE.HemisphereLight('#c9d4da','#7a6f60',.32));
   scene.add(new THREE.AmbientLight('#d2cec3',.05));
   const sunlight=new THREE.DirectionalLight('#eee8d9',2.1);
   sunlight.target.position.set(-2.65,1,-1.5);sunlight.position.copy(sunlight.target.position).addScaledVector(sunDirection,14);

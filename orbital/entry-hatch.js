@@ -11,7 +11,7 @@ export function hatchState(p){
 
 export function createEntryHatch(THREE,{x,y,z,width,height,radius}) {
   const group=new THREE.Group();group.name='Aft entry hatch';
-  const skin=new THREE.MeshPhysicalMaterial({color:'#b9c1c0',roughness:.6,metalness:.05,clearcoat:.08,clearcoatRoughness:.6});
+  const skin=new THREE.MeshPhysicalMaterial({color:'#c2beb3',roughness:.64,metalness:.05,clearcoat:.08,clearcoatRoughness:.6});
   const trim=new THREE.MeshPhysicalMaterial({color:'#2d3539',roughness:.45,metalness:.7});
   const lamp=new THREE.MeshBasicMaterial({color:'#e0a85a'}),locked=new THREE.Color('#e0a85a'),clear=new THREE.Color('#bfe6d2');
   const w=width/2-.012,h=height,r=Math.min(radius,w*.9),d=.07;
