@@ -72,11 +72,23 @@ export function createOrbitalView(THREE,scene,orbit) {
         float crossing=smoothstep(.39,.46,p)*(1.-smoothstep(.56,.63,p));
         float quietCover=smoothstep(.20,.46,p)*(1.-smoothstep(.56,.82,p));
         float cover=jumpActive*mix(crossing,quietCover,quiet);
-        float rays=streaks(q,p*2.8,power)+streaks(rot(.38)*q*1.25,p*3.2+.6,power)*.38;
-        vec3 tunnel=vec3(.001,.002,.004)+rays*vec3(.035,.055,.075)*power;
-        tunnel+=vec3(.004,.007,.010)*exp(-radius*radius*8.)*power;
+        // Three beats: charge (stars stretch, light gathers at the focus),
+        // crossing (a bright core blooms and flashes over the destination swap),
+        // arrival (the new sky decompresses out of the flash).
+        float charge=smoothstep(.06,.42,p)*(1.-smoothstep(.44,.5,p));
+        float rays=streaks(q,p*2.8,power)+streaks(rot(.38)*q*1.25,p*3.2+.6,power)*.6+streaks(rot(-.71)*q*.8,p*2.2+.3,power)*.35;
+        // Chromatic split: red trails lag, blue leads, as if light is Doppler-shifted.
+        float raysR=streaks(q*1.018,p*2.8,power),raysB=streaks(q*.982,p*2.8,power);
+        vec3 rayColor=vec3(raysR*.9,rays*.95,raysB*1.25);
+        vec3 tunnel=vec3(.004,.006,.012)+rayColor*vec3(.55,.75,1.)*power;
+        tunnel+=vec3(.25,.45,.85)*exp(-radius*radius*(26.-charge*14.))*power;
         color=mix(color,tunnel,cover*(1.-quiet));
-        color+=rays*vec3(.016,.025,.033)*power*(1.-cover);
+        color+=rayColor*vec3(.16,.22,.3)*power*(1.-cover);
+        // Gathering glow at the focus during the charge; reads as acceleration.
+        color+=vec3(.35,.55,.9)*exp(-radius*radius*18.)*charge*charge*.5*(1.-quiet);
+        // One short, soft flash exactly over the commit (progress .48).
+        float f=(p-.48)/.035;float flash=exp(-f*f)*jumpActive*(1.-quiet);
+        color=mix(color,vec3(1.,.97,.93)*1.6,flash*.85*(1.-smoothstep(.0,1.4,radius)*.35));
         // Quiet mode is a brief dim-through transition, with no geometric
         // distortion, moving stars, camera movement or sudden white flash.
         color*=1.-quiet*cover*.96;

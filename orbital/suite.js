@@ -15,7 +15,7 @@ import { createOrbitalBackground } from './orbit-background.js?v=c80e74d6761c3be
 import { createEntryHatch } from './entry-hatch.js?v=fbffef56921dcdef';
 import { createEntryFlight, createEntryPlayback } from './entry-flight.js?v=95e58690863af5a6';
 import { createVistaTransit } from './vista-transit.js?v=b6d66b3c8e4010ae';
-import { createOrbitalView } from './orbital-view.js?v=7d837311c6382278';
+import { createOrbitalView } from './orbital-view.js?v=1f10bc5f8f4013ff';
 import { createVistaPicker } from './vista-picker.js?v=95c6230009bde26e';
 import { createVistaLighting } from './vista-lighting.js?v=14263e296f7c4b3f';
 import { createSurfaceReading } from './surface-reading.js?v=2cd67a956bc741a4';
@@ -319,7 +319,12 @@ function createSuite() {
   const transit=createVistaTransit({
     onCommit:updateVista,
     onFrame(state){
-      orbitalView.setTransit(state);vistaLight.update(state);invalidate();
+      orbitalView.setTransit(state);vistaLight.update(state);
+      // A small FOV push sells acceleration; the window light pulses with the crossing flash.
+      const kick=state.active&&!state.lowMotion?Math.sin(Math.PI*Math.min(1,state.progress/.5))**2*(1-Math.min(1,Math.max(0,(state.progress-.5)/.4))):0;
+      const baseFov=mobile?79:59;if(!objectFocus?.active&&!entry?.active){camera.fov=baseFov+kick*6;camera.updateProjectionMatrix();}
+      const pulse=state.active&&!state.lowMotion?Math.exp(-(((state.progress-.48)/.04)**2)):0;windowFill.intensity*=1+pulse*5;earthKey.intensity*=1+pulse*3;
+      invalidate();
       const stage=!state.active?'idle':state.lowMotion?'quiet':state.progress<.25?'charging':state.progress<.7?'transit':'arriving';
       if(stage!==transitStage){transitStage=stage;document.body.dataset.transit=stage;
         if(state.active)vistaCaption.textContent='Switching to '+vistaName(state.desired);
