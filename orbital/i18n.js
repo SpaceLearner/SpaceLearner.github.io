@@ -386,6 +386,7 @@ const zh={
     if(Object.hasOwn(zh,source))return zh[source];
     let m;
     if((m=source.match(/^(\d+) of (\d+) images loaded · (\d+) asset groups pending$/)))return `已加载 ${m[1]}/${m[2]} 张图片 · ${m[3]} 个资源组等待中`;
+    if((m=source.match(/^(\d+) PUBLICATIONS$/)))return `${m[1]} 篇论文`;
     if((m=source.match(/^(\d+) (papers?|records)$/)))return `${m[1]} ${m[2]==='records'?'条记录':'篇论文'}`;
     if((m=source.match(/^(\d+) public records \/ (.+)$/)))return `${m[1]} 条公开记录 / ${m[2]}`;
     if(source.startsWith('Paused · '))return '已暂停 · '+chinese(source.slice(9));

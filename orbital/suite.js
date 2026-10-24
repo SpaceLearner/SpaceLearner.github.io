@@ -23,7 +23,7 @@ import { createArmDemo } from './arm-demo.js?v=2b4b3be0fa35603c';
 import { createLanguagePlacard } from './language-placard.js?v=1f98c8a79072db46';
 import { createCabinInteractions } from './cabin-interactions.js?v=8244840e6ff54774';
 import { createObjectFocus } from './object-focus.js?v=25e2e646187e94da';
-import { createResearchNotebook } from './research-notebook.js?v=241c6692b06992e0';
+import { createResearchNotebook } from './research-notebook.js?v=bafef615e3309dee';
 
 const canvas = document.getElementById('space');
 const status = document.getElementById('status');
@@ -152,7 +152,16 @@ function createSuite() {
   const cushion2=round(.7,.56,.23,4.6,1.02,1.27,mat('#687e81',.95),.1);cushion2.rotation.z=-.14;
   cylinder(.8,.8,.07,2.6,.64,3.4,stone);cylinder(.09,.15,.6,2.6,.3,3.4,bronze);cylinder(.51,.57,.07,2.6,.07,3.4,dark);
   const notes=new THREE.Group();room.add(notes);
-  const notebook=createResearchNotebook(THREE,screenTexture('Field notes',publicationCount+' PUBLICATIONS',[publicationYears,'RESEARCH / PAPERS']));
+  // Paper cover label, redrawn on language change by texture().
+  const notebookLabel=texture((g,w,h)=>{
+    g.fillStyle='#e6dcc5';g.fillRect(0,0,w,h);let seed=23;const r=()=>(seed=seed*16807%2147483647)/2147483647;
+    for(let i=0;i<2600;i++){g.fillStyle=`rgba(90,70,40,${r()*.05})`;g.fillRect(r()*w,r()*h,1,1);}
+    g.strokeStyle='#7d5f33';g.lineWidth=3;g.strokeRect(34,34,w-68,h-68);g.lineWidth=1;g.strokeRect(46,46,w-92,h-92);
+    g.textAlign='center';g.fillStyle='#2a2620';g.font='italic 400 92px "Iowan Old Style", Georgia, "Songti SC", serif';g.fillText('Research Notes',w/2,h*.47);
+    g.fillStyle='#7d5f33';g.font='500 30px -apple-system, "Segoe UI", "PingFang SC", sans-serif';g.fillText(publicationCount+' PUBLICATIONS',w/2,h*.67);
+    g.fillStyle='#6e675b';g.font='400 26px -apple-system, "Segoe UI", sans-serif';g.fillText(publicationYears,w/2,h*.79);
+  },1024,512);
+  const notebook=createResearchNotebook(THREE,notebookLabel);
   notebook.group.position.set(2.6,.70,3.55);notebook.group.rotation.y=-.18;notes.add(notebook.group);
   notes.scale.setScalar(.82);notes.position.set(-4.02,.896,-4.03);notes.rotation.y=.03;
   register(notes,'papers',[-1.8,1.72,-1.2]);

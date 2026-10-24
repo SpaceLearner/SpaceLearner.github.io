@@ -84,3 +84,37 @@ dialog,#sheet{background:var(--paper);color:var(--ink)}
 .image-viewer{background:var(--paper)}
 .image-viewer::backdrop{background:#0a0806d9}
 .image-tools button{background:#e3d8c2;border-color:#b8955f80}
+
+/* Notebook reading surface: laid paper with a faint feint ruling, a red margin
+   line, the gutter shadow of the binding, and handwritten-feeling headings.
+   The physical cover stays on the 3D object; this is the open page. */
+#sheet[data-object="notebook"],#sheet[data-object="notebook"]:not([data-object=""]){
+  --rule:31px;
+  background:
+    linear-gradient(90deg,#00000024 0,#0000000d 14px,transparent 34px),
+    linear-gradient(90deg,transparent 46px,#b0553f55 46px,#b0553f55 47px,transparent 47px),
+    repeating-linear-gradient(180deg,transparent 0,transparent calc(var(--rule) - 1px),#7f97ad2e calc(var(--rule) - 1px),#7f97ad2e var(--rule)),
+    radial-gradient(140% 100% at 60% 40%,#f3ecdc 0%,#ebe2cd 100%);
+  color:#2a2620;border:0;border-left:0;border-radius:2px 4px 4px 2px;
+  box-shadow:inset 0 0 0 1px #00000010,inset -10px 0 18px -14px #0000002a}
+#sheet[data-object="notebook"]:not([data-object=""]) .sheet-body{padding-left:62px!important;line-height:var(--rule)!important;font-size:16px!important}
+#sheet[data-object="notebook"] .sheet-body p{margin:0 0 var(--rule)}
+#sheet[data-object="notebook"] .sheet-body h3{font:italic 400 21px/var(--rule) var(--reading-serif);margin:var(--rule) 0 0;color:#1f2a3a}
+#sheet[data-object="notebook"] .sheet-body h3:first-child{margin-top:0}
+#sheet[data-object="notebook"] .rule{border:0;height:var(--rule);margin:0}
+#sheet[data-object="notebook"] .sheet-body a{color:#1f3f66;text-decoration-color:#1f3f6655}
+#sheet[data-object="notebook"] .publications li{padding-bottom:0;margin-bottom:var(--rule);border:0}
+#sheet[data-object="notebook"] .publications a{font:500 16px/var(--rule) var(--ui-font);color:#2a2620}
+#sheet[data-object="notebook"] .publications small,#sheet[data-object="notebook"] .note{font:13px/var(--rule) var(--ui-font);color:#6e675b;margin:0}
+#sheet[data-object="notebook"] .publications li::marker{color:#b0553f;font-variant-numeric:tabular-nums}
+/* Tabs become index tabs clipped to the top of the page. */
+#sheet[data-object="notebook"] .notebook-tabs{padding:0 14px 0 62px;gap:4px;border:0;background:transparent}
+#sheet[data-object="notebook"] .notebook-tabs button{border:0;border-radius:0 0 3px 3px;background:#ddd2bb;color:#5e574c;box-shadow:inset 0 1px #0000000d}
+#sheet[data-object="notebook"] .notebook-tabs button[aria-pressed="true"]{background:#b8955f;color:#fbf6ea}
+@media(max-width:699px){#sheet[data-object="notebook"]:not([data-object=""]) .sheet-body{padding-left:40px!important}
+  #sheet[data-object="notebook"],#sheet[data-object="notebook"]:not([data-object=""]){background:
+    linear-gradient(90deg,#00000020 0,transparent 22px),
+    linear-gradient(90deg,transparent 28px,#b0553f55 28px,#b0553f55 29px,transparent 29px),
+    repeating-linear-gradient(180deg,transparent 0,transparent calc(var(--rule) - 1px),#7f97ad2e calc(var(--rule) - 1px),#7f97ad2e var(--rule)),
+    #efe7d4}
+  #sheet[data-object="notebook"] .notebook-tabs{padding-left:40px}}
