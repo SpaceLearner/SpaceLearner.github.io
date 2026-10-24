@@ -12,6 +12,7 @@ import { createBed, applyBedBake } from './bed-assets.js?v=7eb4c19116e1ef1d';
 import { createCabinArchitecture } from './cabin-architecture.js?v=779ea87a6940b778';
 import { applyCabinBake } from './cabin-lightmap.js?v=e7ea06bd197eb1b2';
 import { createOrbitalBackground } from './orbit-background.js?v=c80e74d6761c3bee';
+import { createEntryHatch } from './entry-hatch.js?v=98b4379d43aab670';
 import { createEntryFlight, createEntryPlayback } from './entry-flight.js?v=95e58690863af5a6';
 import { createVistaTransit } from './vista-transit.js?v=b6d66b3c8e4010ae';
 import { createOrbitalView } from './orbital-view.js?v=7d837311c6382278';
@@ -126,6 +127,8 @@ function createSuite() {
   },1024,576);}
 
   const cabin=createCabinArchitecture(THREE,{walnut,metalBump:bronze.bumpMap,metalRoughness:bronze.roughnessMap});room.add(cabin);
+  // Covers the aft airlock aperture (outline 2.6 × 4.9 at x=-2.72/.84) just outside its gasket.
+  const hatch=createEntryHatch(THREE,{x:-2.72/.84,y:2.47,z:7.6,width:2.66,height:4.96,radius:.6});room.add(hatch.group);
   track('cabin',applyCabinBake(THREE,cabin)).then(({count})=>{
     document.body.dataset.cabinBake=String(count);
     window.dispatchEvent(new Event('suite-texture-ready'));
@@ -396,7 +399,7 @@ function createSuite() {
       status.textContent='Entering the cabin · About 5 seconds';hint.textContent='Skip at any time to go straight to the desk';
       renderer.setPixelRatio(quality.pixelRatio(width,height,true));
     },
-    onFrame(progress){entryPath.sample(progress,camera);invalidate();},
+    onFrame(progress){hatch.set(progress);entryPath.sample(progress,camera);invalidate();},
     onFinish(reason){
       document.body.classList.remove('entering');entryControls.hidden=true;
       recenterButton.disabled=motionButton.disabled=replayButton.disabled=false;
