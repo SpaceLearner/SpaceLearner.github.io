@@ -1,4 +1,4 @@
-import {createKeyboard} from './desk-inputs.js?v=0d6f67de8d5e8209';
+import {createKeyboard} from './desk-inputs.js?v=7979d33756ad1ab8';
 import {createCoffeeMug} from './coffee-mug.js?v=3b18c44ab7a38c04';
 import {createResearchArm} from './research-arm.js?v=4595f80e5861bbed';
 import { RoundedBoxGeometry } from './vendor/DeskRoundedBoxGeometry.js';
@@ -12,32 +12,38 @@ export function createDeskAssets(THREE, maps = {}) {
   const standard = (color, roughness, metalness = 0, more = {}) =>
     new THREE.MeshPhysicalMaterial({color, roughness, metalness, ...more});
   const materials = {
-    aluminum: standard('#929995', .32, .86),
-    edge: standard('#aeb3ad', .25, .91),
-    graphite: standard('#262c2e', .57, 0),
-    abs: standard('#171b1d', .62, 0),
+    aluminum: standard('#b2a690', .30, .88),
+    edge: standard('#cfc2a6', .22, .92),
+    graphite: standard('#2b2824', .57, 0),
+    abs: standard('#1c1a17', .62, 0),
     rubber: standard('#111516', .91),
     gasket: standard('#080c0e', .77),
-    whiteKey: standard('#bcbdb4', .53, 0),
-    greyKey: standard('#737e7e', .60, 0),
+    whiteKey: standard('#d6cdb9', .55, 0),
+    greyKey: standard('#5a534a', .60, 0),
     ceramic: standard('#c9c5b7', .29, 0, {clearcoat:.42, clearcoatRoughness:.18, ior:1.48}),
     unglazed: standard('#a7a08c', .88),
     coffee: standard('#22140c', .20, 0, {clearcoat:.46, clearcoatRoughness:.15}),
-    robotPaint: standard('#a6aaa2', .44, .08, {clearcoat:.16, clearcoatRoughness:.38}),
-    robotAccent: standard('#6d7a79', .42, .62),
-    hardware: standard('#727b7b', .27, .94),
+    robotPaint: standard('#c9c1b0', .42, .06, {clearcoat:.18, clearcoatRoughness:.36}),
+    robotAccent: standard('#a3845a', .36, .86),
+    hardware: standard('#a3845a', .28, .92),
     recess: standard('#090c0e', .82)
   };
   // Fine roughness only: fabrication texture should never read as large scratches.
   function surfaceTexture(brushed=false) {
-    const data=new Uint8Array(64*64*4);
-    for(let y=0;y<64;y++)for(let x=0;x<64;x++){
-      const i=(y*64+x)*4,grain=((x*37+y*53+x*y*7)%29)/28;
-      const v=Math.round(222+grain*24+(brushed?Math.sin(y*2.7)*9:0));
+    // 256px with value noise and no short integer period, so the grain no longer
+    // tiles into a visible grid; brushing adds long, slightly wavering strokes.
+    const n=256,data=new Uint8Array(n*n*4);
+    const hash=(x,y)=>{let h=Math.imul(x*374761393+y*668265263,1274126177);h^=h>>>13;return ((h>>>0)%1024)/1023;};
+    const smooth=(x,y,cell)=>{const gx=x/cell,gy=y/cell,ix=Math.floor(gx),iy=Math.floor(gy),fx=gx-ix,fy=gy-iy,sx=fx*fx*(3-2*fx),sy=fy*fy*(3-2*fy),w=n/cell;
+      const v=(a,b)=>hash(((a%w)+w)%w,((b%w)+w)%w);return (v(ix,iy)*(1-sx)+v(ix+1,iy)*sx)*(1-sy)+(v(ix,iy+1)*(1-sx)+v(ix+1,iy+1)*sx)*sy;};
+    for(let y=0;y<n;y++)for(let x=0;x<n;x++){
+      const i=(y*n+x)*4,grain=hash(x,y)*.45+smooth(x,y,8)*.35+smooth(x,y,32)*.2;
+      const stroke=brushed?(hash(0,y)*.7+smooth(x,y*8,64)*.3-.5)*22:0;
+      const v=Math.max(0,Math.min(255,Math.round(214+grain*34+stroke)));
       data.set([v,v,v,255],i);
     }
-    const t=new THREE.DataTexture(data,64,64);t.wrapS=t.wrapT=THREE.RepeatWrapping;
-    t.repeat.set(brushed?3:8,8);t.magFilter=THREE.LinearFilter;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.needsUpdate=true;return t;
+    const t=new THREE.DataTexture(data,n,n);t.wrapS=t.wrapT=THREE.RepeatWrapping;
+    t.repeat.set(brushed?1.5:3,3);t.magFilter=THREE.LinearFilter;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.anisotropy=8;t.needsUpdate=true;return t;
   }
   const fineGrain=surfaceTexture(),brushing=surfaceTexture(true);
   for(const name of ['abs','graphite','whiteKey','greyKey','robotPaint'])materials[name].roughnessMap=fineGrain;

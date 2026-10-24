@@ -3,8 +3,8 @@ import { quality } from './quality-profile.js?v=72ab348954d7850d';
 import * as THREE from './vendor/three.module.min.js';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
 import { RectAreaLightUniformsLib } from './vendor/RectAreaLightUniformsLib.js';
-import { createDeskAssets } from './desk-assets.js?v=78c55fe838c3bc94';
-import { createMouse, createDeskMat } from './desk-inputs.js?v=0d6f67de8d5e8209';
+import { createDeskAssets } from './desk-assets.js?v=5a81780ab8b25ade';
+import { createMouse, createDeskMat } from './desk-inputs.js?v=7979d33756ad1ab8';
 import { applyInputBake } from './input-lightmap.js?v=6cc46599476c0c1b';
 import { applyMugBake } from './coffee-mug.js?v=3b18c44ab7a38c04';
 import { createShelfBooks } from './book-assets.js?v=3a17e0c9ea70dfa8';
@@ -21,7 +21,7 @@ import { createVistaLighting } from './vista-lighting.js?v=14263e296f7c4b3f';
 import { createSurfaceReading } from './surface-reading.js?v=2cd67a956bc741a4';
 import { createArmDemo } from './arm-demo.js?v=2b4b3be0fa35603c';
 import { createLanguagePlacard } from './language-placard.js?v=1f98c8a79072db46';
-import { createCabinInteractions } from './cabin-interactions.js?v=8244840e6ff54774';
+import { createCabinInteractions } from './cabin-interactions.js?v=0b722074c6fbdb9c';
 import { createObjectFocus } from './object-focus.js?v=25e2e646187e94da';
 import { createPlant } from './plant.js?v=a91bcf41a243fdc0';
 import { createResearchNotebook } from './research-notebook.js?v=bafef615e3309dee';
@@ -110,12 +110,13 @@ function createSuite() {
   function sphere(r,x,y,z,material,parent=room){return mesh(new THREE.SphereGeometry(r,32,24),material,x,y,z,parent);}
   function lineBetween(a,b,r,material,parent=room){const p=new THREE.Vector3(...a),q=new THREE.Vector3(...b);const m=mesh(new THREE.CylinderGeometry(r,r,p.distanceTo(q),12),material,0,0,0,parent);m.position.copy(p).add(q).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),q.sub(p).normalize());return m;}
   function register(group,id,anchor){group.traverse(m=>{if(m.isMesh){m.userData.panel=id;objects.push(m);}});anchors[id]=new THREE.Vector3(...anchor);}
-  function texture(draw,w=1024,h=512){const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d'),fill=ctx.fillText.bind(ctx);let hasText=false;ctx.fillText=(value,...args)=>{hasText=true;fill(window.suiteI18n?.t(value)||value,...args);};draw(ctx,w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;if(hasText)window.addEventListener('suite-language-change',()=>{ctx.clearRect(0,0,w,h);draw(ctx,w,h);t.needsUpdate=true;window.dispatchEvent(new Event('suite-texture-ready'));});return t;}
+  function texture(draw,w=1024,h=512){const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d'),fill=ctx.fillText.bind(ctx);let hasText=false;ctx.fillText=(value,...args)=>{hasText=true;fill(window.suiteI18n?.t(value)||value,...args);};draw(ctx,w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.userData.redraw=()=>{ctx.clearRect(0,0,w,h);draw(ctx,w,h);t.needsUpdate=true;};if(hasText)window.addEventListener('suite-language-change',()=>{ctx.clearRect(0,0,w,h);draw(ctx,w,h);t.needsUpdate=true;window.dispatchEvent(new Event('suite-texture-ready'));});return t;}
   function screenTexture(title,subtitle,lines){return texture((c,w,h)=>{const bg=c.createLinearGradient(0,0,w,h);bg.addColorStop(0,'#25221d');bg.addColorStop(1,'#12100d');c.fillStyle=bg;c.fillRect(0,0,w,h);c.fillStyle='#d9bb86';c.font='18px monospace';c.fillText('JIAYAN GUO / ORBITAL RESEARCH',48,54);c.strokeStyle='#8a6a3c';c.lineWidth=2;c.beginPath();c.moveTo(48,78);c.lineTo(w-48,78);c.stroke();c.fillStyle='#efe9dc';c.font='52px Georgia';c.fillText(title,48,161);c.fillStyle='#b3aa9b';c.font='19px monospace';c.fillText(subtitle,50,205);lines.forEach((t,i)=>{c.fillStyle=i%2?'#b3aa9b':'#ece6da';c.font='22px monospace';c.fillText(t,50,290+i*53);});c.strokeStyle='#8fb4d9';c.globalAlpha=.5;for(let i=0;i<3;i++){c.beginPath();c.ellipse(790,340,106,35+i*20,-.5,0,Math.PI*2);c.stroke();}c.globalAlpha=1;});}
   function panel(w,h,x,y,z,t,parent){const m=mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:t}),x,y,z,parent);m.castShadow=false;return m;}
   const publicationList=document.getElementById('papers').content.querySelector('.publications');
   const publicationCount=publicationList.children.length,publicationYears=publicationList.dataset.years||'2022 — 2026';
-  function desktopTexture(projects=false){return texture((c,w,h)=>{
+  let liveTick=0;const liveScreens=[];
+  function desktopTexture(projects=false){const t=texture((c,w,h)=>{
     c.fillStyle='#14120f';c.fillRect(0,0,w,h);c.fillStyle='#1e1c19';c.fillRect(0,0,w,36);
     for(let i=0;i<3;i++){c.beginPath();c.arc(20+i*17,18,4,0,Math.PI*2);c.fillStyle=['#a07b72','#aa9974','#7f9286'][i];c.fill();}
     c.fillStyle='#8c8476';c.font='12px Arial';c.fillText('JIAYAN GUO  /  RESEARCH DESKTOP',390,23);
@@ -124,8 +125,16 @@ function createSuite() {
     c.fillStyle='#8c8476';c.font='12px monospace';c.fillText('PERSONAL WORKSPACE',211,85);c.fillStyle='#efe9dc';c.font='46px Georgia';c.fillText(projects?'Selected research':'Jiayan Guo',209,151);
     const cards=projects?[['ZeroSearch','Search agents / reinforcement learning'],['RynnBrain','Embodied foundation models'],['WorldVLA · RynnVLA','Vision, language and action']]:[['01 / Agentic search and tool use','Query, read, reason, act on evidence'],['02 / Embodied agents','From what an agent sees to what it does'],['Research archive',publicationCount+' public records / '+publicationYears]];
     cards.forEach(([title,caption],i)=>{const y=231+i*99;c.fillStyle='#1e1c19';c.fillRect(209,y,775,83);c.strokeStyle='#3a3328';c.strokeRect(209,y,775,83);c.fillStyle='#d9bb86';c.font='23px Georgia';c.fillText(title,231,y+32);c.fillStyle='#a39a8b';c.font='16px Arial';c.fillText(caption,231,y+59);c.fillStyle='#d9bb86';c.font='19px Arial';c.fillText('↗',945,y+44);});
-    c.fillStyle='#7a7265';c.font='11px monospace';c.fillText('SELECT THE SCREEN TO READ',212,554);
-  },1024,576);}
+    c.fillStyle='#7a7265';c.font='11px monospace';c.textAlign='right';c.fillText('SELECT THE SCREEN TO READ',984,566);c.textAlign='left';
+    // Live strip: an agent loop trace that scrolls one step at a time, plus a cursor.
+    const steps=projects?['plan   · decompose task into 4 sub-goals','search · query "embodied spatial grounding"','read   · 6 documents, 2 relevant','act    · call tool: retrieve(paper, sec 3)','observe· result matches sub-goal 2','reflect· revise plan, continue']:['observe· desk, monitor, notebook, arm','plan   · pick up block, place in tray','act    · arm.move(approach)','observe· gripper aligned','act    · arm.grip(); arm.lift()','done   · task complete in 6 steps'];
+    // Two-line console in the free band between the last card (ends y=512) and the footer (y=554).
+    const tick=liveTick,first=tick%steps.length,prev=steps[first],cur=steps[(first+1)%steps.length];
+    c.fillStyle='#100e0c';c.fillRect(209,516,775,28);c.font='11px monospace';
+    c.fillStyle='#6e675b';c.fillText('  '+prev,216,527);c.fillStyle='#d9bb86';c.fillText('› '+cur,216,540);
+    if(tick%2===0)c.fillRect(216+c.measureText('› '+cur).width+3,531,6,11);
+    c.fillStyle='#7a7265';
+  },1024,576);liveScreens.push(t);return t;}
 
   const cabin=createCabinArchitecture(THREE,{walnut,metalBump:bronze.bumpMap,metalRoughness:bronze.roughnessMap});room.add(cabin);
   // Covers the aft airlock aperture (outline 2.6 × 4.9 at x=-2.72/.84) just outside its gasket.
@@ -148,9 +157,27 @@ function createSuite() {
   round(3.3,.78,.25,3.4,.99,1.02,upholstery,.08);
   for(const x of [2.61,4.18]){const back=round(1.45,.65,.24,x,1.01,1.2,ivory,.075);back.rotation.x=-.1;}
   for(const x of [1.85,4.95])round(.18,.52,1.4,x,.76,1.63,upholstery,.055);
-  for(const x of [2.62,4.15])round(1.41,.19,1.01,x,.64,1.55,ivory,.055);
-  const cushion=round(.7,.56,.23,2.25,1.02,1.27,mat('#897158',.95),.1);cushion.rotation.z=.18;
-  const cushion2=round(.7,.56,.23,4.6,1.02,1.27,mat('#687e81',.95),.1);cushion2.rotation.z=-.14;
+  // Upholstery reads as filled fabric: seats dip where people sit, pillows bulge
+  // at the centre and pinch at the corners. Deforms the rounded-box geometry in place.
+  function cushionShape(w,h,d,x,y,z,material,{dip=0,puff=0,round:r=.4}={}){
+    const g=new THREE.BoxGeometry(w,h,d,24,8,18),p=g.attributes.position;
+    for(let i=0;i<p.count;i++){
+      const u=p.getX(i)/(w/2),v=p.getY(i)/(h/2),t=p.getZ(i)/(d/2);
+      // Round every edge: shrink each axis by how far the other two are toward a corner.
+      const sx=1-r*.18*Math.pow(Math.max(Math.abs(v),Math.abs(t)),6),sy=1-r*.35*Math.pow(Math.max(Math.abs(u),Math.abs(t)),6),sz=1-r*.3*Math.pow(Math.max(Math.abs(u),Math.abs(v)),6);
+      let X=p.getX(i)*sx,Y=p.getY(i)*sy,Z=p.getZ(i)*sz;
+      const field=Math.max(0,1-u*u)*Math.max(0,1-t*t);
+      // Seat dip: the top sinks most behind centre, where weight rests.
+      if(dip&&v>0)Y-=dip*field*(.7+.3*Math.max(0,-t))*v;
+      // Pillow puff: both large faces bulge, pinching toward the corners.
+      if(puff){const bulge=puff*Math.max(0,1-u*u)*Math.max(0,1-v*v);Z+=Math.sign(t)*bulge*Math.abs(t);}
+      p.setXYZ(i,X,Y,Z);
+    }
+    g.computeVertexNormals();return mesh(g,material,x,y,z);
+  }
+  for(const x of [2.62,4.15])cushionShape(1.41,.19,1.01,x,.64,1.55,ivory,{dip:.045});
+  const cushion=cushionShape(.7,.56,.23,2.25,1.02,1.27,mat('#8a6a4c',.95),{puff:.025,round:.9});cushion.rotation.z=.18;
+  const cushion2=cushionShape(.7,.56,.23,4.6,1.02,1.27,mat('#5f6b6c',.95),{puff:.025,round:.9});cushion2.rotation.z=-.14;
   cylinder(.8,.8,.07,2.6,.64,3.4,stone);cylinder(.09,.15,.6,2.6,.3,3.4,bronze);cylinder(.51,.57,.07,2.6,.07,3.4,dark);
   const notes=new THREE.Group();room.add(notes);
   // Paper cover label, redrawn on language change by texture().
@@ -232,12 +259,35 @@ function createSuite() {
   // Clear iced coffee at the approved cup position; the glass retains real wall thickness.
   placeDeskAsset(deskAssets.mug,-2.5,1.468,-1.9,1.15,-.4);
   track('cup',applyMugBake(THREE,deskAssets.mug)).then(result=>{document.body.dataset.mugBake=String(result.count);window.dispatchEvent(new Event('suite-texture-ready'));}).catch(error=>{document.body.dataset.mugBake='unavailable';console.warn('Cup detail lighting unavailable:',error);});
-  round(.38,.035,.48,-5.12,1.47,-1.26,leather,.014);
-  for(let i=0;i<4;i++)box(.35,.002,.44,-5.12,1.47+i*.004,-1.26,paper);
-  const pen=lineBetween([-5.21,1.495,-1.08],[-5.03,1.495,-1.44],.007,bronze);sphere(.009,-5.03,1.495,-1.44,black);
+  // Leather notepad and pen sit right of the mouse, angled toward the seat; the left keeps the lamp and arm clear.
+  const notepad=new THREE.Group();notepad.position.set(-1.72,0,-1.12);notepad.rotation.y=-.22;room.add(notepad);
+  round(.38,.035,.48,0,1.47,0,leather,.014,notepad);
+  for(let i=0;i<4;i++)box(.35,.002,.44,0,1.47+i*.004,0,paper,notepad);
+  lineBetween([-.09,1.495,.18],[.09,1.495,-.18],.007,bronze,notepad);sphere(.009,.09,1.495,-.18,black,notepad);
 
   // Personal details: books, plant, shelving, pendant, wall art.
   const bookshelf=round(1.8,.065,.46,-5.72,3.6,-4.3,walnut,.025);bookshelf.name='Walnut books shelf';
+  // Framed star chart on the left wall: a printed celestial map in a walnut frame,
+  // drawn procedurally (no external art). Lit by the scene like any other print.
+  const chart=texture((g,w,h)=>{
+    g.fillStyle='#ebe2cc';g.fillRect(0,0,w,h);let seed=1931;const r=()=>(seed=seed*16807%2147483647)/2147483647;
+    for(let i=0;i<5000;i++){g.fillStyle=`rgba(120,95,60,${r()*.06})`;g.fillRect(r()*w,r()*h,1,1);}
+    const cx=w/2,cy=h*.46,R=h*.36;g.strokeStyle='#3b3428';g.lineWidth=2;g.beginPath();g.arc(cx,cy,R,0,Math.PI*2);g.stroke();
+    g.lineWidth=.8;g.strokeStyle='#3b342866';for(let k=1;k<4;k++){g.beginPath();g.arc(cx,cy,R*k/4,0,Math.PI*2);g.stroke();}
+    for(let k=0;k<12;k++){const a=k*Math.PI/6;g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R);g.stroke();}
+    g.strokeStyle='#7d5f33aa';g.lineWidth=1.4;g.beginPath();g.ellipse(cx,cy,R,R*.42,-.42,0,Math.PI*2);g.stroke();
+    const stars=[];for(let i=0;i<160;i++){const a=r()*Math.PI*2,d=Math.sqrt(r())*R*.97,x=cx+Math.cos(a)*d,y=cy+Math.sin(a)*d,m=r();stars.push([x,y]);g.fillStyle='#2a2620';g.beginPath();g.arc(x,y,.8+m*m*3.2,0,Math.PI*2);g.fill();}
+    g.strokeStyle='#2a262088';g.lineWidth=.9;for(let c=0;c<7;c++){const s0=Math.floor(r()*stars.length);g.beginPath();g.moveTo(...stars[s0]);let cur=stars[s0];for(let k=0;k<4;k++){let best=null,bd=1e9;for(const st of stars){const dd=Math.hypot(st[0]-cur[0],st[1]-cur[1]);if(dd>12&&dd<bd&&dd<R*.32){bd=dd;best=st;}}if(!best)break;g.lineTo(...best);cur=best;}g.stroke();}
+    g.fillStyle='#2a2620';g.textAlign='center';g.font='italic 400 30px "Iowan Old Style", Georgia, serif';g.fillText('Planisphaerium Coeleste',cx,h*.9);
+    g.font='500 13px -apple-system, "Segoe UI", sans-serif';g.fillStyle='#7d5f33';g.fillText('N O R T H E R N   H E M I S P H E R E',cx,h*.945);
+    g.strokeStyle='#3b3428';g.lineWidth=1;g.strokeRect(18,18,w-36,h-36);
+  },512,640);
+  const frame=new THREE.Group();frame.position.set(-6.74,3.55,-1.45);frame.rotation.y=Math.PI/2;room.add(frame);
+  // Undo the room's non-uniform scale so the frame keeps its real proportions.
+  frame.scale.set(1/.84,1/.62,1/.84);
+  for(const [w,h,x,y] of [[.62,.04,0,.38],[.62,.04,0,-.38],[.04,.8,-.29,0],[.04,.8,.29,0]])box(w,h,.035,x,y,0,walnut,frame);
+  box(.58,.76,.01,0,0,-.012,mat('#f3ede0',.95),frame);
+  const print=mesh(new THREE.PlaneGeometry(.46,.575),new THREE.MeshStandardMaterial({map:chart,roughness:.85}),0,0,-.004,frame);print.castShadow=false;
   bookshelf.geometry.computeBoundingBox();
   const shelfBooks=createShelfBooks(THREE);shelfBooks.position.set(-5.72,bookshelf.position.y+bookshelf.geometry.boundingBox.max.y,-4.25);
   shelfBooks.scale.set(1/.84,1/.62,1/.84);room.add(shelfBooks);
@@ -479,7 +529,7 @@ function createSuite() {
   window.addEventListener('pagehide',()=>languageFlip.settle());
   window.addEventListener('suite-startup-unavailable',()=>languageFlip.disable());
   // Optional local review instrumentation, absent from normal visits.
-  if(new URLSearchParams(location.search).has('arm-debug'))window.armDemoDebug={controls:{languageFace,languageBack,languagePanel,languageFlip},demo:armDemo,robot:deskAssets.robot,camera,renderer,scene,obstacles:{keyboard:deskAssets.keyboard,coffee:deskAssets.mug,monitor:deskAssets.monitor,terminal:deskAssets.terminal,mouse:mouseGroup,lamp:room.children.filter(m=>m.isMesh&&[lampBase,lampStem,warm].includes(m.material))},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,rigCalls:deskAssets.robot.armRig.drawCalls})};
+  if(new URLSearchParams(location.search).has('arm-debug'))window.armDemoDebug={controls:{languageFace,languageBack,languagePanel,languageFlip},demo:armDemo,robot:deskAssets.robot,camera,renderer,scene,obstacles:{keyboard:deskAssets.keyboard,coffee:deskAssets.mug,monitor:deskAssets.monitor,terminal:deskAssets.terminal,mouse:mouseGroup,notepad,lamp:room.children.filter(m=>m.isMesh&&[lampBase,lampStem,warm].includes(m.material))},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,rigCalls:deskAssets.robot.armRig.drawCalls})};
   resize();
   const projected=new THREE.Vector3();
   const cabinInteractions=createCabinInteractions(THREE,{scene,camera,canvas,viewport:()=>({width,height}),inactive:()=>entry.active||objectFocus.active,
@@ -495,6 +545,7 @@ function createSuite() {
     // Earth samples UTC; local environmental motion uses a suspendable clock.
     // Opaque reading panels freeze the background; user-driven camera motion stays live.
     if(!paused&&!reading&&ms-lastSceneFrame>=1000/quality.fps){orbit.setTime(Date.now(),ms);needsRender=true;}
+    if(!paused&&!reading&&!entry.active){const next=Math.floor(ms/800);if(next!==liveTick){liveTick=next;for(const t of liveScreens)t.userData.redraw();needsRender=true;}}
     if(needsRender){if((armDemo?.moving||languageFlip.moving)&&lastArmShadow!==-Infinity&&ms-lastArmShadow<1000/(quality.constrained||quality.compact?10:15))scene.traverse(light=>{if(light.isLight&&light.shadow)light.shadow.needsUpdate=false;});else if(renderer.shadowMap.needsUpdate)lastArmShadow=ms;lastSceneFrame=ms;orbit.update(camera);orbitalView.render(renderer,camera);cabinInteractions.layout();needsRender=false;}
     if((!paused&&!reading)||entry.active||transit.active||objectFocus.moving||armDemo?.moving||languageFlip.moving||needsRender)requestFrame();
   }

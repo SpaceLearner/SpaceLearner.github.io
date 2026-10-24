@@ -6,7 +6,7 @@ export function createCabinInteractions(THREE,{scene,camera,canvas,viewport,inac
   function visible(point,id){
     const key=[...camera.position.toArray(),...point.toArray()].map(n=>n.toFixed(4)).join(',');
     const cached=visibilityCache.get(id);if(cached?.key===key)return cached.value;
-    const distance=point.distanceTo(camera.position);direction.copy(point).sub(camera.position).normalize();ray.set(camera.position,direction);ray.far=Math.max(0,distance-.012);
+    const distance=point.distanceTo(camera.position);direction.copy(point).sub(camera.position).normalize();ray.set(camera.position,direction);ray.camera=camera;ray.far=Math.max(0,distance-.012);
     const hits=ray.intersectObjects(scene.children,true).filter(hit=>{let o=hit.object;for(let p=o;p;p=p.parent)if(!p.visible)return false;const material=o.material;return !Array.isArray(material)&&!material?.transparent;});
     const value=!hits.length||hits[0].object.userData.panel===id;visibilityCache.set(id,{key,value});return value;
   }

@@ -81,8 +81,8 @@ export function createKeyboard(THREE,materials) {
     const capParts=[];
     legends.forEach((k,i)=>{
       const col=i%cells,row=Math.floor(i/cells),px=col*cell,py=row*cell;
-      ctx.fillStyle=k.grey?'#737e7e':'#bcbdb4';ctx.fillRect(px,py,cell,cell);
-      ctx.fillStyle=k.grey?'#e7e8de':'#28302e';
+      ctx.fillStyle=k.grey?'#5a534a':'#d6cdb9';ctx.fillRect(px,py,cell,cell);
+      ctx.fillStyle=k.grey?'#efe6d3':'#2b2824';
       const font=k.label.length===1?38:Math.min(30,Math.max(14,112*.0048/k.w));
       ctx.font=`500 ${font}px Arial, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
       ctx.fillText(k.label,px+64,py+53,100);
@@ -113,8 +113,8 @@ function slab(THREE,w,d,h,r){
 
 export function createMouse(THREE){
   const group=new THREE.Group();group.name='Sculpted ergonomic mouse';group.userData.contactOrigin=true;
-  const shell=new THREE.MeshPhysicalMaterial({color:'#b7b8b2',roughness:.43,metalness:0,clearcoat:.08,clearcoatRoughness:.5});
-  const rubber=new THREE.MeshPhysicalMaterial({color:'#202525',roughness:.86,metalness:0});
+  const shell=new THREE.MeshPhysicalMaterial({color:'#d3cab6',roughness:.45,metalness:0,clearcoat:.08,clearcoatRoughness:.5});
+  const rubber=new THREE.MeshPhysicalMaterial({color:'#25221e',roughness:.86,metalness:0});
   const seam=new THREE.MeshStandardMaterial({color:'#111718',roughness:.78});
   const width=t=>.0355*Math.sqrt(Math.max(0,1-t*t))*(.97+.07*t);
   const height=(u,t)=>.006+.034*Math.pow(Math.max(0,1-t*t),.48)*(1+.18*t)*Math.pow(Math.max(0,1-u*u),.48);
@@ -161,7 +161,7 @@ export function createDeskMat(THREE){
   const dye=data.slice();for(let i=0;i<dye.length;i+=4){const value=245+(dye[i]-222)*.45;dye[i]=dye[i+1]=dye[i+2]=value;}
   const weaveColor=new THREE.DataTexture(dye,128,128);weaveColor.colorSpace=THREE.SRGBColorSpace;weaveColor.wrapS=weaveColor.wrapT=THREE.RepeatWrapping;weaveColor.repeat.copy(weave.repeat);weaveColor.magFilter=THREE.LinearFilter;weaveColor.minFilter=THREE.LinearMipmapLinearFilter;weaveColor.generateMipmaps=true;weaveColor.anisotropy=8;weaveColor.needsUpdate=true;
   const rubber=new THREE.MeshStandardMaterial({color:'#303530',roughness:.96});
-  const cloth=new THREE.MeshPhysicalMaterial({color:'#6b7069',map:weaveColor,roughness:.93,metalness:0,bumpMap:weave,bumpScale:.00022,roughnessMap:weave,sheen:.15,sheenRoughness:.95,sheenColor:'#777c71'});
+  const cloth=new THREE.MeshPhysicalMaterial({color:'#7a6e5e',map:weaveColor,roughness:.93,metalness:0,bumpMap:weave,bumpScale:.00022,roughnessMap:weave,sheen:.15,sheenRoughness:.95,sheenColor:'#777c71'});
   addPart(THREE,group,slab(THREE,w,d,h-.0004,r),rubber,'Flexible rubber mat backing');
   const top=addPart(THREE,group,slab(THREE,w-.0008,d-.0008,.0004,r-.0004),cloth,'Woven fabric mat surface');top.position.y=h-.0004;
   // Give the top a metric planar UV; all fabric maps share its fine weave.
@@ -171,7 +171,7 @@ export function createDeskMat(THREE){
     const a=-Math.PI/2+c*Math.PI/2+j/20*Math.PI/2,x=(c<2?1:-1)*(w/2-r),z=(c===1||c===2?1:-1)*(d/2-r);
     contour.push(new THREE.Vector3(x+Math.cos(a)*(r-.0023),h-.0001,z+Math.sin(a)*(r-.0023)));
   }
-  const path=new THREE.CatmullRomCurve3(contour,true),binding=new THREE.MeshStandardMaterial({color:'#555b52',roughness:.94});
+  const path=new THREE.CatmullRomCurve3(contour,true),binding=new THREE.MeshStandardMaterial({color:'#4b4238',roughness:.94});
   addPart(THREE,group,new THREE.TubeGeometry(path,256,.00045,5,true),binding,'Rolled fabric edge binding');
   const points=path.getSpacedPoints(960),ps=[],ns=[],tex=[];
   for(let i=0;i<points.length-1;i++){
@@ -180,7 +180,7 @@ export function createDeskMat(THREE){
     for(const j of [0,2,1,0,3,2]){const v=corners[j];ps.push(v.x,h+.00011,v.z);ns.push(0,1,0);tex.push(j===0||j===3?0:1,j<2?0:1);}
   }
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(ps,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(ns,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(tex,2));
-  addPart(THREE,group,g,new THREE.MeshStandardMaterial({color:'#757a6e',roughness:.97}),'Fine edge overlock stitches');
+  addPart(THREE,group,g,new THREE.MeshStandardMaterial({color:'#8a7d69',roughness:.97}),'Fine edge overlock stitches');
   const shadowGeo=new THREE.PlaneGeometry(w+.026,d+.026);shadowGeo.rotateX(-Math.PI/2);
   const shadow=addPart(THREE,group,shadowGeo,new THREE.MeshBasicMaterial({color:'#000000',transparent:true,opacity:0,depthWrite:false,toneMapped:false}),'Baked mat to walnut contact shadow');shadow.position.y=.00012;shadow.castShadow=shadow.receiveShadow=false;shadow.userData.contactBake=true;
   group.userData.thickness=h;return group;
