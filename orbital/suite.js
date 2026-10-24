@@ -110,20 +110,20 @@ function createSuite() {
   function lineBetween(a,b,r,material,parent=room){const p=new THREE.Vector3(...a),q=new THREE.Vector3(...b);const m=mesh(new THREE.CylinderGeometry(r,r,p.distanceTo(q),12),material,0,0,0,parent);m.position.copy(p).add(q).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),q.sub(p).normalize());return m;}
   function register(group,id,anchor){group.traverse(m=>{if(m.isMesh){m.userData.panel=id;objects.push(m);}});anchors[id]=new THREE.Vector3(...anchor);}
   function texture(draw,w=1024,h=512){const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d'),fill=ctx.fillText.bind(ctx);let hasText=false;ctx.fillText=(value,...args)=>{hasText=true;fill(window.suiteI18n?.t(value)||value,...args);};draw(ctx,w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;if(hasText)window.addEventListener('suite-language-change',()=>{ctx.clearRect(0,0,w,h);draw(ctx,w,h);t.needsUpdate=true;window.dispatchEvent(new Event('suite-texture-ready'));});return t;}
-  function screenTexture(title,subtitle,lines){return texture((c,w,h)=>{const bg=c.createLinearGradient(0,0,w,h);bg.addColorStop(0,'#252c2d');bg.addColorStop(1,'#101617');c.fillStyle=bg;c.fillRect(0,0,w,h);c.fillStyle='#d2bc91';c.font='18px monospace';c.fillText('JIAYAN GUO / ORBITAL RESEARCH',48,54);c.strokeStyle='#5c8898';c.lineWidth=2;c.beginPath();c.moveTo(48,78);c.lineTo(w-48,78);c.stroke();c.fillStyle='#eae5d1';c.font='52px Georgia';c.fillText(title,48,161);c.fillStyle='#b1b7b3';c.font='19px monospace';c.fillText(subtitle,50,205);lines.forEach((t,i)=>{c.fillStyle=i%2?'#9eb4b9':'#d2d3b8';c.font='22px monospace';c.fillText(t,50,290+i*53);});c.strokeStyle='#73c2cc';c.globalAlpha=.5;for(let i=0;i<3;i++){c.beginPath();c.ellipse(790,340,106,35+i*20,-.5,0,Math.PI*2);c.stroke();}c.globalAlpha=1;});}
+  function screenTexture(title,subtitle,lines){return texture((c,w,h)=>{const bg=c.createLinearGradient(0,0,w,h);bg.addColorStop(0,'#25221d');bg.addColorStop(1,'#12100d');c.fillStyle=bg;c.fillRect(0,0,w,h);c.fillStyle='#d9bb86';c.font='18px monospace';c.fillText('JIAYAN GUO / ORBITAL RESEARCH',48,54);c.strokeStyle='#8a6a3c';c.lineWidth=2;c.beginPath();c.moveTo(48,78);c.lineTo(w-48,78);c.stroke();c.fillStyle='#efe9dc';c.font='52px Georgia';c.fillText(title,48,161);c.fillStyle='#b3aa9b';c.font='19px monospace';c.fillText(subtitle,50,205);lines.forEach((t,i)=>{c.fillStyle=i%2?'#b3aa9b':'#ece6da';c.font='22px monospace';c.fillText(t,50,290+i*53);});c.strokeStyle='#8fb4d9';c.globalAlpha=.5;for(let i=0;i<3;i++){c.beginPath();c.ellipse(790,340,106,35+i*20,-.5,0,Math.PI*2);c.stroke();}c.globalAlpha=1;});}
   function panel(w,h,x,y,z,t,parent){const m=mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:t}),x,y,z,parent);m.castShadow=false;return m;}
   const publicationList=document.getElementById('papers').content.querySelector('.publications');
   const publicationCount=publicationList.children.length,publicationYears=publicationList.dataset.years||'2022 — 2026';
   function desktopTexture(projects=false){return texture((c,w,h)=>{
-    c.fillStyle='#171c20';c.fillRect(0,0,w,h);c.fillStyle='#23292e';c.fillRect(0,0,w,36);
+    c.fillStyle='#14120f';c.fillRect(0,0,w,h);c.fillStyle='#1e1c19';c.fillRect(0,0,w,36);
     for(let i=0;i<3;i++){c.beginPath();c.arc(20+i*17,18,4,0,Math.PI*2);c.fillStyle=['#a07b72','#aa9974','#7f9286'][i];c.fill();}
-    c.fillStyle='#a1a9ad';c.font='12px Arial';c.fillText('JIAYAN GUO  /  RESEARCH DESKTOP',390,23);
-    c.fillStyle='#1c2226';c.fillRect(0,36,177,h-36);c.fillStyle='#d5c6a9';c.font='bold 20px Georgia';c.fillText('JG /',25,89);
-    ['Overview','Research','Projects','Publications'].forEach((label,i)=>{c.fillStyle=(projects?i===2:i===0)?'#343b3e':'#1c2226';c.fillRect(14,123+i*47,148,34);c.fillStyle=(projects?i===2:i===0)?'#ece5d5':'#8c979b';c.font='15px Arial';c.fillText(label,27,145+i*47);});
-    c.fillStyle='#899591';c.font='12px monospace';c.fillText('PERSONAL WORKSPACE',211,85);c.fillStyle='#e7e3d9';c.font='46px Georgia';c.fillText(projects?'Selected research':'Jiayan Guo',209,151);
+    c.fillStyle='#8c8476';c.font='12px Arial';c.fillText('JIAYAN GUO  /  RESEARCH DESKTOP',390,23);
+    c.fillStyle='#191714';c.fillRect(0,36,177,h-36);c.fillStyle='#d9bb86';c.font='bold 20px Georgia';c.fillText('JG /',25,89);
+    ['Overview','Research','Projects','Publications'].forEach((label,i)=>{c.fillStyle=(projects?i===2:i===0)?'#2e2a24':'#191714';c.fillRect(14,123+i*47,148,34);c.fillStyle=(projects?i===2:i===0)?'#efe9dc':'#8c8476';c.font='15px Arial';c.fillText(label,27,145+i*47);});
+    c.fillStyle='#8c8476';c.font='12px monospace';c.fillText('PERSONAL WORKSPACE',211,85);c.fillStyle='#efe9dc';c.font='46px Georgia';c.fillText(projects?'Selected research':'Jiayan Guo',209,151);
     const cards=projects?[['ZeroSearch','Search agents / reinforcement learning'],['RynnBrain','Embodied foundation models'],['WorldVLA · RynnVLA','Vision, language and action']]:[['01 / Agentic search and tool use','Query, read, reason, act on evidence'],['02 / Embodied agents','From what an agent sees to what it does'],['Research archive',publicationCount+' public records / '+publicationYears]];
-    cards.forEach(([title,caption],i)=>{const y=231+i*99;c.fillStyle='#20272b';c.fillRect(209,y,775,83);c.strokeStyle='#3a4447';c.strokeRect(209,y,775,83);c.fillStyle='#d6c6a7';c.font='23px Georgia';c.fillText(title,231,y+32);c.fillStyle='#98a4a7';c.font='16px Arial';c.fillText(caption,231,y+59);c.fillStyle='#b9c4be';c.font='19px Arial';c.fillText('↗',945,y+44);});
-    c.fillStyle='#707e82';c.font='11px monospace';c.fillText('SELECT THE SCREEN TO READ',212,554);
+    cards.forEach(([title,caption],i)=>{const y=231+i*99;c.fillStyle='#1e1c19';c.fillRect(209,y,775,83);c.strokeStyle='#3a3328';c.strokeRect(209,y,775,83);c.fillStyle='#d9bb86';c.font='23px Georgia';c.fillText(title,231,y+32);c.fillStyle='#a39a8b';c.font='16px Arial';c.fillText(caption,231,y+59);c.fillStyle='#d9bb86';c.font='19px Arial';c.fillText('↗',945,y+44);});
+    c.fillStyle='#7a7265';c.font='11px monospace';c.fillText('SELECT THE SCREEN TO READ',212,554);
   },1024,576);}
 
   const cabin=createCabinArchitecture(THREE,{walnut,metalBump:bronze.bumpMap,metalRoughness:bronze.roughnessMap});room.add(cabin);
@@ -177,7 +177,7 @@ function createSuite() {
   // Independent physical language placard beside the monitor foot.
   const languagePanel=new THREE.Group();box(.29,.012,.065,0,.006,0,dark,languagePanel);box(.29,.12,.025,0,.066,0,dark,languagePanel);
   // Independent outward-facing textures keep both faces readable, never mirrored.
-  const languageTexture=label=>texture((c,w,h)=>{c.fillStyle='#202621';c.fillRect(0,0,w,h);c.fillStyle='#d5cbb4';c.font='64px Arial';c.textAlign='center';c.fillText(label,w/2,h*.68);},256,128);
+  const languageTexture=label=>texture((c,w,h)=>{c.fillStyle='#1e1c19';c.fillRect(0,0,w,h);c.fillStyle='#d9bb86';c.font='64px Arial';c.textAlign='center';c.fillText(label,w/2,h*.68);},256,128);
   const languageFace=panel(.27,.10,0,.066,.013,languageTexture('EN'),languagePanel);
   const languageBack=panel(.27,.10,0,.066,-.013,languageTexture('中'),languagePanel);languageBack.rotation.y=Math.PI;
   placeDeskAsset(languagePanel,-2.7,deskTop,-1.45,1,-.08);

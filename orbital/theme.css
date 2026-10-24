@@ -1,0 +1,86 @@
+/* One palette, one rule: the cabin is warm, space is cold.
+   Loaded last; overrides earlier files by role rather than editing each one.
+   Brass is the only brand accent. Signal blue is reserved for the outside view. */
+:root{
+  --space:#070b10;--graphite:#1e1c19;--graphite-2:#2a2723;--edge:#b8955f40;
+  --brass:#b8955f;--brass-hi:#d9bb86;--paper:#efe9dc;--ink:#23211d;--ink-2:#5e574c;
+  --signal:#8fb4d9;--on-dark:#ece6da;--on-dark-2:#b3aa9b;
+}
+body[data-startup]{--control-surface:var(--graphite);--control-edge:var(--edge);--control-text:var(--on-dark);--control-muted:var(--on-dark-2);--control-mark:var(--brass)}
+body,.suite{background:var(--space)}
+
+/* Cinematic vignette: pulls the eye to the desk. CSS only, never touches WebGL. */
+.suite::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(120% 95% at 50% 46%,transparent 58%,#07060599 100%)}
+body[data-object-focus="reading"] .suite::after{opacity:0}
+
+/* Startup console: deep space, brass instruments. */
+#scene-load.scene-load{background:radial-gradient(120% 80% at 50% 115%,#14202b 0%,var(--space) 62%);color:var(--on-dark)}
+.startup-eyebrow,#scene-load #scene-load-detail,#scene-load #scene-load-help{color:var(--on-dark-2)}
+.startup-mark{border-color:#3a3328}.startup-mark i{border-color:#2a251e}
+.startup-mark b,.startup-mark:before{color:var(--brass-hi);background:var(--brass)}.startup-mark b{background:none}
+.startup-mark:after{background:#5d5140}
+#scene-load progress{background:#26221c}
+#scene-load progress::-webkit-progress-bar{background:#26221c}
+#scene-load progress::-webkit-progress-value{background:var(--brass)}
+#scene-load progress::-moz-progress-bar{background:var(--brass)}
+.startup-steps li{border-bottom-color:#26221c;color:#7f7668}
+.startup-steps [data-state="active"],.startup-steps [data-state="active"] span,.startup-steps [data-state="complete"]:after{color:var(--brass-hi)}
+.startup-steps [data-state="complete"]{color:var(--on-dark-2)}
+#scene-load :focus-visible{outline-color:var(--brass)}
+
+/* Controls, navigation, labels: warm graphite like the cabin hardware. */
+.top{background:linear-gradient(#0d0b09c8,#0d0b0966 62%,transparent)}
+.brand{color:var(--on-dark)}
+.top nav a:hover,.top nav a[aria-current="page"]{color:#fff}
+.vista-picker,.view-controls,.ready .view-controls,#arm-demo-controls,.entry-controls,.cabin-menu-panel,
+body[data-startup] .language-dock:has(.language-switch),#scene-language .language-switch{background:linear-gradient(var(--graphite-2),var(--graphite));border-color:var(--edge);color:var(--on-dark)}
+.vista-options{background:var(--graphite);border-color:var(--edge)}
+.vista-options button.is-active,.vista-options button:hover,.view-controls button:hover,.view-controls button.active:hover,
+#arm-demo-controls button:hover:not(:disabled),.entry-controls button:hover{background:#b8955f1c}
+.vista-options button[aria-selected="true"]{color:var(--brass-hi)}
+.vista-chevron{border-color:var(--brass)}
+#vista-select{color:var(--on-dark)}
+.hotspots button::before,.ready .hotspots button::before{background:#16130fe8;border-color:#b8955f40;color:var(--on-dark)}
+.hotspots button::after{border-color:#d9bb86aa;background:#1e1c1980}
+.hotspots button.object-hover::after,.hotspots button:hover::after,.hotspots button:focus-visible::after{box-shadow:0 0 10px #d9bb8640}
+#sheet[data-object]:not([data-object=""]) .focus-toolbar button,body[data-startup] .focus-toolbar .language-switch{background:var(--graphite);border-color:var(--edge);color:var(--on-dark)}
+.fallback{background:#1a1714f2;border-color:var(--edge)}
+.fallback button{border-color:var(--edge);color:var(--on-dark);background:#b8955f0d}
+/* Signal blue only where the outside world is involved. */
+body.jumping .vista-picker{border-color:#8fb4d966;box-shadow:0 0 0 1px #8fb4d933,0 0 18px #8fb4d922}
+#vista-caption{color:var(--signal)}
+/* One focus colour everywhere. */
+:focus-visible,.top :focus-visible,.hotspots button:focus-visible,.view-controls button:focus-visible,#vista-select:focus-visible,.vista-options button:focus-visible,
+#arm-demo-controls button:focus-visible,body[data-startup] .language-switch button:focus-visible,#language-flip:focus-visible{outline-color:var(--brass-hi)}
+
+/* Reading surfaces. Paper for the notebook and plain reading; the monitor is a
+   warm-black display under the desk lamp, not a teal terminal. */
+dialog,#sheet{background:var(--paper);color:var(--ink)}
+.sheet-kicker{color:#7d5f33}
+.sheet-body a,.image-tools button,.image-tools a,.figure-open{color:#7a5a2c}
+.sheet-body a{text-decoration-color:#b8955f80}
+.sheet-head h2,.sheet-body h3,.image-head h2{color:var(--ink)}
+.sheet-body .en,.project .role,.timeline span,.note,.publications small{color:var(--ink-2)}
+.publications a{color:var(--ink);text-decoration-color:#b8955f80}
+.publications li::marker{color:#a08560}
+#sheet .close,.image-close{border-color:#b8955f80;color:var(--ink-2)}
+.sheet-body :focus-visible,.close:focus-visible,.image-viewer :focus-visible{outline-color:#7d5f33}
+.news-papers summary{color:#7a5a2c}.news-papers a{color:var(--ink)}
+.news-entry time{color:var(--ink-2)}
+.notebook-tabs button{color:var(--ink-2);border-color:#b8955f66}
+.notebook-tabs button[aria-pressed="true"]{background:#e3d8c2;color:var(--ink);border-color:var(--brass);box-shadow:none}
+#sheet[data-object="notebook"]{border-left-color:#3b2f22}
+#sheet[data-object="monitor"],#sheet[data-object="monitor"]:not([data-object=""]),
+#sheet[data-object="terminal"],#sheet[data-object="terminal"]:not([data-object=""]){background:linear-gradient(160deg,#1d1a16,#141210);color:var(--on-dark);border-color:#3a3328}
+#sheet[data-object="monitor"] .sheet-head,#sheet[data-object="monitor"] .rule,#sheet[data-object="monitor"] .focus-toolbar{border-color:#3a3328}
+#sheet[data-object="monitor"] .sheet-head h2,#sheet[data-object="monitor"] .sheet-body h3,
+#sheet[data-object="terminal"] h3{color:#f3ede1}
+#sheet[data-object="monitor"] a,#sheet[data-object="terminal"] a{color:var(--brass-hi);text-decoration-color:#d9bb8666}
+#sheet[data-object="monitor"] .sheet-kicker,#sheet[data-object="monitor"] .timeline span,#sheet[data-object="monitor"] .note,
+#sheet[data-object="terminal"] .en,#sheet[data-object="terminal"] .role{color:var(--on-dark-2)}
+#sheet[data-object="monitor"] .sheet-body,#sheet[data-object="terminal"] .sheet-body{scrollbar-color:#5d5140 transparent}
+#sheet[data-object="monitor"] :focus-visible,#sheet[data-object="terminal"] :focus-visible{outline-color:var(--brass-hi)}
+.sheet-body{scrollbar-color:#b8955f99 transparent}
+.image-viewer{background:var(--paper)}
+.image-viewer::backdrop{background:#0a0806d9}
+.image-tools button{background:#e3d8c2;border-color:#b8955f80}

@@ -1,12 +1,12 @@
 /* Jiayan Guo: a single-column research page set like a well-made book.
    System fonts only; one ink, one accent, one hairline. */
 :root {
-  --paper: #f7f5ef;
-  --ink: #1c211f;
-  --text: #3d433f;
-  --muted: #6e726b;
-  --accent: #8e3b28;
-  --line: #dcd8cc;
+  --paper: #efe9dc;
+  --ink: #23211d;
+  --text: #3f3a33;
+  --muted: #6e675b;
+  --accent: #7d5f33;
+  --line: #d9cfbd;
   --serif: "Iowan Old Style", "Palatino Linotype", Charter, "Source Serif Pro", Georgia, "Songti SC", serif;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
   --measure: 38rem;
@@ -24,7 +24,7 @@ img { max-width: 100%; height: auto; display: block; }
 button { font: inherit; color: inherit; cursor: pointer; }
 ol, ul { margin: 0; padding: 0; list-style: none; }
 [hidden] { display: none !important; }
-::selection { background: #ead6cb; color: var(--ink); }
+::selection { background: #e3cfa6; color: var(--ink); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 1px; }
 
 .wrap { width: 100%; max-width: 1120px; margin-inline: auto; padding-inline: max(28px, env(safe-area-inset-left)) max(28px, env(safe-area-inset-right)); }
@@ -182,3 +182,13 @@ ol, ul { margin: 0; padding: 0; list-style: none; }
   .paper-list .paper { display: block !important; }
   .paper-list .paper-year { display: grid !important; }
 }
+
+/* Same house as the cabin: a deep-space running head with a brass mark. */
+.header { background: #070b10e6; color: #ece6da; border-bottom: 1px solid #b8955f33; }
+.wordmark { color: #ece6da; }
+.wordmark::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 12px; vertical-align: .18em; border-radius: 50%; background: #b8955f; box-shadow: 0 0 0 3px #b8955f22; }
+.header nav a, .cabin-link { color: #b3aa9b; }
+.header nav a:hover, .header nav a[aria-current] { color: #ece6da; }
+.header nav a[aria-current] { box-shadow: inset 0 -1px #d9bb86; }
+.cabin-link:hover { color: #d9bb86; }
+.header :focus-visible { outline-color: #d9bb86; }
