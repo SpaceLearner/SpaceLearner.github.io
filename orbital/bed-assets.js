@@ -1,4 +1,4 @@
-import { textureAsset } from './asset-profile.js?v=a67911eab6f13824';
+import { textureAsset } from './asset-profile.js?v=a98e02f4cf20485c';
 import { RoundedBoxGeometry } from './vendor/DeskRoundedBoxGeometry.js';
 
 // The existing walnut platform, oatmeal headboard and greige foot throw remain.

@@ -1,21 +1,21 @@
-import { textureAsset } from './asset-profile.js?v=a67911eab6f13824';
-import { quality } from './quality-profile.js?v=72ab348954d7850d';
+import { textureAsset } from './asset-profile.js?v=a98e02f4cf20485c';
+import { quality } from './quality-profile.js?v=6d5253d0af09c6de';
 import * as THREE from './vendor/three.module.min.js';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
 import { RectAreaLightUniformsLib } from './vendor/RectAreaLightUniformsLib.js';
-import { createDeskAssets } from './desk-assets.js?v=5a81780ab8b25ade';
+import { createDeskAssets } from './desk-assets.js?v=836cb6fe27a3f82b';
 import { createMouse, createDeskMat } from './desk-inputs.js?v=7979d33756ad1ab8';
-import { applyInputBake } from './input-lightmap.js?v=6cc46599476c0c1b';
-import { applyMugBake } from './coffee-mug.js?v=3b18c44ab7a38c04';
+import { applyInputBake } from './input-lightmap.js?v=5f53d0b4f92c1970';
+import { applyMugBake } from './coffee-mug.js?v=3ce9d4bcd729f67b';
 import { createShelfBooks } from './book-assets.js?v=3a17e0c9ea70dfa8';
-import { createBed, applyBedBake } from './bed-assets.js?v=fd218e1f2e52272a';
+import { createBed, applyBedBake } from './bed-assets.js?v=2091167704043bd4';
 import { createCabinArchitecture } from './cabin-architecture.js?v=9e44c4e9e4da1bf9';
-import { applyCabinBake } from './cabin-lightmap.js?v=15f447780e7e70d1';
+import { applyCabinBake } from './cabin-lightmap.js?v=ba37249aee255bbe';
 import { createOrbitalBackground } from './orbit-background.js?v=f1413e0b9d82c157';
 import { createEntryHatch } from './entry-hatch.js?v=fbffef56921dcdef';
 import { createEntryFlight, createEntryPlayback } from './entry-flight.js?v=95e58690863af5a6';
 import { createVistaTransit } from './vista-transit.js?v=b6d66b3c8e4010ae';
-import { createOrbitalView } from './orbital-view.js?v=1f10bc5f8f4013ff';
+import { createOrbitalView } from './orbital-view.js?v=950d629314de7084';
 import { createVistaPicker } from './vista-picker.js?v=95c6230009bde26e';
 import { createVistaLighting } from './vista-lighting.js?v=14263e296f7c4b3f';
 import { createSurfaceReading } from './surface-reading.js?v=2cd67a956bc741a4';
@@ -62,7 +62,6 @@ function showFallback(message) {
 try {
   renderer = new THREE.WebGLRenderer({canvas, antialias: true, alpha: false, powerPreference:'high-performance'});
   renderer.setPixelRatio(quality.pixelRatio(innerWidth,innerHeight));
-  renderer.transmissionResolutionScale=quality.compact?.5:.75;
   document.body.dataset.quality=quality.textureTier;
   renderer.setSize(innerWidth, canvas.parentElement.clientHeight, false);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -237,7 +236,7 @@ function createSuite() {
   // A shielded task light: only the downward cone illuminates the work surface.
   const lampLight=new THREE.SpotLight('#ffd3a0',1.05,2.4,Math.PI/3.1,.78,2);
   lampLight.position.set(-4.96,2.21,-1.96);lampLight.target.position.set(-4.55,1.44,-1.3);
-  lampLight.castShadow=true;lampLight.shadow.mapSize.set(1024,1024);
+  lampLight.castShadow=true;lampLight.shadow.mapSize.setScalar(quality.compact||quality.constrained?512:1024);
   lampLight.shadow.camera.near=.08;lampLight.shadow.camera.far=3;
   lampLight.shadow.bias=-.00008;lampLight.shadow.normalBias=.0015;
   room.add(lampLight,lampLight.target);
@@ -259,8 +258,8 @@ function createSuite() {
   // Clear iced coffee at the approved cup position; the glass retains real wall thickness.
   placeDeskAsset(deskAssets.mug,-2.5,1.468,-1.9,1.15,-.4);
   track('cup',applyMugBake(THREE,deskAssets.mug)).then(result=>{document.body.dataset.mugBake=String(result.count);window.dispatchEvent(new Event('suite-texture-ready'));}).catch(error=>{document.body.dataset.mugBake='unavailable';console.warn('Cup detail lighting unavailable:',error);});
-  // Leather notepad and pen sit right of the mouse, angled toward the seat; the left keeps the lamp and arm clear.
-  const notepad=new THREE.Group();notepad.position.set(-1.72,0,-1.12);notepad.rotation.y=-.22;room.add(notepad);
+  // Leather notepad and pen sit at the far right of the desk, beyond the research notebook, angled toward the seat.
+  const notepad=new THREE.Group();notepad.position.set(-1.19,0,-1.31);notepad.rotation.y=-.32;room.add(notepad);
   round(.38,.035,.48,0,1.47,0,leather,.014,notepad);
   for(let i=0;i<4;i++)box(.35,.002,.44,0,1.47+i*.004,0,paper,notepad);
   lineBetween([-.09,1.495,.18],[.09,1.495,-.18],.007,bronze,notepad);sphere(.009,.09,1.495,-.18,black,notepad);
@@ -312,6 +311,10 @@ function createSuite() {
   // Correct architectural proportions: human-scale ceiling and furniture heights.
   room.scale.set(.84,.62,.84);
   for(const anchor of Object.values(anchors))anchor.multiply(room.scale);
+  // Sub-centimetre parts (screws, wheel ribs, LEDs) are below a shadow-map texel;
+  // skipping them saves shadow draw calls with no visible change. The arm keeps its own.
+  room.updateMatrixWorld(true);const casterScale=new THREE.Vector3();
+  room.traverse(o=>{if(!o.isMesh||!o.castShadow)return;for(let p=o;p;p=p.parent)if(p===deskAssets.robot)return;o.geometry.computeBoundingSphere();o.getWorldScale(casterScale);if(o.geometry.boundingSphere.radius*Math.max(casterScale.x,casterScale.y,casterScale.z)<.012)o.castShadow=false;});
 
   // An open celestial field, with a smaller depth-tested Earth near the window edge.
   // At this apparent size the 2k maps are sufficient, including on desktop.
@@ -325,7 +328,7 @@ function createSuite() {
   scene.add(new THREE.AmbientLight('#d2cec3',.05));
   const sunlight=new THREE.DirectionalLight('#eee8d9',2.1);
   sunlight.target.position.set(-2.65,1,-1.5);sunlight.position.copy(sunlight.target.position).addScaledVector(sunDirection,14);
-  sunlight.castShadow=true;sunlight.shadow.mapSize.set(2048,2048);
+  sunlight.castShadow=true;sunlight.shadow.mapSize.setScalar(quality.compact||quality.constrained?1024:2048);
   // Concentrate the shadow map on the desktop; millimetre offsets keep feet grounded.
   Object.assign(sunlight.shadow.camera,{left:-3.2,right:3.2,top:3,bottom:-2.5,near:.1,far:28});
   sunlight.shadow.bias=-.00008;sunlight.shadow.normalBias=.002;sunlight.shadow.radius=2;
@@ -335,7 +338,7 @@ function createSuite() {
   const earthKey=new THREE.DirectionalLight('#b9d1e0',.28);earthKey.name='Earthlight through the window';
   earthKey.target.position.set(-2.65,1,-1.5);
   earthKey.position.copy(earthKey.target.position).addScaledVector(orbit.center.clone().sub(earthKey.target.position).normalize(),10);
-  earthKey.castShadow=true;earthKey.shadow.mapSize.set(2048,2048);
+  earthKey.castShadow=true;earthKey.shadow.mapSize.setScalar(quality.compact||quality.constrained?1024:2048);
   Object.assign(earthKey.shadow.camera,{left:-3.2,right:3.2,top:2.5,bottom:-2.5,near:.1,far:15});
   earthKey.shadow.bias=-.00008;earthKey.shadow.normalBias=.001;earthKey.shadow.radius=3;
   scene.add(earthKey,earthKey.target);
@@ -529,11 +532,13 @@ function createSuite() {
   window.addEventListener('pagehide',()=>languageFlip.settle());
   window.addEventListener('suite-startup-unavailable',()=>languageFlip.disable());
   // Optional local review instrumentation, absent from normal visits.
-  if(new URLSearchParams(location.search).has('arm-debug'))window.armDemoDebug={controls:{languageFace,languageBack,languagePanel,languageFlip},demo:armDemo,robot:deskAssets.robot,camera,renderer,scene,obstacles:{keyboard:deskAssets.keyboard,coffee:deskAssets.mug,monitor:deskAssets.monitor,terminal:deskAssets.terminal,mouse:mouseGroup,notepad,lamp:room.children.filter(m=>m.isMesh&&[lampBase,lampStem,warm].includes(m.material))},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,rigCalls:deskAssets.robot.armRig.drawCalls})};
+  if(new URLSearchParams(location.search).has('arm-debug'))window.armDemoDebug={controls:{languageFace,languageBack,languagePanel,languageFlip},demo:armDemo,robot:deskAssets.robot,camera,renderer,scene,obstacles:{keyboard:deskAssets.keyboard,coffee:deskAssets.mug,monitor:deskAssets.monitor,terminal:deskAssets.terminal,mouse:mouseGroup,lamp:room.children.filter(m=>m.isMesh&&[lampBase,lampStem,warm].includes(m.material))},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,rigCalls:deskAssets.robot.armRig.drawCalls})};
   resize();
   const projected=new THREE.Vector3();
   const cabinInteractions=createCabinInteractions(THREE,{scene,camera,canvas,viewport:()=>({width,height}),inactive:()=>entry.active||objectFocus.active,
     targets:{monitor:()=>deskAssets.monitorScreen.mesh.getWorldPosition(new THREE.Vector3()),projects:()=>deskAssets.terminalScreen.mesh.getWorldPosition(new THREE.Vector3()),arm:()=>deskAssets.robot.localToWorld(new THREE.Vector3(.03,.25,.09)),papers:()=>notebook.group.localToWorld(new THREE.Vector3(.03,.04,0))},languageFace,languagePanel,languageFlip,changed:invalidate});
+  let lastInput=performance.now();
+  for(const type of ['pointerdown','pointermove','keydown','wheel','touchstart'])window.addEventListener(type,()=>{const wasIdle=performance.now()-lastInput>60000;lastInput=performance.now();if(wasIdle)requestFrame();},{passive:true});
   function render(ms){
     frameRequest=0;
     if(!viewAvailable||document.hidden)return;
@@ -544,7 +549,11 @@ function createSuite() {
     if(ms-lastSceneFrame>=1000/quality.fps)armDemo?.tick(ms);
     // Earth samples UTC; local environmental motion uses a suspendable clock.
     // Opaque reading panels freeze the background; user-driven camera motion stays live.
-    if(!paused&&!reading&&ms-lastSceneFrame>=1000/quality.fps){orbit.setTime(Date.now(),ms);needsRender=true;}
+    // Interactive motion keeps the full rate; a still scene with only ambient drift uses ambientFps.
+    const interactive=!!gesture||entry.active||transit.active||objectFocus.moving||armDemo?.moving||languageFlip.moving;
+    // After a minute without input the ambient drift drops to 8 fps; any input restores it.
+    const idle=ms-lastInput>60000,ambientRate=idle?8:quality.ambientFps;
+    if(!paused&&!reading&&ms-lastSceneFrame>=1000/(interactive?quality.fps:ambientRate)){orbit.setTime(Date.now(),ms);needsRender=true;}
     if(!paused&&!reading&&!entry.active){const next=Math.floor(ms/800);if(next!==liveTick){liveTick=next;for(const t of liveScreens)t.userData.redraw();needsRender=true;}}
     if(needsRender){if((armDemo?.moving||languageFlip.moving)&&lastArmShadow!==-Infinity&&ms-lastArmShadow<1000/(quality.constrained||quality.compact?10:15))scene.traverse(light=>{if(light.isLight&&light.shadow)light.shadow.needsUpdate=false;});else if(renderer.shadowMap.needsUpdate)lastArmShadow=ms;lastSceneFrame=ms;orbit.update(camera);orbitalView.render(renderer,camera);cabinInteractions.layout();needsRender=false;}
     if((!paused&&!reading)||entry.active||transit.active||objectFocus.moving||armDemo?.moving||languageFlip.moving||needsRender)requestFrame();

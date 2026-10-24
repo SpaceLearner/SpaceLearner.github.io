@@ -1,5 +1,5 @@
 // Select once at startup: rotating the device never downloads a second atlas.
-import { quality } from './quality-profile.js?v=72ab348954d7850d';
+import { quality } from './quality-profile.js?v=6d5253d0af09c6de';
 const compact=quality.textureTier==='compact';
 const variants=new Map([
   ['irradiance-rgbm.webp','irradiance-rgbm.webp'],

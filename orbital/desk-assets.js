@@ -1,5 +1,5 @@
 import {createKeyboard} from './desk-inputs.js?v=7979d33756ad1ab8';
-import {createCoffeeMug} from './coffee-mug.js?v=3b18c44ab7a38c04';
+import {createCoffeeMug} from './coffee-mug.js?v=3ce9d4bcd729f67b';
 import {createResearchArm} from './research-arm.js?v=4595f80e5861bbed';
 import { RoundedBoxGeometry } from './vendor/DeskRoundedBoxGeometry.js';
 

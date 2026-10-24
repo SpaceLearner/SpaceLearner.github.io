@@ -5,9 +5,10 @@ import {RoundedBoxGeometry} from './vendor/DeskRoundedBoxGeometry.js';
 export function createCoffeeMug(THREE){
   const mug=new THREE.Group();mug.name='Glass of iced coffee';
   Object.assign(mug.userData,{units:'metres',contactOrigin:true,capacityML:280,drink:'iced coffee',wallThickness:.002,baseThickness:.007});
-  const glass=new THREE.MeshPhysicalMaterial({color:'#ffffff',roughness:.085,metalness:0,transmission:.98,thickness:.002,ior:1.5,attenuationColor:'#f4fbf8',attenuationDistance:.35,transparent:true,opacity:.76,depthWrite:false,envMapIntensity:.9});
+  // No transmission: it would re-render the whole scene each frame for a few-centimetre cup.
+  const glass=new THREE.MeshPhysicalMaterial({color:'#eef6f3',roughness:.06,metalness:0,ior:1.5,clearcoat:1,clearcoatRoughness:.04,specularIntensity:1,transparent:true,opacity:.22,depthWrite:false,envMapIntensity:1.6,side:THREE.DoubleSide});
   const coffeeMaterial=new THREE.MeshPhysicalMaterial({color:'#27150b',roughness:.18,metalness:0,ior:1.333,specularIntensity:.8,envMapIntensity:.75});
-  const iceMaterial=new THREE.MeshPhysicalMaterial({color:'#ffffff',roughness:.055,metalness:0,transmission:.94,thickness:.021,ior:1.31,attenuationColor:'#d8e8e4',attenuationDistance:.3,envMapIntensity:1.9,depthWrite:false});
+  const iceMaterial=new THREE.MeshPhysicalMaterial({color:'#e6f1ee',roughness:.08,metalness:0,ior:1.31,clearcoat:1,clearcoatRoughness:.06,transparent:true,opacity:.5,envMapIntensity:1.9,depthWrite:false});
   function mesh(geometry,material,name){const m=new THREE.Mesh(geometry,material);m.name=name;m.receiveShadow=true;mug.add(m);return m;}
   const profile=[[0,0],[.028,0],[.030,0.0003],[.0314,.001],[.0322,.0023],[.0326,.004],[.033,.009],[.034,.026],[.0357,.050],[.0375,.074],[.039,.096]];
   for(let i=1;i<=16;i++){const a=i*Math.PI/16;profile.push([.038+.001*Math.cos(a),.096+.001*Math.sin(a)]);}
@@ -47,8 +48,8 @@ export function createCoffeeMug(THREE){
   return mug;
 }
 
-// Only the contact decal is baked. Glass and ice retain live transmission and
-// reflections; no opaque diffuse lightmap is applied to transparent surfaces.
+// Only the contact decal is baked. Glass and ice keep live reflections (alpha glass,
+// no transmission pass); no opaque diffuse lightmap is applied to transparent surfaces.
 export async function applyMugBake(THREE,mug){
   const texture=await new THREE.TextureLoader().loadAsync(new URL('./iced-coffee/contact.png',import.meta.url).href);texture.colorSpace=THREE.NoColorSpace;
   const shadow=mug.getObjectByName('Glass base contact shadow');shadow.material.alphaMap=texture;shadow.material.opacity=.50;shadow.material.needsUpdate=true;return {count:1};

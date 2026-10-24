@@ -1,4 +1,4 @@
-import { textureAsset } from './asset-profile.js?v=a67911eab6f13824';
+import { textureAsset } from './asset-profile.js?v=a98e02f4cf20485c';
 import { batchArchitecture } from './static-batch.js?v=80a918055dedda24';
 // Cycles diffuse lighting uses a separate UV atlas; live lighting still supplies
 // the view-dependent metal/clearcoat reflections. RGBM keeps the lightmap linear.

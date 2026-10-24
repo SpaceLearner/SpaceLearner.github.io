@@ -8,6 +8,8 @@ const constrained = !!navigator.connection?.saveData ||
 export const quality = Object.freeze({
   compact, constrained, textureTier: compact || constrained ? 'compact' : 'full',
   fps: compact || constrained ? 30 : 60,
+  // Ambient-only frames (Earth, station, clouds) move slowly; render them less often.
+  ambientFps: compact || constrained ? 20 : 30,
   skyPixels: compact || constrained ? 800000 : 1600000,
   pixelRatio(width, height, entering = false) {
     const cap = constrained ? 1.25 : compact ? 1.6 : entering ? 1.5 : 1.7;
