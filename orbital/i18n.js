@@ -1,5 +1,9 @@
 // English remains the source of truth; only explicitly catalogued UI and prose are localized.
 const zh={
+  "Across both, I focus on how agents learn from interaction feedback rather than static demonstrations, and how they organize tools and multi-step workflows. The same view applies to decision-making agents in real markets: generative auto-bidding (KDD 2024) plans a whole bidding trajectory at once and was tested online on Alibaba's advertising platform. The long-term goal is agents that carry out long-horizon tasks reliably in complex environments.": "在这两条主线上，我关注智能体如何从交互反馈而非静态示范中学习，以及如何组织工具与多步骤工作流。同样的思路也适用于真实市场中的决策智能体：生成式自动竞价（KDD 2024）一次性规划整条出价轨迹，并在阿里巴巴广告平台进行了线上测试。长期目标是让智能体在复杂环境中可靠地完成长程任务。",
+  "I previously worked on graph learning and recommender systems.": "此前，我也研究图学习与推荐系统。",
+  "Generative auto-bidding (AIGB): DiffBid treats an advertiser's bidding over a campaign as one trajectory and generates it with a conditional diffusion model, avoiding the error that builds up step by step in Markovian RL. In an online A/B test on Alibaba's advertising platform it raised GMV by 2.81% and ROI by 3.36%.": "生成式自动竞价（AIGB）：DiffBid 将广告主在一次投放周期内的出价视为一条完整轨迹，用条件扩散模型直接生成，避免马尔可夫式强化学习中逐步累积的误差。在阿里巴巴广告平台的线上 A/B 测试中，GMV 提升 2.81%，ROI 提升 3.36%。",
+  "First author · KDD 2024": "第一作者 · KDD 2024",
   "· Research Engineer": "· 研究工程师",
   "· Visiting student": "· 访问学生",
   "Tencent": "腾讯",
@@ -47,8 +51,8 @@ const zh={
   "An action model with a built-in world model: one autoregressive network generates robot actions and predicts the frames they lead to, so the agent anticipates consequences as it acts. It precedes RynnVLA-002; the original repository now redirects there.": "内置世界模型的动作模型：同一个自回归网络既生成机器人动作，也预测动作导致的画面，让智能体在行动时预判后果。它是 RynnVLA-002 的前序工作，原代码仓库现已跳转至后者。",
   "Embodied agents: from perception to action": "具身智能体：从感知到行动",
   "Agentic search and tool use": "智能体搜索与工具使用",
-  ">AGENTIC SEARCH<": "智能体搜索",
-  ">EMBODIED AGENTS<": "具身智能体",
+  "AGENTIC SEARCH": "智能体搜索",
+  "EMBODIED AGENTS": "具身智能体",
   "01 / Agentic search and tool use": "01 / 智能体搜索与工具使用",
   "02 / Embodied agents": "02 / 具身智能体",
   "Query, read, reason, act on evidence": "查询、阅读、推理、依据证据行动",

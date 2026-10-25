@@ -13,8 +13,8 @@
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="canonical" href="https://spacelearner.github.io/classic/">
   <link rel="stylesheet" href="../news.css?v=79864139a38a54be">
-  <link rel="stylesheet" href="styles.css?v=0aa80d0827f371a0">
-  <script src="app.js?v=8704e6fc73e398e6" defer></script>
+  <link rel="stylesheet" href="styles.css?v=57630ece9a645061">
+  <script src="app.js?v=3cb3429e48cc585f" defer></script>
 </head>
 <body>
   <a class="skip" href="#content">Skip to content</a>
@@ -71,13 +71,13 @@
             <p>An embodied agent closes the same loop through a body: perceive, plan, act, and see the consequences. <a href="#project-rynnbrain">RynnBrain</a> provides perception and planning: egocentric grounding in space and time, physical reasoning, and task plans. <a href="#project-worldvla">WorldVLA</a> and the <a href="#project-rynnvla">RynnVLA series</a> turn plans into robot actions and predict what those actions will look like.</p>
           </li>
         </ol>
-        <p>Across both, I focus on how agents learn from interaction feedback rather than static demonstrations, and how they organize tools and multi-step workflows. The long-term goal is agents that carry out long-horizon tasks reliably in complex environments.</p>
-        <p class="aside">Earlier work: generative decision-making, graph learning, and recommender systems.</p>
+        <p>Across both, I focus on how agents learn from interaction feedback rather than static demonstrations, and how they organize tools and multi-step workflows. The same view applies to decision-making agents in real markets: generative auto-bidding (KDD 2024) plans a whole bidding trajectory at once and was tested online on Alibaba's advertising platform. The long-term goal is agents that carry out long-horizon tasks reliably in complex environments.</p>
+        <p class="aside">Earlier work: graph learning and recommender systems.</p>
       </div>
     </section>
 
     <section id="projects" class="section wrap" data-step="act" data-no="02" aria-labelledby="projects-title">
-      <header class="section-head"><p class="step"><span class="step-no">02</span><span class="step-type">act</span><span class="step-count">6 projects</span></p><h2 id="projects-title">Selected work</h2></header>
+      <header class="section-head"><p class="step"><span class="step-no">02</span><span class="step-type">act</span><span class="step-count">7 projects</span></p><h2 id="projects-title">Selected work</h2></header>
       <div class="section-body">
         <p class="group-label"><span>I</span>Agentic search and tool use</p>
         <article class="work work--figure" aria-labelledby="project-zerosearch">
@@ -123,6 +123,11 @@
         </div>
 
         <p class="group-label"><span>—</span>Earlier work</p>
+        <article class="work work--compact" aria-labelledby="project-aigb">
+          <h3 id="project-aigb">AIGB / DiffBid</h3>
+          <p class="work-role">First author · KDD 2024</p>
+          <p>DiffBid treats an advertiser's bidding over a campaign as one trajectory and generates it with a conditional diffusion model, avoiding the error that builds up step by step in Markovian RL. In an online A/B test on Alibaba's advertising platform it raised GMV by 2.81% and ROI by 3.36%. <a href="https://arxiv.org/abs/2405.16141" target="_blank" rel="noopener noreferrer">Paper</a></p>
+        </article>
         <article class="work work--compact" aria-labelledby="project-jgcf">
           <h3 id="project-jgcf">JGCF</h3>
           <p>Graph collaborative filtering that shapes user–item signals with Jacobi polynomials. KDD 2023. <a href="https://arxiv.org/abs/2306.03624" target="_blank" rel="noopener noreferrer">Paper</a> · <a href="https://github.com/SpaceLearner/JGCF" target="_blank" rel="noopener noreferrer">Code</a></p>
