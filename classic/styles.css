@@ -50,7 +50,17 @@ ol, ul { margin: 0; padding: 0; list-style: none; }
 .header nav a:hover, .header nav a[aria-current] { color: var(--ink); }
 .header nav a[aria-current]::before { content: "› "; color: var(--reason); }
 .run-status { display: flex; align-items: center; gap: 8px; color: var(--muted); min-width: 92px; }
-.run-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--observe); box-shadow: 0 0 0 3px color-mix(in srgb, var(--observe) 18%, transparent); }
+.run-status { --step: var(--muted); }
+.run-status[data-step="reason"] { --step: var(--reason); }
+.run-status[data-step="act"] { --step: var(--act); }
+.run-status[data-step="observe"] { --step: var(--observe); }
+.run-status[data-step="memory"] { --step: var(--memory); }
+.run-status[data-step="update"] { --step: var(--update); }
+/* The dot takes the colour of the step in view and pulses once when the step changes. */
+.run-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--step); box-shadow: 0 0 0 3px color-mix(in srgb, var(--step) 18%, transparent); transition: background .25s, box-shadow .25s; }
+.run-status.is-stepping .run-dot { animation: run-pulse .6s ease-out; }
+#run-step { color: var(--step); transition: color .25s; }
+@keyframes run-pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--step) 55%, transparent); } 100% { box-shadow: 0 0 0 9px transparent; } }
 .cabin-link:hover { color: var(--reason); }
 
 /* Hero: the task prompt. Name large, mission as the first line of output. */
@@ -242,7 +252,7 @@ ol, ul { margin: 0; padding: 0; list-style: none; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   * { transition: none !important; }
-  .hero-figure * { animation: none !important; }
+  .hero-figure *, .run-dot { animation: none !important; }
   .loop-signal, .loop-halo { display: none; }
 }
 @media print {
