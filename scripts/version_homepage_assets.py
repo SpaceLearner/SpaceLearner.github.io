@@ -45,7 +45,7 @@ def build(root):
         active.remove(path)
         return digests[path]
 
-    for relative in ('index.html', 'classic/index.html', 'classic/zh/index.html'):
+    for relative in ('index.html', 'classic/index.html'):
         path = root / relative
         outputs[path] = stamp(path, MODULE, stamp(path, ASSET, path.read_text()))
     return outputs
