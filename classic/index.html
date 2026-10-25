@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="description" content="Jiayan Guo studies agents that plan, call tools, observe, and adapt over long multi-step tasks, from agentic search to embodied robots. Research, selected work, papers, and experience.">
-  <meta name="theme-color" content="#070b10">
+  <meta name="theme-color" content="#14161b">
   <meta property="og:title" content="Jiayan Guo · General-purpose Agents">
   <meta property="og:description" content="Agents that plan, call tools, observe, and adapt over long multi-step tasks, from agentic search to embodied robots.">
   <meta property="og:type" content="website">
@@ -13,22 +13,23 @@
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="canonical" href="https://spacelearner.github.io/classic/">
   <link rel="stylesheet" href="../news.css?v=79864139a38a54be">
-  <link rel="stylesheet" href="styles.css?v=9f2e2c769274cf95">
-  <script src="app.js?v=afd8f75d631a1b3b" defer></script>
+  <link rel="stylesheet" href="styles.css?v=82ab922545b944a9">
+  <script src="app.js?v=8704e6fc73e398e6" defer></script>
 </head>
 <body>
   <a class="skip" href="#content">Skip to content</a>
   <header class="header">
     <div class="header-inner wrap">
-      <a class="wordmark" href="#top">Jiayan Guo</a>
-      <nav aria-label="Main navigation"><a href="#research">Research</a><a href="#projects">Work</a><a href="#publications">Papers</a><a href="#news">News</a><a href="#experience">Experience</a></nav>
+      <a class="wordmark" href="#top" aria-label="Jiayan Guo, back to top">jiayan-guo <span>~/research</span></a>
+      <nav aria-label="Main navigation"><a href="#research">Research</a><a href="#projects">Work</a><a href="#publications">Papers</a><a href="#experience">Experience</a><a href="#news">News</a></nav>
+      <p class="run-status" aria-hidden="true"><span class="run-dot"></span><span id="run-step">ready</span></p>
       <a class="cabin-link" href="../">3D cabin <span aria-hidden="true">↗</span></a>
     </div>
   </header>
   <main id="top">
     <section class="hero wrap" aria-labelledby="hero-title">
       <div class="hero-copy" id="content" tabindex="-1">
-        <p class="hero-kicker">Agents that plan, act, and learn</p>
+        <p class="hero-kicker"><span>task</span> general-purpose agents</p>
         <h1 id="hero-title">Jiayan Guo</h1>
         <p class="hero-lede">I study agents that act: they plan, call tools, observe what happens, and adjust, over long multi-step tasks in digital and physical environments.</p>
         <p class="hero-meta">At <strong>Tencent</strong>, I work on general-purpose agents. Previously at <strong>Alibaba DAMO Academy</strong> on multimodal agents and embodied foundation models. Ph.D., Peking University.</p>
@@ -40,23 +41,23 @@
       </div>
       <figure class="hero-figure">
         <svg viewBox="0 0 560 490" role="img" aria-labelledby="loop-title"><title id="loop-title">An agent in the loop: reasoning, acting, and learning across digital and physical environments</title>
-          <defs><marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7d5f33"/></marker><filter id="loop-glow" x="-300%" y="-300%" width="700%" height="700%"><feGaussianBlur stdDeviation="3.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-          <g fill="none"><circle cx="280" cy="249" r="167" stroke="#c4b9a6" stroke-width="1"/><circle class="loop-ring" cx="280" cy="249" r="133" stroke="#c4b9a6" stroke-width="1" stroke-dasharray="1 6"/><g class="loop-orbit"><ellipse cx="280" cy="249" rx="204" ry="82" transform="rotate(-38 280 249)" stroke="#d9cfbd" stroke-width="1"/></g><g class="loop-orbit loop-orbit--b"><ellipse cx="280" cy="249" rx="204" ry="82" transform="rotate(38 280 249)" stroke="#d9cfbd" stroke-width="1"/></g>
-          <path d="M 201 102 A 167 167 0 0 1 444 215" stroke="#7d5f33" stroke-width="1.6" marker-end="url(#arrow)"/><path d="M 428 327 A 167 167 0 0 1 164 369" stroke="#7d5f33" stroke-width="1.6" marker-end="url(#arrow)"/><path d="M 118 295 A 167 167 0 0 1 142 153" stroke="#7d5f33" stroke-width="1.6" marker-end="url(#arrow)"/></g>
+          <defs><marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#9aa0a8"/></marker><filter id="loop-glow" x="-300%" y="-300%" width="700%" height="700%"><feGaussianBlur stdDeviation="3.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+          <g fill="none"><circle cx="280" cy="249" r="167" stroke="#c9cdd2" stroke-width="1"/><circle class="loop-ring" cx="280" cy="249" r="133" stroke="#c9cdd2" stroke-width="1" stroke-dasharray="1 6"/><g class="loop-orbit"><ellipse cx="280" cy="249" rx="204" ry="82" transform="rotate(-38 280 249)" stroke="#dfe1e3" stroke-width="1"/></g><g class="loop-orbit loop-orbit--b"><ellipse cx="280" cy="249" rx="204" ry="82" transform="rotate(38 280 249)" stroke="#dfe1e3" stroke-width="1"/></g>
+          <path d="M 201 102 A 167 167 0 0 1 444 215" stroke="#9aa0a8" stroke-width="1.4" marker-end="url(#arrow)"/><path d="M 428 327 A 167 167 0 0 1 164 369" stroke="#9aa0a8" stroke-width="1.4" marker-end="url(#arrow)"/><path d="M 118 295 A 167 167 0 0 1 142 153" stroke="#9aa0a8" stroke-width="1.4" marker-end="url(#arrow)"/></g>
           <g class="loop-signal" aria-hidden="true"><circle class="loop-trail" cx="280" cy="249" r="167" transform="rotate(-90 280 249)" stroke-dasharray="78 971.3" stroke-dashoffset="78"/><circle class="loop-head" cx="280" cy="82" r="5"/></g>
-          <circle class="loop-halo" cx="280" cy="249" r="58" fill="none" stroke="#b8955f" stroke-width="1.5"/>
-          <circle cx="280" cy="249" r="58" fill="#23211d"/>
-          <text x="280" y="255" text-anchor="middle" fill="#efe9dc" font-family="Iowan Old Style, Charter, Georgia, serif" font-size="22" font-style="italic">agent</text>
-          <g fill="#7d5f33"><circle class="loop-node" cx="280" cy="82" r="4"/><circle class="loop-node loop-node--act" cx="422" cy="337" r="4"/><circle class="loop-node loop-node--learn" cx="137" cy="336" r="4"/></g>
-          <g font-family="-apple-system, Segoe UI, sans-serif" fill="#23211d" font-size="12" letter-spacing="2.4"><text class="loop-label" x="280" y="52" text-anchor="middle">REASON</text><text class="loop-label loop-node--act" x="461" y="372" text-anchor="middle">ACT</text><text class="loop-label loop-node--learn" x="95" y="372" text-anchor="middle">LEARN</text></g>
-          <g font-family="-apple-system, Segoe UI, sans-serif" fill="#7a7265" font-size="9" letter-spacing="2"><text x="462" y="143" transform="rotate(57 462 143)">DIGITAL</text><text x="232" y="447">PHYSICAL</text></g>
+          <circle class="loop-halo" cx="280" cy="249" r="58" fill="none" stroke="#4a4ed1" stroke-width="1.5"/>
+          <circle cx="280" cy="249" r="58" fill="#14161b"/>
+          <text x="280" y="256" text-anchor="middle" fill="#f2f3f5" font-family="ui-monospace, SF Mono, Menlo, Consolas, monospace" font-size="19">agent</text>
+          <g><circle class="loop-node loop-node--reason" cx="280" cy="82" r="5"/><circle class="loop-node loop-node--act" cx="422" cy="337" r="5"/><circle class="loop-node loop-node--learn" cx="137" cy="336" r="5"/></g>
+          <g font-family="ui-monospace, SF Mono, Menlo, Consolas, monospace" font-size="13" font-weight="600" letter-spacing="1"><text fill="#4a4ed1" x="280" y="52" text-anchor="middle">reason</text><text fill="#9a4f08" x="461" y="372" text-anchor="middle">act</text><text fill="#0a7268" x="95" y="372" text-anchor="middle">learn</text></g>
+          <g font-family="ui-monospace, SF Mono, Menlo, Consolas, monospace" fill="#5f636b" font-size="10" letter-spacing="1.5"><text x="462" y="143" transform="rotate(57 462 143)">digital</text><text x="236" y="447">physical</text></g>
         </svg>
         <figcaption>One loop, two worlds: agents that reason, act, and learn from what happens next.</figcaption>
       </figure>
     </section>
 
-    <section id="research" class="section wrap" aria-labelledby="research-title">
-      <header class="section-head"><p class="section-no">01</p><h2 id="research-title">Research</h2></header>
+    <section id="research" class="section wrap" data-step="reason" data-no="01" aria-labelledby="research-title">
+      <header class="section-head"><p class="step"><span class="step-no">01</span><span class="step-type">reason</span><span class="step-count">2 threads</span></p><h2 id="research-title">Research</h2></header>
       <div class="section-body">
         <p class="lede">The question behind my work: what does an agent need to finish a long task on its own? It has to decide what to do next, act through tools or a body, and learn from the feedback.</p>
         <ol class="threads">
@@ -74,8 +75,8 @@
       </div>
     </section>
 
-    <section id="projects" class="section wrap" aria-labelledby="projects-title">
-      <header class="section-head"><p class="section-no">02</p><h2 id="projects-title">Selected work</h2></header>
+    <section id="projects" class="section wrap" data-step="act" data-no="02" aria-labelledby="projects-title">
+      <header class="section-head"><p class="step"><span class="step-no">02</span><span class="step-type">act</span><span class="step-count">6 projects</span></p><h2 id="projects-title">Selected work</h2></header>
       <div class="section-body">
         <p class="group-label"><span>I</span>Agentic search and tool use</p>
         <article class="work work--figure" aria-labelledby="project-zerosearch">
@@ -128,8 +129,8 @@
       </div>
     </section>
 
-    <section id="publications" class="section wrap" aria-labelledby="publications-title">
-      <header class="section-head"><p class="section-no">03</p><h2 id="publications-title">Papers</h2></header>
+    <section id="publications" class="section wrap" data-step="observe" data-no="03" aria-labelledby="publications-title">
+      <header class="section-head"><p class="step"><span class="step-no">03</span><span class="step-type">observe</span><span class="step-count">27 papers</span></p><h2 id="publications-title">Papers</h2></header>
       <div class="section-body">
         <div class="paper-toolbar"><div class="filters" role="group" aria-label="Choose a paper list"><button class="filter" type="button" data-filter="selected" aria-pressed="false">Selected <span>5</span></button><button class="filter" type="button" data-filter="all" aria-pressed="true">All <span>27</span></button></div><a href="https://scholar.google.com/citations?user=M-AFBG4AAAAJ&amp;hl=en" target="_blank" rel="noopener noreferrer">Google Scholar <span aria-hidden="true">↗</span></a></div>
         <div class="paper-list" data-view="all">
@@ -174,8 +175,8 @@
         <p class="aside">Compiled from public profiles, code repositories, and the papers themselves. Preprints are labeled as such.</p>
       </div>
     </section>
-    <section id="experience" class="section wrap" aria-labelledby="experience-title">
-      <header class="section-head"><p class="section-no">04</p><h2 id="experience-title">Experience</h2></header>
+    <section id="experience" class="section wrap" data-step="memory" data-no="04" aria-labelledby="experience-title">
+      <header class="section-head"><p class="step"><span class="step-no">04</span><span class="step-type">memory</span><span class="step-count">4 entries</span></p><h2 id="experience-title">Experience</h2></header>
       <div class="section-body">
         <ol class="timeline">
           <li><span class="when">Now</span><div><h3>Tencent</h3><p>General-purpose agents</p></div></li>
@@ -192,13 +193,13 @@
       </div>
     </section>
 
-    <section id="news" class="section wrap" aria-labelledby="news-title">
-      <header class="section-head"><p class="section-no">05</p><h2 id="news-title">News</h2></header>
+    <section id="news" class="section wrap" data-step="update" data-no="05" aria-labelledby="news-title">
+      <header class="section-head"><p class="step"><span class="step-no">05</span><span class="step-type">update</span></p><h2 id="news-title">News</h2></header>
       <div class="section-body"><!-- NEWS:START -->
 <ol class="news-list" aria-label="News, newest first"><li class="news-entry"><time datetime="2026-09">September 2026</time><div><p class="news-summary">Three papers accepted at NeurIPS 2026.</p><details class="news-papers"><summary>Papers and acceptance details <span aria-hidden="true">＋</span></summary><ul><li><a lang="en" href="https://openreview.net/forum?id=2uT2MbEwuy" target="_blank" rel="noopener noreferrer">WorldVLA: A Unified Vision-Language-Action and World Model<span aria-hidden="true"> ↗</span></a><small lang="en">NeurIPS 2026 · Poster</small></li><li><a lang="en" href="https://openreview.net/forum?id=OBDBEkTysD" target="_blank" rel="noopener noreferrer">Benchmarking Fine-Grained Spatio-Temporal Awareness in Embodied Brain Models<span aria-hidden="true"> ↗</span></a><small lang="en">NeurIPS 2026 · Evaluations and Datasets Track · Poster</small></li><li><a lang="en" href="https://openreview.net/forum?id=f8reCCiMzH" target="_blank" rel="noopener noreferrer">InterLV-Search: Benchmarking Interleaved Multimodal Agentic Search<span aria-hidden="true"> ↗</span></a><small lang="en">NeurIPS 2026 · Evaluations and Datasets Track · Poster</small></li></ul></details></div></li></ol>
 <!-- NEWS:END --></div>
     </section>
   </main>
-  <footer class="footer wrap"><span>© 2026 Jiayan Guo</span><a href="../">Enter the 3D cabin <span aria-hidden="true">↗</span></a><a href="#top">Back to top <span aria-hidden="true">↑</span></a></footer>
+  <footer class="footer wrap"><span class="trace-end">✓ loop complete</span><span>© 2026 Jiayan Guo</span><a href="../">Enter the 3D cabin <span aria-hidden="true">↗</span></a><a href="#top">Back to top <span aria-hidden="true">↑</span></a></footer>
 </body>
 </html>

@@ -40,8 +40,8 @@ if news_path.exists():
 years=sorted({p['year'] for p in items},reverse=True)
 selection_count=sum(p['selected'] for p in items)
 if selection_count!=5:raise ValueError(f'Expected five retained selected papers, found {selection_count}')
-parts=[f'''    <section id="publications" class="section wrap" aria-labelledby="publications-title">
-      <header class="section-head"><p class="section-no">03</p><h2 id="publications-title">Papers</h2></header>
+parts=[f'''    <section id="publications" class="section wrap" data-step="observe" data-no="03" aria-labelledby="publications-title">
+      <header class="section-head"><p class="step"><span class="step-no">03</span><span class="step-type">observe</span><span class="step-count">{len(items)} papers</span></p><h2 id="publications-title">Papers</h2></header>
       <div class="section-body">
         <div class="paper-toolbar"><div class="filters" role="group" aria-label="Choose a paper list"><button class="filter" type="button" data-filter="selected" aria-pressed="false">Selected <span>{selection_count}</span></button><button class="filter" type="button" data-filter="all" aria-pressed="true">All <span>{len(items)}</span></button></div><a href="https://scholar.google.com/citations?user=M-AFBG4AAAAJ&amp;hl=en" target="_blank" rel="noopener noreferrer">Google Scholar <span aria-hidden="true">↗</span></a></div>
         <div class="paper-list" data-view="all">''']
