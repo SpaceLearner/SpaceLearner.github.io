@@ -39,3 +39,28 @@ if ('IntersectionObserver' in window) {
   }, {passive: true});
 }
 filters.find(button => button.dataset.filter === 'selected')?.click();
+// Justified prose: glue the last words with no-break spaces until the last line is a third full.
+// ponytail: only the final line is checked; text-wrap: pretty handles the rest where supported.
+const NBSP = "\u00a0";
+const prose = [...document.querySelectorAll('.hero-lede, .hero-meta, .lede, .threads p, .work p:not(.work-role, .work-links), .timeline p, .service')];
+const lastLineFill = p => {
+  const range = document.createRange(); range.selectNodeContents(p);
+  const rects = [...range.getClientRects()].filter(r => r.width);
+  if (new Set(rects.map(r => Math.round(r.bottom))).size < 2) return 1;
+  return (rects.at(-1).right - p.getBoundingClientRect().left) / p.clientWidth;
+};
+const fixLastLines = () => prose.forEach(p => {
+  const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT), spaces = [];
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    node.data = node.data.replaceAll(NBSP, ' ');
+    for (let i = node.data.indexOf(' '); i >= 0; i = node.data.indexOf(' ', i + 1)) spaces.push([node, i]);
+  }
+  for (let k = 1; k <= 6 && k < spaces.length && lastLineFill(p) < 1 / 3; k++) {
+    const [node, i] = spaces[spaces.length - k];
+    node.data = node.data.slice(0, i) + NBSP + node.data.slice(i + 1);
+  }
+});
+let resizeTimer;
+addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(fixLastLines, 150); });
+document.fonts.ready.then(fixLastLines);
