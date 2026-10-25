@@ -61,6 +61,8 @@ ol, ul { margin: 0; padding: 0; list-style: none; }
 .hero h1 { font: 650 clamp(48px, 7vw, 84px)/.98 var(--sans); letter-spacing: -.045em; margin-bottom: 28px; }
 .hero-lede { font-size: clamp(20px, 2vw, 24px); line-height: 1.45; color: var(--ink); max-width: 30em; margin-bottom: 20px; letter-spacing: -.012em; }
 .hero-meta { font-size: 15px; line-height: 1.7; color: var(--muted); max-width: 36em; }
+.hero-meta + .hero-meta { margin-top: 10px; }
+.hero-meta a { color: var(--text); }
 .hero-meta strong { font-weight: 550; }
 .hero-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; font: 13px/1 var(--mono); }
 .hero-links a { display: inline-flex; align-items: center; gap: 6px; padding: 10px 14px; min-height: 40px; border: 1px solid var(--line-2); border-radius: 6px; background: var(--card); color: var(--ink); text-decoration: none; }
@@ -157,6 +159,12 @@ ol, ul { margin: 0; padding: 0; list-style: none; }
 .timeline h3 { font: 600 17px/1.4 var(--sans); letter-spacing: -.01em; }
 .timeline p { font-size: 14.5px; color: var(--muted); }
 .subhead { font: 600 12px/1 var(--mono); color: var(--muted); margin: 30px 0 12px; }
+.timeline .role { font: 500 12px/1 var(--mono); color: var(--muted); margin-left: 8px; letter-spacing: 0; vertical-align: 2px; }
+.timeline--compact li { padding-block: 10px; }
+.timeline--compact h3 { font-size: 15.5px; }
+.timeline--compact p { font-size: 14px; }
+.service { font-size: 14.5px; color: var(--text); max-width: var(--measure); }
+.service em { font-style: normal; color: var(--ink); }
 .subhead::before { content: "# "; }
 .honors li { padding-block: 4px; font-size: 15px; }
 .honors li::before { content: "+"; font-family: var(--mono); color: var(--observe); margin-right: 12px; }
