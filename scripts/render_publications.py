@@ -74,7 +74,7 @@ for year in years:
   parts.append(f'''<li class="paper" data-selected="{str(p['selected']).lower()}"><a class="paper-title" href="{e(p['url'])}" target="_blank" rel="noopener noreferrer">{e(p['title'])}</a>{authors}{summary}<p class="paper-meta"><span class="venue">{e(venue_raw)}</span>{role}{award}{links}{note}</p></li>''')
  parts.append('</ol></section>')
 parts.append('''        </div>
-        <p class="aside">Compiled from public profiles, code repositories, and the papers themselves. Preprints are labeled as such.</p>
+        <p class="aside">I put this list together from public profiles, code repositories, and the papers themselves. Preprints are marked.</p>
       </div>
     </section>''')
 def venue_label(p):

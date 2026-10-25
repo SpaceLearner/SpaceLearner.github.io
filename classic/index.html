@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="description" content="Jiayan Guo studies agents that plan, call tools, observe, and adapt over long multi-step tasks, from agentic search to embodied robots. Research, selected work, papers, and experience.">
+  <meta name="description" content="Jiayan Guo works on AI agents that can see a long task through on their own, from search agents to robots. Research, selected work, papers, and experience.">
   <meta name="theme-color" content="#14161b">
   <meta property="og:title" content="Jiayan Guo · General-purpose Agents">
-  <meta property="og:description" content="Agents that plan, call tools, observe, and adapt over long multi-step tasks, from agentic search to embodied robots.">
+  <meta property="og:description" content="Research on AI agents that can see a long task through on their own, from search agents to robots.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://spacelearner.github.io/classic/">
   <title>Jiayan Guo · General-purpose Agents</title>
@@ -31,9 +31,9 @@
       <div class="hero-copy" id="content" tabindex="-1">
         <p class="hero-kicker"><span>task</span> general-purpose agents</p>
         <h1 id="hero-title">Jiayan Guo</h1>
-        <p class="hero-lede">I study agents that act: they plan, call tools, observe what happens, and adjust, over long multi-step tasks in digital and physical environments.</p>
-        <p class="hero-meta">At <strong>Tencent</strong>, I work on general-purpose agents. Before that, at <strong>Alibaba DAMO Academy</strong>, I worked on multimodal agents and embodied foundation models: I was corresponding author of <a href="#project-zerosearch">ZeroSearch</a> and one of the project leads of <a href="#project-rynnbrain">RynnBrain</a>.</p>
-        <p class="hero-meta">I received my Ph.D. in Intelligence Science and Technology from <strong>Peking University</strong> in 2024, working on large language models, graph learning, and generative models, with research internships at <strong>Microsoft Research Asia</strong> along the way.</p>
+        <p class="hero-lede">I work on AI agents you can hand a long task and trust to see it through. That means making a plan, using tools, checking what actually happened, and changing course when needed, whether the agent lives on a computer or in a robot.</p>
+        <p class="hero-meta">I'm at <strong>Tencent</strong>, working on general-purpose agents. Before that I was at <strong>Alibaba DAMO Academy</strong>, where I worked on multimodal agents and embodied foundation models. I was the corresponding author of <a href="#project-zerosearch">ZeroSearch</a> and one of the project leads of <a href="#project-rynnbrain">RynnBrain</a>.</p>
+        <p class="hero-meta">I did my Ph.D. in Intelligence Science and Technology at <strong>Peking University</strong> and finished in 2024. There I worked on large language models, graph learning, and generative models, and interned twice at <strong>Microsoft Research Asia</strong> along the way.</p>
         <ul class="hero-links">
           <li><a href="https://scholar.google.com/citations?user=M-AFBG4AAAAJ&amp;hl=en" target="_blank" rel="noopener noreferrer">Google Scholar <span aria-hidden="true">↗</span></a></li>
           <li><a href="https://github.com/SpaceLearner" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a></li>
@@ -53,26 +53,26 @@
           <g font-family="ui-monospace, SF Mono, Menlo, Consolas, monospace" font-size="13" font-weight="600" letter-spacing="1"><text fill="#4a4ed1" x="280" y="52" text-anchor="middle">reason</text><text fill="#9a4f08" x="461" y="372" text-anchor="middle">act</text><text fill="#0a7268" x="95" y="372" text-anchor="middle">learn</text></g>
           <g font-family="ui-monospace, SF Mono, Menlo, Consolas, monospace" fill="#5f636b" font-size="10" letter-spacing="1.5"><text x="462" y="143" transform="rotate(57 462 143)">digital</text><text x="236" y="447">physical</text></g>
         </svg>
-        <figcaption>One loop, two worlds: agents that reason, act, and learn from what happens next.</figcaption>
+        <figcaption>On a screen or in a robot, the agent keeps going around the same loop.</figcaption>
       </figure>
     </section>
 
     <section id="research" class="section wrap" data-step="reason" data-no="01" aria-labelledby="research-title">
       <header class="section-head"><p class="step"><span class="step-no">01</span><span class="step-type">reason</span><span class="step-count">2 threads</span></p><h2 id="research-title">Research</h2></header>
       <div class="section-body">
-        <p class="lede">The question behind my work: what does an agent need to finish a long task on its own? It has to decide what to do next, act through tools or a body, and learn from the feedback.</p>
+        <p class="lede">Most of my work comes back to one question. What does an agent need in order to finish a long task by itself? It has to pick a sensible next step, carry it out with a tool or a robot arm, and get better from the feedback.</p>
         <ol class="threads">
           <li>
             <h3><span>I</span>Agentic search and tool use</h3>
-            <p>Search is an agent's most basic tool: decide what to look for, query, read, and decide again. <a href="#project-zerosearch">ZeroSearch</a> trains that loop with reinforcement learning against a simulated retriever, so the policy learns from interaction without a live search engine. <a href="#project-interlv-search">InterLV-Search</a> evaluates the same loop with images in it: can an agent use visual evidence to choose its next search step?</p>
+            <p>Search is the first tool most agents need. The agent has to work out what to look for, read what comes back, and decide whether to search again. <a href="#project-zerosearch">ZeroSearch</a> trains this with reinforcement learning but swaps the real search engine for a simulated one, so training doesn't depend on live search calls. <a href="#project-interlv-search">InterLV-Search</a> asks what changes when images are part of the evidence, and whether an agent can use what it sees to decide where to search next.</p>
           </li>
           <li>
             <h3><span>II</span>Embodied agents: from perception to action</h3>
-            <p>An embodied agent closes the same loop through a body: perceive, plan, act, and see the consequences. <a href="#project-rynnbrain">RynnBrain</a> provides perception and planning: egocentric grounding in space and time, physical reasoning, and task plans. <a href="#project-worldvla">WorldVLA</a> and the <a href="#project-rynnvla">RynnVLA series</a> turn plans into robot actions and predict what those actions will look like.</p>
+            <p>A robot goes through the same cycle with a body. It looks around, makes a plan, moves, and sees what changed. <a href="#project-rynnbrain">RynnBrain</a> does the looking and planning. It locates things in space and time from the robot's own point of view, reasons about the physical world, and writes task plans. <a href="#project-worldvla">WorldVLA</a> and the <a href="#project-rynnvla">RynnVLA series</a> turn those plans into robot actions, and also predict what the scene will look like after each one.</p>
           </li>
         </ol>
-        <p>Across both, I focus on how agents learn from interaction feedback rather than static demonstrations, and how they organize tools and multi-step workflows. The same view applies to decision-making agents in real markets: generative auto-bidding (KDD 2024) plans a whole bidding trajectory at once and was tested online on Alibaba's advertising platform. The long-term goal is agents that carry out long-horizon tasks reliably in complex environments.</p>
-        <p class="aside">Earlier work: graph learning and recommender systems.</p>
+        <p>In both threads I care most about agents that learn by trying things, not only from recorded demonstrations, and about how they juggle tools across many steps. The idea carries over to agents making decisions in real markets. Our generative auto-bidding work (KDD 2024) plans an advertiser's whole bidding trajectory in one go, and we tested it live on Alibaba's advertising platform. What I'm working toward is agents you can rely on for long tasks in messy, real environments.</p>
+        <p class="aside">Before agents, I worked on graph learning and recommender systems.</p>
       </div>
     </section>
 
@@ -84,7 +84,7 @@
           <div class="work-text">
             <h3 id="project-zerosearch">ZeroSearch</h3>
             <p class="work-role">Corresponding author · 2025</p>
-            <p>Trains LLM agents to search: the agent issues queries and reasons over the results across turns. During RL training a simulated retriever stands in for the search engine, supplying documents of controlled quality on a curriculum.</p>
+            <p>ZeroSearch teaches LLM agents to search. Over several turns, the agent writes queries and reasons about what comes back. During RL training a simulated retriever plays the search engine, and we control the quality of the documents it returns, making them harder to use as training goes on.</p>
             <p class="work-links"><a href="https://arxiv.org/abs/2505.04588" target="_blank" rel="noopener noreferrer">Paper <span aria-hidden="true">↗</span></a><a href="https://github.com/Alibaba-NLP/ZeroSearch" target="_blank" rel="noopener noreferrer">Code <span aria-hidden="true">↗</span></a></p>
           </div>
           <figure class="work-figure"><a href="../research-assets/zerosearch-model.jpg" target="_blank" rel="noopener noreferrer" aria-label="Open the full-resolution ZeroSearch training diagram"><img src="../research-assets/zerosearch-model.jpg" width="2957" height="1229" alt="ZeroSearch method: a policy model interacts with a simulated retrieval model, trained with PPO or GRPO." loading="lazy" decoding="async"></a><figcaption>Training framework (PPO / GRPO) · <a href="https://github.com/Alibaba-NLP/ZeroSearch/blob/main/assets/model.jpg" target="_blank" rel="noopener noreferrer">source</a></figcaption></figure>
@@ -92,7 +92,7 @@
         <article class="work" aria-labelledby="project-interlv-search">
           <h3 id="project-interlv-search">InterLV-Search</h3>
           <p class="work-role">Co-author · NeurIPS 2026, Evaluations and Datasets Track</p>
-          <p>A benchmark for whether agents can use visual evidence to decide what to search next, not just to answer at the end. It spans three levels: active visual evidence seeking, controlled offline search, and open-web interleaved search.</p>
+          <p>A benchmark that checks whether agents use images to decide what to search for next, rather than only glancing at them when writing the final answer. It has three levels: going out to find visual evidence, searching in a controlled offline setting, and searching the open web where images and text are mixed.</p>
           <p class="work-links"><a href="https://arxiv.org/abs/2605.07510" target="_blank" rel="noopener noreferrer">Paper <span aria-hidden="true">↗</span></a><a href="https://github.com/hbhalpha/InterLV-Search-Bench" target="_blank" rel="noopener noreferrer">Code <span aria-hidden="true">↗</span></a></p>
         </article>
 
@@ -101,7 +101,7 @@
           <div class="work-text">
             <h3 id="project-rynnbrain">RynnBrain</h3>
             <p class="work-role">One of the project leads · 2026</p>
-            <p>An open embodied foundation model that serves as an agent's brain: egocentric perception, spatiotemporal grounding, physical reasoning, and planning in one model. I contributed to pre-training, Chain-of-Point reasoning, VLA, and training infrastructure.</p>
+            <p>An open embodied foundation model meant to act as a robot's brain. One model handles first-person perception, locating things in space and time, physical reasoning, and planning. I worked on pre-training, Chain-of-Point reasoning, VLA, and the training infrastructure.</p>
             <p class="work-links"><a href="https://arxiv.org/abs/2602.14979" target="_blank" rel="noopener noreferrer">Paper <span aria-hidden="true">↗</span></a><a href="https://github.com/alibaba-damo-academy/RynnBrain" target="_blank" rel="noopener noreferrer">Code <span aria-hidden="true">↗</span></a><a href="https://arxiv.org/html/2602.14979v1#A1" target="_blank" rel="noopener noreferrer">Contributions <span aria-hidden="true">↗</span></a><a href="https://arxiv.org/abs/2607.17977" target="_blank" rel="noopener noreferrer">RynnBrain 1.1 <span aria-hidden="true">↗</span></a></p>
           </div>
           <figure class="work-figure"><a href="../research-assets/rynnbrain-framework.png" target="_blank" rel="noopener noreferrer" aria-label="Open the full-resolution RynnBrain 1.0 architecture diagram"><img src="../research-assets/rynnbrain-framework-preview.png" width="3840" height="2160" alt="RynnBrain architecture: images, video, and instructions pass through a visual encoder and a Dense/MoE decoder to produce spatial grounding, reasoning, and action plans." loading="lazy" decoding="async"></a><figcaption>RynnBrain 1.0 architecture · <a href="https://github.com/alibaba-damo-academy/RynnBrain/blob/rynnbrain1.0/cookbooks/assets/framework.png" target="_blank" rel="noopener noreferrer">source</a></figcaption></figure>
@@ -110,15 +110,15 @@
           <article class="work" aria-labelledby="project-worldvla">
             <h3 id="project-worldvla">WorldVLA</h3>
             <p class="work-role">Co-author · 2025</p>
-            <p>An action model with a built-in world model: one autoregressive network generates robot actions and predicts the frames they lead to, so the agent anticipates consequences as it acts.</p>
-            <p class="work-note">Precedes RynnVLA-002; the original repository now redirects there.</p>
+            <p>An action model with a world model inside it. The same autoregressive network outputs robot actions and predicts the video frames that follow, so the robot has some idea of what its actions will do.</p>
+            <p class="work-note">WorldVLA came before RynnVLA-002, and its original repository now redirects there.</p>
             <p class="work-links"><a href="https://arxiv.org/abs/2506.21539" target="_blank" rel="noopener noreferrer">Paper <span aria-hidden="true">↗</span></a><a href="https://github.com/alibaba-damo-academy/WorldVLA" target="_blank" rel="noopener noreferrer">Code <span aria-hidden="true">↗</span></a><a href="https://huggingface.co/Alibaba-DAMO-Academy/WorldVLA" target="_blank" rel="noopener noreferrer">Model <span aria-hidden="true">↗</span></a></p>
           </article>
           <article class="work" aria-labelledby="project-rynnvla">
             <h3 id="project-rynnvla">RynnVLA series</h3>
             <p class="work-role">Co-author · ICRA 2026 (001)</p>
-            <p><strong>001</strong> pre-trains on egocentric human manipulation videos, then transfers to robot control through trajectory-aware modeling and ActionVAE. <a href="https://arxiv.org/abs/2509.15212" target="_blank" rel="noopener noreferrer">Paper</a> · <a href="https://github.com/alibaba-damo-academy/RynnVLA-001" target="_blank" rel="noopener noreferrer">Code</a> · <a href="https://huggingface.co/blog/Alibaba-DAMO-Academy/rynnvla-001" target="_blank" rel="noopener noreferrer">Overview</a></p>
-            <p><strong>002</strong>, the successor to WorldVLA, adds a continuous Action Transformer, wrist-camera input, and robot state to jointly model actions and future observations. <a href="https://arxiv.org/abs/2511.17502" target="_blank" rel="noopener noreferrer">Paper</a> · <a href="https://github.com/alibaba-damo-academy/RynnVLA-002" target="_blank" rel="noopener noreferrer">Code</a> · <a href="https://huggingface.co/Alibaba-DAMO-Academy/RynnVLA-002" target="_blank" rel="noopener noreferrer">Model</a></p>
+            <p><strong>001</strong> first learns from videos of people handling objects, filmed from their own point of view, then carries that over to robot control with trajectory-aware modeling and ActionVAE. <a href="https://arxiv.org/abs/2509.15212" target="_blank" rel="noopener noreferrer">Paper</a> · <a href="https://github.com/alibaba-damo-academy/RynnVLA-001" target="_blank" rel="noopener noreferrer">Code</a> · <a href="https://huggingface.co/blog/Alibaba-DAMO-Academy/rynnvla-001" target="_blank" rel="noopener noreferrer">Overview</a></p>
+            <p><strong>002</strong> follows on from WorldVLA. It adds a continuous Action Transformer, a wrist camera, and the robot's own state, and models actions and future observations together. <a href="https://arxiv.org/abs/2511.17502" target="_blank" rel="noopener noreferrer">Paper</a> · <a href="https://github.com/alibaba-damo-academy/RynnVLA-002" target="_blank" rel="noopener noreferrer">Code</a> · <a href="https://huggingface.co/Alibaba-DAMO-Academy/RynnVLA-002" target="_blank" rel="noopener noreferrer">Model</a></p>
           </article>
         </div>
 
@@ -126,11 +126,11 @@
         <article class="work work--compact" aria-labelledby="project-aigb">
           <h3 id="project-aigb">AIGB / DiffBid</h3>
           <p class="work-role">First author · KDD 2024</p>
-          <p>DiffBid treats an advertiser's bidding over a campaign as one trajectory and generates it with a conditional diffusion model, avoiding the error that builds up step by step in Markovian RL. In an online A/B test on Alibaba's advertising platform it raised GMV by 2.81% and ROI by 3.36%. <a href="https://arxiv.org/abs/2405.16141" target="_blank" rel="noopener noreferrer">Paper</a></p>
+          <p>DiffBid looks at an advertiser's bids over a whole campaign as one trajectory and generates all of it with a conditional diffusion model. That avoids the errors that pile up step by step in Markovian RL. In an online A/B test on Alibaba's advertising platform, GMV went up 2.81% and ROI went up 3.36%. <a href="https://arxiv.org/abs/2405.16141" target="_blank" rel="noopener noreferrer">Paper</a></p>
         </article>
         <article class="work work--compact" aria-labelledby="project-jgcf">
           <h3 id="project-jgcf">JGCF</h3>
-          <p>Graph collaborative filtering that shapes user–item signals with Jacobi polynomials. KDD 2023. <a href="https://arxiv.org/abs/2306.03624" target="_blank" rel="noopener noreferrer">Paper</a> · <a href="https://github.com/SpaceLearner/JGCF" target="_blank" rel="noopener noreferrer">Code</a></p>
+          <p>A graph collaborative filtering method that uses Jacobi polynomials to shape the signals on the user–item graph. KDD 2023. <a href="https://arxiv.org/abs/2306.03624" target="_blank" rel="noopener noreferrer">Paper</a> · <a href="https://github.com/SpaceLearner/JGCF" target="_blank" rel="noopener noreferrer">Code</a></p>
         </article>
       </div>
     </section>
@@ -178,7 +178,7 @@
 <li class="paper" data-selected="false"><a class="paper-title" href="https://arxiv.org/abs/2201.13025" target="_blank" rel="noopener noreferrer">Learning Robust Representation Through Graph Adversarial Contrastive Learning</a><p class="paper-authors"><strong>Jiayan Guo</strong>, Shangyang Li, Yue Zhao, Yan Zhang</p><p class="paper-meta"><span class="venue">DASFAA 2022</span><a href="https://arxiv.org/abs/2201.13025" target="_blank" rel="noopener noreferrer">Paper</a></p></li>
 </ol></section>
         </div>
-        <p class="aside">Compiled from public profiles, code repositories, and the papers themselves. Preprints are labeled as such.</p>
+        <p class="aside">I put this list together from public profiles, code repositories, and the papers themselves. Preprints are marked.</p>
       </div>
     </section>
     <section id="experience" class="section wrap" data-step="memory" data-no="04" aria-labelledby="experience-title">
@@ -186,13 +186,13 @@
       <div class="section-body">
         <ol class="timeline">
           <li><span class="when">Now</span><div><h3>Tencent</h3><p>General-purpose agents</p></div></li>
-          <li><span class="when">Previously</span><div><h3>Alibaba DAMO Academy <span class="role">Research Engineer</span></h3><p>Multimodal agents and embodied foundation models. Corresponding author of ZeroSearch; one of the project leads of RynnBrain.</p></div></li>
+          <li><span class="when">Previously</span><div><h3>Alibaba DAMO Academy <span class="role">Research Engineer</span></h3><p>Multimodal agents and embodied foundation models. Corresponding author of ZeroSearch and one of the project leads of RynnBrain.</p></div></li>
           <li><span class="when">2019–2024</span><div><h3>Peking University <span class="role">Ph.D.</span></h3><p>Intelligence Science and Technology. Large language models, multimodal LLMs, graph learning, and generative models.</p></div></li>
           <li><span class="when">2015–2019</span><div><h3>Beijing Institute of Technology <span class="role">B.S.</span></h3><p>Computer Science and Technology.</p></div></li>
         </ol>
         <h3 class="subhead">Research internships</h3>
         <ol class="timeline timeline--compact">
-          <li><span class="when">2023–2024</span><div><h3>Alibaba Group, Alimama</h3><p>Generative auto-bidding (AIGB); led to the KDD 2024 paper.</p></div></li>
+          <li><span class="when">2023–2024</span><div><h3>Alibaba Group, Alimama</h3><p>Generative auto-bidding (AIGB), which became the KDD 2024 paper.</p></div></li>
           <li><span class="when">2022–2023</span><div><h3>Microsoft Research Asia, DKI Group</h3><p>Graph learning for heterogeneous graphs and recommender systems.</p></div></li>
           <li><span class="when">2022</span><div><h3>HKUST <span class="role">Visiting student</span></h3><p>Recommender systems, with Prof. Sunghun Kim.</p></div></li>
           <li><span class="when">2021–2022</span><div><h3>Meituan</h3><p>Re-ranking models for a multi-stage advertising system.</p></div></li>
