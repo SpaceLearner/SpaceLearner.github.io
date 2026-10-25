@@ -46,7 +46,7 @@ ol, ul { margin: 0; padding: 0; list-style: none; }
 .wordmark { color: var(--ink); text-decoration: none; font-weight: 600; letter-spacing: -.01em; padding-block: 12px; }
 .wordmark span { color: var(--muted); font-weight: 400; }
 .header nav { display: flex; gap: 22px; margin-left: auto; }
-.header nav a, .cabin-link { color: var(--muted); text-decoration: none; padding-block: 12px; }
+.header nav a, .cabin-link, .lang-link { color: var(--muted); text-decoration: none; padding-block: 12px; }
 .header nav a:hover, .header nav a[aria-current] { color: var(--ink); }
 .header nav a[aria-current]::before { content: "› "; color: var(--reason); }
 .run-status { display: flex; align-items: center; gap: 8px; color: var(--muted); min-width: 92px; }
@@ -61,7 +61,7 @@ ol, ul { margin: 0; padding: 0; list-style: none; }
 .run-status.is-stepping .run-dot { animation: run-pulse .6s ease-out; }
 #run-step { color: var(--step); transition: color .25s; }
 @keyframes run-pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--step) 55%, transparent); } 100% { box-shadow: 0 0 0 9px transparent; } }
-.cabin-link:hover { color: var(--reason); }
+.lang-link:hover, .cabin-link:hover { color: var(--reason); }
 
 /* Hero: the task prompt. Name large, mission as the first line of output. */
 .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: 64px; align-items: center; padding-block: clamp(56px, 10vh, 112px) clamp(44px, 7vh, 80px); }
@@ -229,7 +229,7 @@ ol, ul { margin: 0; padding: 0; list-style: none; }
   .wrap { padding-inline: max(18px, env(safe-area-inset-left)) max(18px, env(safe-area-inset-right)); }
   html { scroll-padding-top: 104px; }
   .header-inner { flex-wrap: wrap; gap: 0 14px; min-height: 0; padding-top: calc(6px + env(safe-area-inset-top)); }
-  .cabin-link { margin-left: auto; }
+  .lang-link { margin-left: auto; }
   .header nav { order: 3; width: 100%; margin: 0; gap: 0; justify-content: space-between; overflow-x: auto; }
   .header nav a { padding: 12px 0 14px; min-height: 44px; }
   .section { padding-left: calc(max(18px, env(safe-area-inset-left)) + 34px); }
