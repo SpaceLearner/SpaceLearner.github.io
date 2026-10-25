@@ -55,6 +55,31 @@ ol, ul { margin: 0; padding: 0; list-style: none; }
 .hero-figure { margin: 0; }
 .hero-figure svg { width: 100%; height: auto; display: block; }
 .hero-figure figcaption { margin-top: 12px; font: italic 15px/1.55 var(--serif); color: var(--muted); text-align: center; }
+/* The loop runs: a signal travels reason -> act -> learn; each stage lights as
+   it arrives, and the core pulses when the loop closes. Orbits drift slowly.
+   Stage phases are the nodes' clockwise angles from the top: ACT 121.8deg, LEARN 238.7deg. */
+.hero-figure svg { --loop: 9s; }
+.loop-orbit, .loop-ring, .loop-signal { transform-box: view-box; transform-origin: 280px 249px; }
+.loop-orbit { animation: loop-spin 80s linear infinite; }
+.loop-orbit--b { animation-duration: 110s; animation-direction: reverse; }
+.loop-ring { animation: loop-spin 140s linear infinite reverse; }
+.loop-signal { animation: loop-spin var(--loop) linear infinite; }
+.loop-trail { fill: none; stroke: #b8955f; stroke-width: 2.4; stroke-linecap: round; opacity: .6; }
+.loop-head { fill: #d9bb86; filter: url(#loop-glow); }
+.loop-node, .loop-halo { transform-box: fill-box; transform-origin: center; }
+.loop-node { animation: loop-node var(--loop) linear infinite; }
+.loop-label { animation: loop-label var(--loop) linear infinite; }
+.loop-node--act { animation-delay: calc(var(--loop) * -.662); }
+.loop-node--learn { animation-delay: calc(var(--loop) * -.337); }
+.loop-halo { opacity: 0; animation: loop-halo var(--loop) ease-out infinite; }
+@keyframes loop-spin { to { transform: rotate(360deg); } }
+@keyframes loop-node { 0% { transform: scale(2.2); fill: #d9bb86; } 14%, 100% { transform: scale(1); fill: #7d5f33; } }
+@keyframes loop-label { 0% { fill: #7d5f33; } 20%, 100% { fill: #23211d; } }
+@keyframes loop-halo { 0% { transform: scale(1); opacity: .7; } 30%, 100% { transform: scale(1.8); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .hero-figure * { animation: none !important; }
+  .loop-signal, .loop-halo { display: none; }
+}
 
 /* Sections: a narrow label column and a reading column. */
 .section { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 48px; padding-block: 72px; border-top: 1px solid var(--line); }

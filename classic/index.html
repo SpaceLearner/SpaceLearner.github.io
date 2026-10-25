@@ -13,7 +13,7 @@
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="canonical" href="https://spacelearner.github.io/classic/">
   <link rel="stylesheet" href="../news.css?v=79864139a38a54be">
-  <link rel="stylesheet" href="styles.css?v=52e4292913ed6a0f">
+  <link rel="stylesheet" href="styles.css?v=9f2e2c769274cf95">
   <script src="app.js?v=afd8f75d631a1b3b" defer></script>
 </head>
 <body>
@@ -40,13 +40,15 @@
       </div>
       <figure class="hero-figure">
         <svg viewBox="0 0 560 490" role="img" aria-labelledby="loop-title"><title id="loop-title">An agent in the loop: reasoning, acting, and learning across digital and physical environments</title>
-          <defs><marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7d5f33"/></marker></defs>
-          <g fill="none"><circle cx="280" cy="249" r="167" stroke="#c4b9a6" stroke-width="1"/><circle cx="280" cy="249" r="133" stroke="#c4b9a6" stroke-width="1" stroke-dasharray="1 6"/><ellipse cx="280" cy="249" rx="204" ry="82" transform="rotate(-38 280 249)" stroke="#d9cfbd" stroke-width="1"/><ellipse cx="280" cy="249" rx="204" ry="82" transform="rotate(38 280 249)" stroke="#d9cfbd" stroke-width="1"/>
+          <defs><marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7d5f33"/></marker><filter id="loop-glow" x="-300%" y="-300%" width="700%" height="700%"><feGaussianBlur stdDeviation="3.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+          <g fill="none"><circle cx="280" cy="249" r="167" stroke="#c4b9a6" stroke-width="1"/><circle class="loop-ring" cx="280" cy="249" r="133" stroke="#c4b9a6" stroke-width="1" stroke-dasharray="1 6"/><g class="loop-orbit"><ellipse cx="280" cy="249" rx="204" ry="82" transform="rotate(-38 280 249)" stroke="#d9cfbd" stroke-width="1"/></g><g class="loop-orbit loop-orbit--b"><ellipse cx="280" cy="249" rx="204" ry="82" transform="rotate(38 280 249)" stroke="#d9cfbd" stroke-width="1"/></g>
           <path d="M 201 102 A 167 167 0 0 1 444 215" stroke="#7d5f33" stroke-width="1.6" marker-end="url(#arrow)"/><path d="M 428 327 A 167 167 0 0 1 164 369" stroke="#7d5f33" stroke-width="1.6" marker-end="url(#arrow)"/><path d="M 118 295 A 167 167 0 0 1 142 153" stroke="#7d5f33" stroke-width="1.6" marker-end="url(#arrow)"/></g>
+          <g class="loop-signal" aria-hidden="true"><circle class="loop-trail" cx="280" cy="249" r="167" transform="rotate(-90 280 249)" stroke-dasharray="78 971.3" stroke-dashoffset="78"/><circle class="loop-head" cx="280" cy="82" r="5"/></g>
+          <circle class="loop-halo" cx="280" cy="249" r="58" fill="none" stroke="#b8955f" stroke-width="1.5"/>
           <circle cx="280" cy="249" r="58" fill="#23211d"/>
           <text x="280" y="255" text-anchor="middle" fill="#efe9dc" font-family="Iowan Old Style, Charter, Georgia, serif" font-size="22" font-style="italic">agent</text>
-          <g fill="#7d5f33"><circle cx="280" cy="82" r="4"/><circle cx="422" cy="337" r="4"/><circle cx="137" cy="336" r="4"/></g>
-          <g font-family="-apple-system, Segoe UI, sans-serif" fill="#23211d" font-size="12" letter-spacing="2.4"><text x="280" y="52" text-anchor="middle">REASON</text><text x="461" y="372" text-anchor="middle">ACT</text><text x="95" y="372" text-anchor="middle">LEARN</text></g>
+          <g fill="#7d5f33"><circle class="loop-node" cx="280" cy="82" r="4"/><circle class="loop-node loop-node--act" cx="422" cy="337" r="4"/><circle class="loop-node loop-node--learn" cx="137" cy="336" r="4"/></g>
+          <g font-family="-apple-system, Segoe UI, sans-serif" fill="#23211d" font-size="12" letter-spacing="2.4"><text class="loop-label" x="280" y="52" text-anchor="middle">REASON</text><text class="loop-label loop-node--act" x="461" y="372" text-anchor="middle">ACT</text><text class="loop-label loop-node--learn" x="95" y="372" text-anchor="middle">LEARN</text></g>
           <g font-family="-apple-system, Segoe UI, sans-serif" fill="#7a7265" font-size="9" letter-spacing="2"><text x="462" y="143" transform="rotate(57 462 143)">DIGITAL</text><text x="232" y="447">PHYSICAL</text></g>
         </svg>
         <figcaption>One loop, two worlds: agents that reason, act, and learn from what happens next.</figcaption>
