@@ -29,6 +29,8 @@ h1, h2, h3, p { margin: 0; overflow-wrap: break-word; }
 p { text-wrap: pretty; }
 /* Justify running prose only; short label lines stay ragged. */
 .hero-lede, .hero-meta, .lede, .threads p, .work p:not(.work-role, .work-links), .timeline p, .service { text-align: justify; hyphens: auto; }
+/* Narrow columns and one-sentence entries open rivers when justified; keep them ragged. */
+.work-pair .work p, .timeline--compact p { text-align: start; }
 h1, h2, h3 { color: var(--ink); text-wrap: balance; }
 strong { color: var(--ink); font-weight: 600; }
 img { max-width: 100%; height: auto; display: block; }
@@ -227,6 +229,8 @@ ol, ul { margin: 0; padding: 0; list-style: none; }
   .step-no { position: absolute; left: calc(max(28px, env(safe-area-inset-left))); }
   .run-status { display: none; }
 }
+/* Single-column layout is too narrow to justify without gaps; go ragged-right. */
+@media (max-width: 960px) { p { text-align: start !important; } }
 @media (max-width: 640px) {
   .wrap { padding-inline: max(18px, env(safe-area-inset-left)) max(18px, env(safe-area-inset-right)); }
   html { scroll-padding-top: 104px; }
