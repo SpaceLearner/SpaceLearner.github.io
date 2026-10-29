@@ -22,5 +22,15 @@
         "publishedAt": "2026-09-25"
       }
     ]
+  },
+  {
+    "date": "2026-07-16",
+    "summary": "RynnBrain 1.1 released, with model checkpoints and a technical report.",
+    "url": "https://github.com/alibaba-damo-academy/RynnBrain#news"
+  },
+  {
+    "date": "2026-02-09",
+    "summary": "RynnBrain released, with open-source code and model checkpoints.",
+    "url": "https://github.com/alibaba-damo-academy/RynnBrain/tree/rynnbrain1.0"
   }
 ]

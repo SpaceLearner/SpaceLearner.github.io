@@ -15,7 +15,14 @@ START, END = '<!-- NEWS:START -->', '<!-- NEWS:END -->'
 def render(entries):
     rows = []
     for item in sorted(entries, key=lambda row: row['date'], reverse=True):
-        date = datetime.strptime(item['date'], '%Y-%m')
+        date = datetime.strptime(item['date'], '%Y-%m-%d' if len(item['date']) == 10 else '%Y-%m')
+        date_label = date.strftime('%d %B %Y').lstrip('0') if len(item['date']) == 10 else date.strftime('%B %Y')
+        summary = escape(item['summary'])
+        if item.get('url'):
+            source = urlsplit(item['url'])
+            if source.scheme != 'https' or not source.netloc:
+                raise ValueError('News sources must use absolute HTTPS URLs')
+            summary = '<a href="' + escape(item['url'], quote=True) + '" target="_blank" rel="noopener noreferrer">' + summary + '</a>'
         papers = []
         for paper in item.get('papers', []):
             url = urlsplit(paper['url'])
@@ -28,8 +35,8 @@ def render(entries):
         details = ('<details class="news-papers"><summary>Papers and acceptance details <span aria-hidden="true">＋</span></summary>'
                    + '<ul>' + ''.join(papers) + '</ul></details>') if papers else ''
         rows.append('<li class="news-entry"><time datetime="' + item['date'] + '">'
-                    + date.strftime('%B %Y') + '</time><div><p class="news-summary">'
-                    + escape(item['summary']) + '</p>' + details + '</div></li>')
+                    + date_label + '</time><div><p class="news-summary">'
+                    + summary + '</p>' + details + '</div></li>')
     return START + '\n<ol class="news-list" aria-label="News, newest first">' + ''.join(rows) + '</ol>\n' + END
 
 
