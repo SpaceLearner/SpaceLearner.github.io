@@ -1,10 +1,43 @@
 'use strict';
 const list = document.querySelector('.paper-list');
 const filters = [...document.querySelectorAll('.filter')];
+const search = document.getElementById('paper-search');
+const results = document.getElementById('paper-results');
+const empty = document.querySelector('.paper-empty');
+const papers = [...list.querySelectorAll('.paper')];
+let view = 'selected';
+const normalize = value => value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+const archive = papers.map(paper => ({paper, text: normalize(paper.textContent + ' ' + paper.closest('.paper-year').querySelector('h3').textContent)}));
+const updatePapers = () => {
+  const query = normalize(search.value.trim());
+  const activeView = query ? 'all' : view;
+  list.dataset.view = activeView;
+  let count = 0;
+  archive.forEach(({paper, text}) => {
+    const matches = (!query || query.split(/\s+/).every(word => text.includes(word))) && (activeView === 'all' || paper.dataset.selected === 'true');
+    paper.hidden = !matches;
+    if (matches) count++;
+  });
+  list.querySelectorAll('.paper-year').forEach(year => { year.hidden = ![...year.querySelectorAll('.paper')].some(paper => !paper.hidden); });
+  filters.forEach(filter => filter.setAttribute('aria-pressed', String(filter.dataset.filter === activeView)));
+  results.textContent = query ? `${count} matching ${count === 1 ? 'paper' : 'papers'} in the full archive` : `${count} ${activeView === 'selected' ? 'selected papers' : 'papers in the archive'}`;
+  empty.hidden = count !== 0;
+};
 filters.forEach(button => button.addEventListener('click', () => {
-  list.dataset.view = button.dataset.filter;
-  filters.forEach(filter => filter.setAttribute('aria-pressed', String(filter === button)));
+  view = button.dataset.filter;
+  search.value = '';
+  updatePapers();
 }));
+search.closest('.paper-search').hidden = false;
+results.hidden = false;
+search.addEventListener('input', updatePapers);
+const motion = document.querySelector('.motion-toggle');
+motion.hidden = false;
+motion.addEventListener('click', () => {
+  const paused = motion.closest('figure').classList.toggle('is-paused');
+  motion.setAttribute('aria-pressed', String(paused));
+  motion.textContent = paused ? 'Resume animation' : 'Pause animation';
+});
 if ('IntersectionObserver' in window) {
   const links = [...document.querySelectorAll('nav a')];
   const status = document.getElementById('run-step');
@@ -39,28 +72,3 @@ if ('IntersectionObserver' in window) {
   }, {passive: true});
 }
 filters.find(button => button.dataset.filter === 'selected')?.click();
-// Justified prose: glue the last words with no-break spaces until the last line is a third full.
-// ponytail: only the final line is checked; text-wrap: pretty handles the rest where supported.
-const NBSP = "\u00a0";
-const prose = [...document.querySelectorAll('.hero-lede, .hero-meta, .lede, .threads p, .work p:not(.work-role, .work-links), .timeline p, .service')];
-const lastLineFill = p => {
-  const range = document.createRange(); range.selectNodeContents(p);
-  const rects = [...range.getClientRects()].filter(r => r.width);
-  if (new Set(rects.map(r => Math.round(r.bottom))).size < 2) return 1;
-  return (rects.at(-1).right - p.getBoundingClientRect().left) / p.clientWidth;
-};
-const fixLastLines = () => prose.forEach(p => {
-  const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT), spaces = [];
-  while (walker.nextNode()) {
-    const node = walker.currentNode;
-    node.data = node.data.replaceAll(NBSP, ' ');
-    for (let i = node.data.indexOf(' '); i >= 0; i = node.data.indexOf(' ', i + 1)) spaces.push([node, i]);
-  }
-  for (let k = 1; k <= 6 && k < spaces.length && lastLineFill(p) < 1 / 3; k++) {
-    const [node, i] = spaces[spaces.length - k];
-    node.data = node.data.slice(0, i) + NBSP + node.data.slice(i + 1);
-  }
-});
-let resizeTimer;
-addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(fixLastLines, 150); });
-document.fonts.ready.then(fixLastLines);

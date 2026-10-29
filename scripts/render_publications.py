@@ -44,7 +44,10 @@ parts=[f'''    <section id="publications" class="section wrap" data-step="observ
       <header class="section-head"><p class="step"><span class="step-no">03</span><span class="step-type">observe</span><span class="step-count">{len(items)} papers</span></p><h2 id="publications-title">Papers</h2></header>
       <div class="section-body">
         <div class="paper-toolbar"><div class="filters" role="group" aria-label="Choose a paper list"><button class="filter" type="button" data-filter="selected" aria-pressed="false">Selected <span>{selection_count}</span></button><button class="filter" type="button" data-filter="all" aria-pressed="true">All <span>{len(items)}</span></button></div><a href="https://scholar.google.com/citations?user=M-AFBG4AAAAJ&amp;hl=en" target="_blank" rel="noopener noreferrer">Google Scholar <span aria-hidden="true">↗</span></a></div>
-        <div class="paper-list" data-view="all">''']
+        <div class="paper-search" hidden><label for="paper-search">Search the full archive</label><input id="paper-search" type="search" placeholder="Title, author, venue, or year" autocomplete="off" aria-controls="paper-list" aria-describedby="paper-results"></div>
+        <p class="paper-results" id="paper-results" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+        <p class="paper-empty" hidden>No matching papers. Try another title, author, venue, or year.</p>
+        <div class="paper-list" id="paper-list" data-view="all">''']
 for year in years:
  group=[p for p in items if p['year']==year]
  parts.append(f'<section class="paper-year" data-has-selected="{str(any(p["selected"] for p in group)).lower()}" aria-labelledby="year-{year}"><h3 id="year-{year}">{year}</h3><ol>')
@@ -65,6 +68,7 @@ for year in years:
   for link in p.get('links',[]):
    if not link['url'].startswith('https://'):raise ValueError('Invalid additional source URL')
    links+=f'<a href="{e(link["url"])}" target="_blank" rel="noopener noreferrer">{e(link["label"])}</a>'
+  links=re.sub(r'<a ([^>]+)>([^<]+)</a>', lambda m: '<a '+m[1]+' aria-label="'+e(m[2]+' — '+p['title'], quote=True)+'">'+m[2]+'</a>', links)
   venue_raw=p.get('venue') or 'Preprint'
   if venue_raw=='arXiv':venue_raw='arXiv preprint'
   if 'Intelligent Systems and Technology' in venue_raw:venue_raw='ACM TIST '+str(year)
@@ -74,7 +78,7 @@ for year in years:
   parts.append(f'''<li class="paper" data-selected="{str(p['selected']).lower()}"><a class="paper-title" href="{e(p['url'])}" target="_blank" rel="noopener noreferrer">{e(p['title'])}</a>{authors}{summary}<p class="paper-meta"><span class="venue">{e(venue_raw)}</span>{role}{award}{links}{note}</p></li>''')
  parts.append('</ol></section>')
 parts.append('''        </div>
-        <p class="aside">I put this list together from public profiles, code repositories, and the papers themselves. Preprints are marked.</p>
+        <p class="aside">Published papers and preprints, grouped by year. Preprints are labeled.</p>
       </div>
     </section>''')
 def venue_label(p):
