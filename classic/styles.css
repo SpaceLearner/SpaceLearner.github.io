@@ -376,6 +376,19 @@ ol, ul { margin: 0; padding: 0; list-style: none; }
   .timeline li, #news .news-entry { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .timeline .role { margin-left: 0; display: block; margin-top: 2px; }
 }
+/* English long-form prose only: keep short text and compact screens ragged-right. */
+@media (min-width: 961px) {
+  p.prose-justify, .work-pair .work p.prose-justify {
+    text-align: justify;
+    text-align-last: left;
+    text-justify: inter-word;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    hyphenate-limit-chars: 7 3 3;
+    hyphenate-limit-lines: 2;
+    text-wrap: pretty;
+  }
+}
 @media print {
   body { background: #fff; font-size: 10.5pt; }
   .header, .filters, .paper-search, .paper-results, .paper-empty, .footer, .hero-figure, .section::before { display: none !important; }
