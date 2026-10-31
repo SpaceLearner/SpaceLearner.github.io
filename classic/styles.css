@@ -27,8 +27,9 @@ a { color: inherit; text-decoration-line: underline; text-decoration-thickness: 
 a:hover { color: var(--reason); text-decoration-color: currentColor; }
 h1, h2, h3, p { margin: 0; overflow-wrap: break-word; }
 p { text-wrap: pretty; word-spacing: normal; letter-spacing: normal; }
-/* Balance prominent introductions; normal wrapping remains the fallback. */
-.hero-meta, .hero-detail, .lede, .threads p, #research .section-body > p { text-wrap: balance; }
+/* Prose fills a consistent reading column; pretty avoids short final lines
+   without shrinking every paragraph to a separately balanced block. */
+.hero-meta, .hero-detail, .lede, .threads p, #research .section-body > p { text-wrap: pretty; }
 /* Natural spacing keeps long research prose comfortable at every width. */
 .hero-lede, .hero-meta, .lede, .threads p, .work p:not(.work-role, .work-links), .timeline p, .service { text-align: start; hyphens: none; }
 /* Narrow columns and one-sentence entries open rivers when justified; keep them ragged. */
@@ -293,6 +294,87 @@ ol, ul { margin: 0; padding: 0; list-style: none; }
   * { transition: none !important; }
   .hero-figure *, .run-dot { animation: none !important; }
   .loop-signal, .loop-halo { display: none; }
+}
+/* Typography and figure proportions; retain the original visual language. */
+.hero h1 { font-size: clamp(44px, 5.5vw, 64px); line-height: 1.05; margin-bottom: 20px; }
+.hero-affiliation { margin-bottom: 22px; }
+.hero-copy { --intro-width: 40rem; }
+.hero-affiliation, .hero-lede, .hero-meta { width: 100%; max-width: var(--intro-width); }
+.hero-lede { line-height: 1.45; margin-bottom: 24px; text-wrap: pretty; }
+.hero-detail { font-size: 17px; line-height: 1.65; margin-top: 10px; max-width: 100%; }
+.hero-meta { line-height: 1.8; }
+.hero-meta + .hero-meta { margin-top: 16px; }
+.hero-links { margin-top: 26px; }
+.section-body > .lede { line-height: 1.65; margin-bottom: 18px; }
+.section-body > .lede + .lede { margin-top: 0; margin-bottom: 28px; }
+.threads p, .work p:not(.work-role, .work-links) { line-height: 1.75; }
+.work h3 { line-height: 1.25; }
+.paper-title { line-height: 1.5; text-wrap: pretty; }
+.paper-authors { margin-top: 6px; }
+.paper-summary { margin-top: 5px; }
+.paper-meta { margin-top: 7px; }
+@media (min-width: 961px) {
+  .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 40px; }
+  .hero-figure { padding-left: 20px; }
+  .hero-figure figcaption { max-width: 32ch; margin-inline: auto; text-wrap: balance; }
+}
+@media (max-width: 960px) and (min-width: 641px) { .hero-figure { max-width: 290px; } }
+@media (max-width: 640px) {
+  .hero h1 { margin-bottom: 18px; }
+  .hero-detail { font-size: 16px; }
+  .hero-meta { line-height: 1.75; }
+  .hero-figure { width: 100%; max-width: 240px; }
+  .hero-figure figcaption { font-size: 12px; line-height: 1.65; text-wrap: balance; }
+}
+/* Page-wide typesetting: content grids share edges; prose uses a readable measure. */
+:root { --prose-width: 40rem; --date-width: 120px; }
+.section { padding-block: 40px; }
+.section-body { width: 100%; }
+.section-body > p, .work p, .threads p, .service { max-width: var(--prose-width); }
+.section-body > .group-label, .work .work-links { max-width: none; }
+.section-head h2 { line-height: 1.25; }
+.step-count { line-height: 1.5; }
+.threads { gap: 24px; margin-bottom: 28px; }
+.threads h3 { display: grid; grid-template-columns: 18px minmax(0, 1fr); column-gap: 12px; line-height: 1.45; margin-bottom: 12px; }
+.threads p { margin-left: 30px; }
+.group-label { line-height: 1.6; margin-bottom: 24px; }
+.group-label:not(:first-child) { margin-top: 40px; }
+.work h3 { font-size: 24px; letter-spacing: -.02em; }
+.work-role { line-height: 1.65; }
+.work-pair { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+.work-pair h3 { font-size: 24px; }
+.work--compact h3 { font-size: 21px; }
+.paper-toolbar { flex-wrap: wrap; gap: 12px 20px; line-height: 1.5; }
+.paper-search { margin-top: 16px; }
+.paper-year { gap: 24px; padding-top: 28px; }
+.paper:not([hidden]) ~ .paper:not([hidden]) { margin-top: 24px; padding-top: 24px; }
+.paper-meta { align-items: center; gap: 4px 12px; }
+.paper-meta a { min-height: 44px; }
+.timeline li { grid-template-columns: var(--date-width) minmax(0, 1fr); gap: 20px; padding-block: 16px; }
+.timeline h3 { line-height: 1.5; }
+.timeline p { margin-top: 4px; line-height: 1.7; }
+.timeline .role { display: inline-block; line-height: 1.5; vertical-align: baseline; }
+.timeline--compact li { padding-block: 12px; }
+.subhead { line-height: 1.5; margin: 32px 0 16px; }
+.honors li { padding-left: 24px; position: relative; }
+.honors li::before { position: absolute; left: 0; }
+#news .news-entry { grid-template-columns: var(--date-width) minmax(0, 1fr); align-items: start; }
+#news .news-entry + .news-entry { margin-top: 20px; padding-top: 20px; }
+#news .news-entry time, .when { font-variant-numeric: tabular-nums; }
+#news .news-summary { line-height: 1.7; }
+@media (min-width: 641px) and (max-width: 960px) {
+  .section-body { max-width: none; padding: 28px; }
+  .section-head { gap: 10px; }
+}
+@media (max-width: 640px) {
+  .section { padding-block: 32px; }
+  .threads li { padding: 16px; }
+  .threads h3 { column-gap: 8px; }
+  .threads p { margin-left: 0; }
+  .work h3, .work-pair h3 { font-size: 23px; }
+  .paper-year { gap: 8px; }
+  .timeline li, #news .news-entry { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .timeline .role { margin-left: 0; display: block; margin-top: 2px; }
 }
 @media print {
   body { background: #fff; font-size: 10.5pt; }
