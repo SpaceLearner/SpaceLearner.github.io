@@ -16,7 +16,7 @@ const zh={
   "Microsoft Research Asia, SIG Group": "微软亚洲研究院 · SIG 组",
   "· Ph.D.": "· 博士",
   "· B.S.": "· 学士",
-  "At Tencent, I work on general-purpose agents.": "目前，我在腾讯从事通用智能体研究。",
+  "At Tencent, my research focuses on general-purpose agents, particularly agent harness design, recursive self-improvement (RSI), and multi-agent systems (MAS).": "目前，我在腾讯从事通用智能体研究，重点关注智能体 Harness 设计、递归式自我改进（RSI）和多智能体系统（MAS）。",
   "Before that, at Alibaba DAMO Academy, I worked on multimodal agents and embodied foundation models: I was corresponding author of ZeroSearch and one of the project leads of RynnBrain.": "此前，我在 Alibaba DAMO Academy 研究多模态智能体与具身基础模型，是 ZeroSearch 的通讯作者、RynnBrain 的项目负责人之一。",
   "I received my Ph.D. in Intelligence Science and Technology from Peking University in 2024, working on large language models, graph learning, and generative models, with research internships at Microsoft Research Asia along the way.": "我于 2024 年在北京大学获得智能科学与技术博士学位，研究大语言模型、图学习与生成模型，期间在微软亚洲研究院进行研究实习。",
   "Multimodal agents and embodied foundation models. Corresponding author of ZeroSearch; one of the project leads of RynnBrain.": "多模态智能体与具身基础模型。ZeroSearch 通讯作者；RynnBrain 项目负责人之一。",
