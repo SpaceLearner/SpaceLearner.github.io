@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Jiayan Guo’s research at Tencent and Alibaba DAMO Academy, including ZeroSearch, RynnBrain, and work on graph learning and recommender systems.">
+  <meta name="description" content="Jiayan Guo studies general-purpose agents at Tencent, including how they revise plans, improve across attempts, and work together on long tasks.">
   <meta name="theme-color" content="#faf9f6">
   <meta property="og:title" content="Jiayan Guo | Research and publications">
-  <meta property="og:description" content="General-purpose agents, multimodal search, and robot learning. Projects and publications by Jiayan Guo.">
+  <meta property="og:description" content="Jiayan Guo’s research on general-purpose agents, recursive self-improvement, and multi-agent systems at Tencent.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://spacelearner.github.io/classic/">
   <title>Jiayan Guo | Research and publications</title>
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="canonical" href="https://spacelearner.github.io/classic/">
   <link rel="stylesheet" href="../news.css?v=79864139a38a54be">
-  <link rel="stylesheet" href="styles.css?v=6d0ea5eb94d2a4a5">
+  <link rel="stylesheet" href="styles.css?v=5c2043da206cfacf">
   <script src="app.js?v=fb98696dc4d68c72" defer></script>
 </head>
 <body id="top">
@@ -32,23 +32,16 @@
     <section id="research" class="intro wrap" aria-labelledby="hero-title">
       <div class="bio">
         <h1 id="hero-title">Jiayan Guo</h1>
-        <p class="affiliation" id="research-title">Tencent <span aria-hidden="true">/</span> General-purpose agents</p>
-        <p>I work on agent harnesses, the software that lets a language model call tools and keep track of a task across turns. I also study how agents learn from earlier attempts and how they share work.</p>
-        <p>At Alibaba DAMO Academy, I was the corresponding author on <a href="#project-zerosearch">ZeroSearch</a>, where we trained search agents with a simulated retriever. I also co-led <a href="#project-rynnbrain">RynnBrain</a>, a family of models for robot perception and planning. I earned my Ph.D. at Peking University in 2024.</p>
+        <p class="research-lead" id="research-title">I study general-purpose agents at Tencent.</p>
+        <p>How can the same agent handle unfamiliar tasks that take many steps? I’m interested in how it revises a plan when new evidence comes in, and what it learns from one attempt that helps with the next. My current work spans recursive self-improvement, multi-agent systems, and agent harness design.</p>
+        <p>Before joining Tencent, I studied search and embodied agents at Alibaba DAMO Academy. I was the corresponding author on <a href="#project-zerosearch">ZeroSearch</a> and co-led <a href="#project-rynnbrain">RynnBrain</a>. I received my Ph.D. from Peking University in 2024.</p>
         <ul class="bio-links" aria-label="Academic profiles">
           <li><a href="https://scholar.google.com/citations?user=M-AFBG4AAAAJ&amp;hl=en">Google Scholar</a></li>
           <li><a href="https://github.com/SpaceLearner">GitHub</a></li>
         </ul>
       </div>
-      <figure class="intro-figure">
-        <!-- Three cropped panels from the RynnBrain 1.1 real-robot evaluation figure. See figures/LICENSE.txt. -->
-        <div class="filmstrip">
-          <img src="figures/pull-chair.webp" width="540" height="258" alt="A humanoid robot reaches for the back of a wooden chair.">
-          <img src="figures/flip-steak.webp" width="524" height="257" alt="Two robot hands turn a steak on a griddle using spatulas.">
-          <img src="figures/place-plate.webp" width="539" height="263" alt="The robot handles a plate beside a dining table.">
-        </div>
-        <figcaption><a href="https://github.com/alibaba-damo-academy/RynnBrain/blob/5b8641993fd265300dba89f079d9b708ffe19ed4/cookbooks/assets/images/realrobo_demo.png">RynnBrain 1.1</a> in three experiments. The robot pulls out a chair, turns a steak, and sets down a plate.</figcaption>
-      </figure>
+      <img class="agent-loop" src="agent-loop.svg" width="464" height="405"
+           alt="The agent reasons, acts, and uses the result to guide its next decision.">
     </section>
 
     <section id="news" class="section wrap" aria-labelledby="news-title">
@@ -231,7 +224,7 @@
       <div class="section-body">
         <h3 class="subhead">Appointments and education</h3>
         <ol class="timeline">
-          <li><span class="when">Present</span><div><h4>Tencent</h4><p>Agent harness design, recursive self-improvement, and multi-agent systems.</p></div></li>
+          <li><span class="when">Present</span><div><h4>Tencent</h4><p>General-purpose agents, with a focus on recursive self-improvement, multi-agent systems, and agent harness design.</p></div></li>
           <li><span class="when">Prior role</span><div><h4>Alibaba DAMO Academy <span class="role">Research Engineer</span></h4><p>Multimodal search and embodied foundation models.</p></div></li>
           <li><span class="when">2019–2024</span><div><h4>Peking University <span class="role">Ph.D.</span></h4><p>Intelligence Science and Technology. I studied language models, graph learning, and generative models.</p></div></li>
           <li><span class="when">2015–2019</span><div><h4>Beijing Institute of Technology <span class="role">B.S.</span></h4><p>Computer Science and Technology.</p></div></li>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="48 24 464 405" width="464" height="405" role="img" aria-labelledby="title">
+  <title id="title">An agent reasons, acts, and learns from the result</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#77796b"/>
+    </marker>
+  </defs>
+  <g fill="none" stroke="#d8d7cd">
+    <circle cx="280" cy="249" r="167"/>
+    <circle cx="280" cy="249" r="133" stroke-dasharray="1 6"/>
+    <ellipse cx="280" cy="249" rx="204" ry="82" transform="rotate(-38 280 249)"/>
+    <ellipse cx="280" cy="249" rx="204" ry="82" transform="rotate(38 280 249)"/>
+  </g>
+  <g fill="none" stroke="#77796b" stroke-width="1.5" marker-end="url(#arrow)">
+    <path d="M201 102 A167 167 0 0 1 444 215"/>
+    <path d="M428 327 A167 167 0 0 1 164 369"/>
+    <path d="M118 295 A167 167 0 0 1 142 153"/>
+  </g>
+  <circle cx="280" cy="249" r="58" fill="#252922"/>
+  <text x="280" y="258" text-anchor="middle" fill="#faf9f6" font-family="Georgia, serif" font-size="31">agent</text>
+  <g fill="#883d2b">
+    <circle cx="280" cy="82" r="5"/>
+    <circle cx="422" cy="337" r="5"/>
+    <circle cx="137" cy="336" r="5"/>
+  </g>
+  <g font-family="Arial, sans-serif" fill="#5c382d" font-size="19" text-anchor="middle">
+    <text x="280" y="58">reason</text>
+    <text x="455" y="367">act</text>
+    <text x="102" y="367">learn</text>
+  </g>
+</svg>
