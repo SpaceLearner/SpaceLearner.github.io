@@ -40,13 +40,21 @@ if news_path.exists():
 years=sorted({p['year'] for p in items},reverse=True)
 selection_count=sum(p['selected'] for p in items)
 if selection_count!=5:raise ValueError(f'Expected five retained selected papers, found {selection_count}')
-parts=[f'''    <section id="publications" class="section wrap" data-step="observe" data-no="03" aria-labelledby="publications-title">
-      <header class="section-head"><p class="step"><span class="step-no">03</span><span class="step-type">observe</span><span class="step-count">{len(items)} papers</span></p><h2 id="publications-title">Papers</h2></header>
+parts=[f'''    <section id="publications" class="section wrap" aria-labelledby="publications-title">
+      <header class="section-head"><h2 id="publications-title">Publications</h2></header>
       <div class="section-body">
-        <div class="paper-toolbar"><div class="filters" role="group" aria-label="Choose a paper list"><button class="filter" type="button" data-filter="selected" aria-pressed="false">Selected <span>{selection_count}</span></button><button class="filter" type="button" data-filter="all" aria-pressed="true">All <span>{len(items)}</span></button></div><a href="https://scholar.google.com/citations?user=M-AFBG4AAAAJ&amp;hl=en" target="_blank" rel="noopener noreferrer">Google Scholar <span aria-hidden="true">↗</span></a></div>
-        <div class="paper-search" hidden><label for="paper-search">Search the full archive</label><input id="paper-search" type="search" placeholder="Title, author, venue, or year" autocomplete="off" aria-controls="paper-list" aria-describedby="paper-results"></div>
-        <p class="paper-results" id="paper-results" role="status" aria-live="polite" aria-atomic="true" hidden></p>
-        <p class="paper-empty" hidden>No matching papers. Try another title, author, venue, or year.</p>
+        <div class="paper-toolbar">
+          <div class="filters" role="group" aria-label="Publication list" hidden>
+            <button class="filter" type="button" data-filter="selected" aria-controls="paper-list" aria-pressed="false">Selected <span>({selection_count})</span></button>
+            <button class="filter" type="button" data-filter="all" aria-controls="paper-list" aria-pressed="true">All <span>({len(items)})</span></button>
+          </div>
+          <div class="paper-search" hidden>
+            <label for="paper-search">Search all publications</label>
+            <input id="paper-search" type="search" placeholder="Title, author, venue or year" autocomplete="off" aria-controls="paper-list">
+          </div>
+        </div>
+        <p class="paper-results" id="paper-results" role="status" aria-atomic="true" hidden></p>
+        <p class="paper-empty" hidden>No papers match your search.</p>
         <div class="paper-list" id="paper-list" data-view="all">''']
 for year in years:
  group=[p for p in items if p['year']==year]
@@ -54,15 +62,23 @@ for year in years:
  for p in group:
   note=f' <span class="paper-note">{e(p["displayNote"])}</span>' if p.get('displayNote') else ''
   link_label={'Record':'Record','arXiv':'arXiv','OpenReview':'OpenReview'}.get(p.get('linkLabel'),'Paper')
-  summary=f'<p class="paper-summary">{e(p["summary"])}</p>' if p.get('summary') else ''
   authors=''
   if p.get('authors'):
    names=p['authors'] if isinstance(p['authors'],list) else [p['authors']]
+   formatted=['<strong>'+e(n)+'</strong>' if n=='Jiayan Guo' else e(n) for n in names]
+   full=', '.join(formatted)
    if len(names)>12:
-    # ponytail: long author lists collapse around Jiayan Guo's position.
-    k=names.index('Jiayan Guo') if 'Jiayan Guo' in names else 0
-    names=names[:max(k+1,3)]+[f'… {len(names)-max(k+1,3)} more']
-   authors='<p class="paper-authors">'+', '.join('<strong>'+e(n)+'</strong>' if n=='Jiayan Guo' else e(n) for n in names)+'</p>'
+    prefix=formatted[:3]
+    if 'Jiayan Guo' in names[3:]:
+     position=names.index('Jiayan Guo')
+     if position>3:prefix.append('…')
+     prefix.append(formatted[position])
+     if position<len(names)-1:prefix.append('…')
+    else:prefix.append('…')
+    preview=', '.join(prefix)
+    authors=f'<details class="paper-authors"><summary>{preview} ({len(names)} authors)</summary><p>{full}</p></details>'
+   else:
+    authors=f'<p class="paper-authors">{full}</p>'
   links=f'<a href="{e(p["url"])}" target="_blank" rel="noopener noreferrer">{link_label}</a>'
   if p.get('code'):links+=f'<a href="{e(p["code"])}" target="_blank" rel="noopener noreferrer">Code</a>'
   for link in p.get('links',[]):
@@ -75,10 +91,9 @@ for year in years:
   if 'The Web Conference' in venue_raw:venue_raw='WWW '+str(year)
   role=f'<span class="paper-role">{e(p["contribution"].replace("Jiayan Guo · ",""))}</span>' if p.get('contribution') else ''
   award=f'<a class="paper-award" href="{e(p["award"]["url"])}" target="_blank" rel="noopener noreferrer">{e(p["award"]["label"])}</a>' if p.get('award') else ''
-  parts.append(f'''<li class="paper" data-selected="{str(p['selected']).lower()}"><a class="paper-title" href="{e(p['url'])}" target="_blank" rel="noopener noreferrer">{e(p['title'])}</a>{authors}{summary}<p class="paper-meta"><span class="venue">{e(venue_raw)}</span>{role}{award}{links}{note}</p></li>''')
+  parts.append(f'''<li class="paper" data-selected="{str(p['selected']).lower()}"><a class="paper-title" href="{e(p['url'])}" target="_blank" rel="noopener noreferrer">{e(p['title'])}</a>{authors}<p class="paper-meta"><span class="venue">{e(venue_raw)}</span>{role}{award}{links}{note}</p></li>''')
  parts.append('</ol></section>')
 parts.append('''        </div>
-        <p class="aside">Published papers and preprints, grouped by year. Preprints are labeled.</p>
       </div>
     </section>''')
 def venue_label(p):
@@ -91,7 +106,7 @@ def write_checked(page,old,new):
 
 def update(root,classic_path,orbital_path,full_page):
  page=root/classic_path;old=page.read_text()
- new,n=re.subn(r'    <section id="publications".*?(?=    <section id="experience")',lambda _:'\n'.join(parts)+'\n',old,flags=re.S)
+ new,n=re.subn(r'^    <section id="publications" .*?^    </section>',lambda _:'\n'.join(parts),old,flags=re.S|re.M)
  if n!=1:raise ValueError('Missing classic publication section: '+str(page))
  write_checked(page,old,new)
  entries=[]
